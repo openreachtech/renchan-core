@@ -1,0 +1,59 @@
+scalar DateTime
+
+################################################################################
+#### QUERY
+################################################################################
+
+type Query {
+  customers: [Customer!]!
+  assets: [Asset!]!
+}
+
+################################################################################
+#### MUTATION
+################################################################################
+
+type Mutation {
+  signUp(input: SignUpInput): AuthResult!
+  signIn(input: SignInInput): AuthResult!
+}
+
+################################################################################
+#### TYPE
+################################################################################
+
+type Admin {
+  id: Int!
+  name: String!
+}
+
+type Customer {
+  id: Int!
+  name: String!
+  inviteCode: String!
+}
+
+type Asset {
+  customerId: Int!
+  stakedAmount: String!
+  rewardsAmount: String!
+}
+
+type AuthResult {
+  accessToken: String!
+  admin: Admin!
+}
+
+################################################################################
+#### INPUT
+################################################################################
+
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}

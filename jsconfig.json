@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "moduleResolution": "node",
+    "module": "es2022",
+    "target": "es2022"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

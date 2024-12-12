@@ -1,0 +1,232 @@
+scalar BigNumber
+scalar DateTime
+scalar Upload
+
+################################################################################
+#### QUERY
+################################################################################
+
+type Query {
+  customer: Customer!
+  messages: [Message!]!
+
+  # for furo boilerplate -------------------------------------------------------
+  companySponsors: CompanySponsorsResult!
+  curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
+
+  # for subscription -----------------------------------------------------------
+  chatMessages (input: ChatMessagesInput!): ChatMessagesResult!
+  chatRooms: ChatRoomsResult!
+
+  # for scalar sample ----------------------------------------------------------
+  customerAmounts: CustomerAmountsResult!
+}
+
+################################################################################
+#### MUTATION
+################################################################################
+
+type Mutation {
+  signUp(input: SignUpInput): SignUpResult!
+  signIn(input: SignInInput): AuthResult!
+
+  # for furo boilerplate -------------------------------------------------------
+  uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
+
+  # for subscription -----------------------------------------------------------
+  createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
+  sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
+
+  # for scalar sample ----------------------------------------------------------
+  postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
+}
+
+################################################################################
+#### SUBSCRIPTION
+################################################################################
+
+type Subscription {
+  onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
+}
+
+################################################################################
+#### TYPE
+################################################################################
+
+type Customer {
+  id: Int!
+  name: String!
+  inviteCode: String!
+}
+
+type Message {
+  customerId: Int!
+  message: String!
+}
+
+type AuthResult {
+  accessToken: String!
+  customer: Customer!
+}
+
+# for furo boilerplate ---------------------------------------------------------
+type CompanySponsorsResult {
+  companySponsors:  [CompanySponsor!]!
+}
+
+type CompanySponsor {
+  id: Int!
+  registeredAt: DateTime!
+  companyName: String!
+  companyDescription: String!
+  companySponsorHomepage: String
+  companySponsorLogo: String
+}
+
+type CurriculumsResult {
+  curriculums: [Curriculum!]!
+  pagination: Pagination!
+}
+
+type Curriculum {
+  id: Int!
+  title: String!
+  description: String!
+  thumbnailUrl: String!
+  postedAt: String!
+}
+
+type SignUpResult {
+  sentTo: String!
+}
+
+type UploadCustomerForumPostImageResult {
+  imageUrl: String!
+}
+
+type Pagination {
+  limit: Int!
+  offset: Int!
+  sort: Sort
+  totalRecords: Int!
+}
+
+type Sort {
+  targetColumn: String!
+  orderBy: String!
+}
+
+# for subscription -----------------------------------------------------------
+
+type ChatMessagesResult {
+  messages: [ChatMessage!]!
+}
+
+type ChatRoomsResult {
+  rooms: [ChatRoom!]!
+}
+
+type SendChatMessageResult {
+  message: ChatMessage!
+}
+
+type CreateChatRoomResult {
+  rooms: [ChatRoom!]!
+}
+
+type OnReceiveMessageResult {
+  message: ChatMessage!
+}
+
+type ChatMessage {
+  id: Int! # for edit/delete
+  content: String!
+  sender: String!
+}
+
+type ChatRoom {
+  id: Int!
+  name: String!
+}
+
+# for scalar sample ------------------------------------------------------------
+
+type PostAppointmentResult {
+  appointment: Appointment!
+}
+
+type Appointment {
+  id: Int!
+  appointedAt: DateTime!
+  place: String!
+}
+
+type CustomerAmountsResult {
+  stakedAmount: BigNumber!
+  rewardsAmount: BigNumber!
+}
+
+################################################################################
+#### INPUT
+################################################################################
+
+input SignUpInput {
+  email: String!
+  username: String
+  firstName: String
+  lastName: String
+  password: String!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+# for furo boilerplate ---------------------------------------------------------
+input CurriculumsSearchInput {
+  pagination: PaginationInput!
+}
+
+input UploadCustomerForumPostImageInput {
+  image: Upload!
+}
+
+input PaginationInput {
+  limit: Int!
+  offset: Int!
+  sort: SortInput
+}
+
+input SortInput {
+  targetColumn: String!
+  orderBy: String!
+}
+
+# for subscription -------------------------------------------------------------
+
+input ChatMessagesInput {
+  roomId: Int!
+}
+
+input CreateChatRoomInput {
+  name: String! # room name
+}
+
+input SendMessageInput {
+  roomId: Int!
+  content: String!
+  sender: String! # username
+}
+
+input OnReceiveMessageInput {
+  roomId: Int!
+}
+
+# for scalar sample ------------------------------------------------------------
+
+input PostAppointmentInput {
+  clientCustomerId: Int!
+  appointedAt: DateTime!
+  place: String!
+}

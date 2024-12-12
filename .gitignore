@@ -1,0 +1,20 @@
+#### for Application
+app/storage/
+
+#### environment
+.env
+node_modules/
+playground/
+
+#### for Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+#### for Mac
+.DS_Store
+
+#### environment to develop
+.vscode/*
+!.vscode/cspell.json

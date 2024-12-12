@@ -1,0 +1,70 @@
+{
+  "name": "@openreachtech/renchan",
+  "version": "2.2.1",
+  "description": "Renchan Core module for Application.",
+  "files": [
+    "lib/",
+    "types/"
+  ],
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "db:drop": "npm run db:teardown",
+    "db:seed:master": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/master --debug",
+    "db:seed:dev": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/development --debug",
+    "db:setup": "sequelize-cli db:migrate;",
+    "db:teardown": "rm app/storage/*.sqlite3",
+    "dev": "export NODE_ENV=development; nodemon app",
+    "l": "npm run lint",
+    "lint": "eslint .",
+    "test": "export NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\"; export NODE_ENV=development; ./test.sh",
+    "test:live": "export NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\"; export NODE_ENV=live; ./test-live.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openreachtech/renchan-core.git"
+  },
+  "keywords": [
+    "Renchan"
+  ],
+  "author": "Open Reach Tech inc.",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/openreachtech/renchan-core/issues"
+  },
+  "homepage": "https://github.com/openreachtech/renchan-core#readme",
+  "dependencies": {
+    "@graphql-tools/schema": "^10.0.6",
+    "@graphql-tools/utils": "^10.5.5",
+    "@openreachtech/renchan-env": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "graphql": "^16.9.0",
+    "graphql-http": "^1.22.1",
+    "graphql-playground-middleware-express": "^1.7.23",
+    "graphql-upload": "^17.0.0",
+    "graphql-ws": "^5.16.0",
+    "ioredis": "^5.4.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "@openreachtech/eslint-config": "^3.0.2",
+    "@openreachtech/jest-constructor-spy": "^1.1.0",
+    "@openreachtech/jest-expect-each": "^0.1.0",
+    "@openreachtech/renchan-sequelize": "^2.0.1",
+    "@openreachtech/renchan-tools": "^1.0.0",
+    "@steweucen/fertile-forest-sequelize": "^0.1.0",
+    "@stylistic/eslint-plugin-js": "^2.9.0",
+    "@stylistic/eslint-plugin-plus": "^2.9.0",
+    "@types/jest": "^29.5.13",
+    "eslint": "^9.12.0",
+    "jest": "^29.7.0",
+    "mariadb": "^3.3.2",
+    "nodemon": "^3.1.7",
+    "sequelize": "^6.37.4",
+    "sequelize-cli": "^6.6.2",
+    "sequelize-mig": "^3.1.3",
+    "sqlite3": "^5.1.7"
+  }
+}
