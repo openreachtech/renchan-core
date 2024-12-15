@@ -47,6 +47,7 @@ declare global {
         expressRequest: ExpressType.Request
         userEntity: renchan.UserEntity
         engine: ServerEngine
+        requestedAt: Date
       }
     }
 
