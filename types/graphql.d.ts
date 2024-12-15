@@ -54,6 +54,7 @@ declare global {
         expressRequest: ExpressRequest
         userEntity: UserEntity
         engine: ServerEngine
+        requestedAt: Date
       }
     }
 
