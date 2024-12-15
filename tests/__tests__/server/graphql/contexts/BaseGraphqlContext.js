@@ -1193,6 +1193,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new params.Engine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {
@@ -1261,6 +1262,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new params.Engine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {
@@ -1315,6 +1317,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new BaseGraphqlServerEngine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {
