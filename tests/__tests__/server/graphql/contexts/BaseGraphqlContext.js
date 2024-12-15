@@ -397,7 +397,9 @@ describe('BaseGraphqlContext', () => {
     describe('to return an instance of own class', () => {
       /**
        * @type {Array<{
-       *   params: import('../../../../../lib/server/graphql/contexts/BaseGraphqlContext.js').BaseGraphqlContextAsyncFactoryParams
+       *   params: import('../../../../../lib/server/graphql/contexts/BaseGraphqlContext.js').BaseGraphqlContextAsyncFactoryParams & {
+       *     EngineCtor: GraphqlType.ServerEngineCtor
+       *   }
        *   mocks: {
        *     visa: GraphqlType.Visa
        *   }
@@ -409,6 +411,7 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-customer',
             },
+            EngineCtor: CustomerGraphqlServerEngine,
           },
           mocks: {
             visa: GraphqlVisa.create({
@@ -426,6 +429,7 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-admin',
             },
+            EngineCtor: AdminGraphqlServerEngine,
           },
           mocks: {
             visa: GraphqlVisa.create({
@@ -444,7 +448,16 @@ describe('BaseGraphqlContext', () => {
         const createVisaSpy = jest.spyOn(BaseGraphqlContext, 'createVisa')
           .mockResolvedValue(mocks.visa)
 
-        const context = await BaseGraphqlContext.createAsync(params)
+        const engine = await params.EngineCtor.createAsync()
+
+        const args = {
+          expressRequest: params.expressRequest,
+          requestParams: null,
+          engine,
+          requestedAt: new Date(),
+        }
+
+        const context = await BaseGraphqlContext.createAsync(args)
 
         expect(context)
           .toBeInstanceOf(BaseGraphqlContext)
@@ -475,6 +488,7 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-customer',
             },
+            requestedAt: new Date('2024-11-01T01:00:01.001Z'),
           },
           mocks: {
             userEntity: {
@@ -496,6 +510,7 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-admin',
             },
+            requestedAt: new Date('2024-11-02T02:00:02.002Z'),
           },
           mocks: {
             userEntity: {
@@ -520,15 +535,18 @@ describe('BaseGraphqlContext', () => {
           engine: mockEngine,
           userEntity: mocks.userEntity,
           visa: mocks.visa,
+          requestedAt: params.requestedAt,
         }
         const expectedFindUserArgs = {
           expressRequest: params.expressRequest,
           accessToken: null,
+          requestedAt: params.requestedAt,
         }
         const expectedCreateVisaArgs = {
           expressRequest: params.expressRequest,
           engine: mockEngine,
           userEntity: mocks.userEntity,
+          requestedAt: params.requestedAt,
         }
 
         const createSpy = jest.spyOn(BaseGraphqlContext, 'create')
@@ -541,6 +559,7 @@ describe('BaseGraphqlContext', () => {
           expressRequest: params.expressRequest,
           requestParams: mockExpressRequest,
           engine: mockEngine,
+          requestedAt: params.requestedAt,
         }
 
         await BaseGraphqlContext.createAsync(args)
@@ -640,6 +659,7 @@ describe('BaseGraphqlContext', () => {
         const userEntity = await BaseGraphqlContext.findUser({
           expressRequest: stubExpressRequest,
           accessToken: null,
+          requestedAt: new Date(),
         })
 
         expect(userEntity)
@@ -686,6 +706,7 @@ describe('BaseGraphqlContext', () => {
           expressRequest: stubExpressRequest,
           userEntity: params.userEntity,
           engine: mockEngine,
+          requestedAt: new Date(),
         }
 
         const visa = await BaseGraphqlContextSpy.createVisa(args)
@@ -1172,6 +1193,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new params.Engine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {
@@ -1240,6 +1262,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new params.Engine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {
@@ -1294,6 +1317,7 @@ describe('BaseGraphqlContext', () => {
       const engine = new BaseGraphqlServerEngine({
         config: /** @type {*} */ ({}),
         share: /** @type {*} */ ({}),
+        errorHash: {},
       })
 
       const args = {

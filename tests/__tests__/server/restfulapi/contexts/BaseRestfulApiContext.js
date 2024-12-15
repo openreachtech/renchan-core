@@ -490,6 +490,7 @@ describe('BaseRestfulApiContext', () => {
             expressRequest: {
               path: '/alpha',
             },
+            requestedAt: new Date('2024-09-01T01:00:01.001Z'),
           },
           mocks: {
             userEntity: {
@@ -508,6 +509,7 @@ describe('BaseRestfulApiContext', () => {
             expressRequest: {
               path: '/beta',
             },
+            requestedAt: new Date('2024-09-02T02:00:02.002Z'),
           },
           mocks: {
             userEntity: {
@@ -529,15 +531,18 @@ describe('BaseRestfulApiContext', () => {
           engine: mockEngine,
           userEntity: mocks.userEntity,
           visa: mocks.visa,
+          requestedAt: params.requestedAt,
         }
         const expectedFindUserArgs = {
           expressRequest: params.expressRequest,
           accessToken: null,
+          requestedAt: params.requestedAt,
         }
         const expectedCreateVisaArgs = {
           expressRequest: params.expressRequest,
           engine: mockEngine,
           userEntity: mocks.userEntity,
+          requestedAt: params.requestedAt,
         }
 
         const createSpy = jest.spyOn(BaseRestfulApiContext, 'create')
@@ -549,6 +554,7 @@ describe('BaseRestfulApiContext', () => {
         const args = {
           expressRequest: params.expressRequest,
           engine: mockEngine,
+          requestedAt: params.requestedAt,
         }
 
         await BaseRestfulApiContext.createAsync(args)
@@ -648,6 +654,7 @@ describe('BaseRestfulApiContext', () => {
         const userEntity = await BaseRestfulApiContext.findUser({
           expressRequest: stubExpressRequest,
           accessToken: null,
+          requestedAt: new Date(),
         })
 
         expect(userEntity)
@@ -694,6 +701,7 @@ describe('BaseRestfulApiContext', () => {
           expressRequest: stubExpressRequest,
           userEntity: params.userEntity,
           engine: mockEngine,
+          requestedAt: new Date(),
         }
 
         const visa = await BaseRestfulApiContextSpy.createVisa(args)
