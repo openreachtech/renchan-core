@@ -686,6 +686,7 @@ describe('BaseGraphqlContext', () => {
           expressRequest: stubExpressRequest,
           userEntity: params.userEntity,
           engine: mockEngine,
+          requestedAt: new Date(),
         }
 
         const visa = await BaseGraphqlContextSpy.createVisa(args)
