@@ -640,6 +640,7 @@ describe('BaseGraphqlContext', () => {
         const userEntity = await BaseGraphqlContext.findUser({
           expressRequest: stubExpressRequest,
           accessToken: null,
+          requestedAt: new Date(),
         })
 
         expect(userEntity)
