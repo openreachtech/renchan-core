@@ -648,6 +648,7 @@ describe('BaseRestfulApiContext', () => {
         const userEntity = await BaseRestfulApiContext.findUser({
           expressRequest: stubExpressRequest,
           accessToken: null,
+          requestedAt: new Date(),
         })
 
         expect(userEntity)
