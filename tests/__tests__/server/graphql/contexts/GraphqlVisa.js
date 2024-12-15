@@ -533,6 +533,13 @@ describe('GraphqlVisa', () => {
           userEntity: userEntityTally,
         }
 
+        const expectedPassedArgs = {
+          expressRequest: stubExpressRequest,
+          engine: derivedEngine,
+          userEntity: userEntityTally,
+          requestedAt: expect.any(Date), // TODO: Replace with requestedAt of parameter.
+        }
+
         const createSpy = jest.spyOn(GraphqlVisa, 'create')
         const hasAuthenticatedSpy = jest.spyOn(params.visaIssuers, 'hasAuthenticated')
         const hasAuthorizedSpy = jest.spyOn(params.visaIssuers, 'hasAuthorized')
@@ -543,11 +550,11 @@ describe('GraphqlVisa', () => {
         expect(createSpy)
           .toHaveBeenCalledWith(expected)
         expect(hasAuthenticatedSpy)
-          .toHaveBeenCalledWith(args)
+          .toHaveBeenCalledWith(expectedPassedArgs)
         expect(hasAuthorizedSpy)
-          .toHaveBeenCalledWith(args)
+          .toHaveBeenCalledWith(expectedPassedArgs)
         expect(generateSchemaPermissionHashSpy)
-          .toHaveBeenCalledWith(args)
+          .toHaveBeenCalledWith(expectedPassedArgs)
       })
     })
   })
