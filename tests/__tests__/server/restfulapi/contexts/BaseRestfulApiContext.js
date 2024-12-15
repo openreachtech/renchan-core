@@ -694,6 +694,7 @@ describe('BaseRestfulApiContext', () => {
           expressRequest: stubExpressRequest,
           userEntity: params.userEntity,
           engine: mockEngine,
+          requestedAt: new Date(),
         }
 
         const visa = await BaseRestfulApiContextSpy.createVisa(args)
