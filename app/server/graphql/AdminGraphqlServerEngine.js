@@ -1,8 +1,6 @@
 import express from 'express'
 import cors from 'cors'
 
-import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
-
 import rootPath from '../../../lib/globals/root-path.js'
 
 import BaseGraphqlServerEngine from '../../../lib/server/graphql/BaseGraphqlServerEngine.js'
@@ -11,6 +9,8 @@ import AdminGraphqlShare from './contexts/AdminGraphqlShare.js'
 import AdminGraphqlContext from './contexts/AdminGraphqlContext.js'
 
 import DateTimeScalar from '../../../lib/server/graphql/scalars/concretes/DateTimeScalar.js'
+
+import graphqlUploadExpressWithResolvingContentType from '../../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
 
 /**
  * Renchan server engine for admin.
@@ -64,7 +64,7 @@ export default class AdminGraphqlServerEngine extends BaseGraphqlServerEngine {
         this.config.staticPath
       ),
 
-      graphqlUploadExpress({
+      graphqlUploadExpressWithResolvingContentType({
         maxFileSize: 10000000, // 10 MB
         maxFiles: 10,
       }),
