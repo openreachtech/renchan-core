@@ -444,7 +444,8 @@ describe('FileContentReader', () => {
 describe('FileContentReader', () => {
   describe('#concatenateChunks()', () => {
     describe('should concatenate chunks from the stream', () => {
-      const alphaStreamMock = {
+      /** @type {import('stream').Readable} */
+      const alphaStreamMock = /** @type {*} */ ({
         on: jest.fn((event, callback) => {
           if (event === 'data') {
             // @ts-expect-error
@@ -460,8 +461,10 @@ describe('FileContentReader', () => {
 
           return alphaStreamMock
         }),
-      }
-      const betaStreamMock = {
+      })
+
+      /** @type {import('stream').Readable} */
+      const betaStreamMock = /** @type {*} */ ({
         on: jest.fn((event, callback) => {
           if (event === 'data') {
             // @ts-expect-error
@@ -477,12 +480,20 @@ describe('FileContentReader', () => {
 
           return betaStreamMock
         }),
-      }
+      })
 
-      const cases = [
+      /**
+       * @type {Array<{
+       *   params: {
+       *     stream: import('stream').Readable
+       *   }
+       *   expected: Buffer
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
         {
           params: {
-            file: alphaStreamMock,
+            stream: alphaStreamMock,
           },
           expected: Buffer.concat([
             Buffer.from('alpha-chunk-first'),
@@ -491,20 +502,20 @@ describe('FileContentReader', () => {
         },
         {
           params: {
-            file: betaStreamMock,
+            stream: betaStreamMock,
           },
           expected: Buffer.concat([
             Buffer.from('beta-chunk-first'),
             Buffer.from('beta-chunk-second'),
           ]),
         },
-      ]
+      ])
 
-      test.each(cases)('file: $params.file', async ({ params, expected }) => {
+      test.each(cases)('stream: $params.stream', async ({ params, expected }) => {
         /** @type {import('graphql-upload/processRequest.mjs').FileUpload} */
         const fileMock = /** @type {*} */ ({
           createReadStream: jest.fn()
-            .mockReturnValue(params.file),
+            .mockReturnValue(params.stream),
         })
 
         const args = {
@@ -513,7 +524,7 @@ describe('FileContentReader', () => {
         const reader = new FileContentReader(args)
 
         const actual = await reader.concatenateChunks({
-          stream: params.file,
+          stream: params.stream,
         })
 
         expect(actual)
@@ -543,26 +554,34 @@ describe('FileContentReader', () => {
         }),
       }
 
-      const cases = [
+      /**
+       * @type {Array<{
+       *   params: {
+       *     stream: import('stream').Readable
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
         {
           params: {
-            file: alphaStreamMock,
+            stream: alphaStreamMock,
           },
           expected: 'Alpha stream error',
         },
         {
           params: {
-            file: betaStreamMock,
+            stream: betaStreamMock,
           },
           expected: 'Beta stream error',
         },
-      ]
+      ])
 
-      test.each(cases)('file: $params.file', async ({ params, expected }) => {
+      test.each(cases)('stream: $params.stream', async ({ params, expected }) => {
         /** @type {import('graphql-upload/processRequest.mjs').FileUpload} */
         const fileMock = /** @type {*} */ ({
           createReadStream: jest.fn()
-            .mockReturnValue(params.file),
+            .mockReturnValue(params.stream),
         })
 
         const args = {
@@ -571,7 +590,7 @@ describe('FileContentReader', () => {
         const reader = new FileContentReader(args)
 
         await expect(reader.concatenateChunks({
-          stream: params.file,
+          stream: params.stream,
         }))
           .rejects
           .toThrow(expected)
