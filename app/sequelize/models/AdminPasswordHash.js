@@ -1,9 +1,13 @@
 import {
-  ModelAttributeFactory,
+  BackupMixinModel,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatRoom extends RenchanModel {
+/**
+ * AdminPasswordHash model.
+ */
+export default class AdminPasswordHash extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -11,10 +15,17 @@ export default class ChatRoom extends RenchanModel {
     return {
       ...factory.ID_BIGINT,
 
-      name: {
+      AdminId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+      passwordHash: {
         type: DataTypes.STRING(191),
         allowNull: false,
-        unique: true,
+      },
+      savedAt: {
+        type: DataTypes.DATE(3),
+        allowNull: false,
       },
     }
   }
@@ -30,7 +41,7 @@ export default class ChatRoom extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsTo(this._.Admin)
   }
 
   /** @override */
@@ -53,11 +64,29 @@ export default class ChatRoom extends RenchanModel {
 
     // noop
   }
+
+  /** @override */
+  static get Mixins () {
+    return [
+      BackupMixinModel,
+    ]
+  }
+
+  /**
+   * get: Backup model for BackupMixinModel
+   *
+   * @returns {typeof import('./AdminPasswordHashesBk')} - Backup model declaration
+   */
+  static get BackupModel () {
+    return this._.AdminPasswordHashesBk
+  }
 }
 
 /**
- * @typedef {{
+ * @typedef {AdminPasswordHash & {
  *   id: number
- *   name: string
- * }} ChatRoomEntity
+ *   AdminId: number
+ *   passwordHash: string
+ *   savedAt: Date
+ * }} AdminPasswordHashEntity
  */

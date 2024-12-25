@@ -1,9 +1,12 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatRoom extends RenchanModel {
+/**
+ * AdminPasswordHashesBk model.
+ */
+export default class AdminPasswordHashesBk extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -11,10 +14,17 @@ export default class ChatRoom extends RenchanModel {
     return {
       ...factory.ID_BIGINT,
 
-      name: {
+      AdminId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+      passwordHash: {
         type: DataTypes.STRING(191),
         allowNull: false,
-        unique: true,
+      },
+      savedAt: {
+        type: DataTypes.DATE(3),
+        allowNull: false,
       },
     }
   }
@@ -23,6 +33,8 @@ export default class ChatRoom extends RenchanModel {
   static createOptions (sequelizeClient) {
     return {
       ...super.createOptions(sequelizeClient),
+
+      tableName: 'admin_password_hashes_bk',
     }
   }
 
@@ -56,8 +68,10 @@ export default class ChatRoom extends RenchanModel {
 }
 
 /**
- * @typedef {{
+ * @typedef {AdminPasswordHashesBk & {
  *   id: number
- *   name: string
- * }} ChatRoomEntity
+ *   AdminId: number
+ *   passwordHash: string
+ *   savedAt: Date
+ * }} AdminPasswordHashesBkEntity
  */

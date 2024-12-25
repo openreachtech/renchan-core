@@ -1,8 +1,11 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
+/**
+ * Admin model.
+ */
 export default class Admin extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
@@ -10,16 +13,60 @@ export default class Admin extends RenchanModel {
 
     return {
       ...factory.ID_BIGINT,
-      email: {
-        type: DataTypes.STRING(191),
+
+      registeredAt: {
+        type: DataTypes.DATE(3),
         allowNull: false,
-      },
-      password: {
-        type: DataTypes.STRING(191),
-      },
-      phoneNumber: {
-        type: DataTypes.STRING(31),
       },
     }
   }
+
+  /** @override */
+  static createOptions (sequelizeClient) {
+    return {
+      ...super.createOptions(sequelizeClient),
+    }
+  }
+
+  /** @override */
+  static associate () {
+    super.associate?.()
+
+    this.hasOne(this._.AdminSecret)
+    this.hasOne(this._.AdminPasswordHash)
+
+    this.hasMany(this._.AdminRoleAssignment)
+
+    this.belongsToMany(this._.AdminRole, {
+      through: this._.AdminRoleAssignment,
+    })
+  }
+
+  /** @override */
+  static defineScopes (Op) {
+    super.defineScopes?.(Op)
+
+    // noop
+  }
+
+  /** @override */
+  static setupHooks () {
+    super.setupHooks?.()
+
+    // noop
+  }
+
+  /** @override */
+  static defineSubqueries () {
+    super.defineSubqueries?.()
+
+    // noop
+  }
 }
+
+/**
+ * @typedef {Admin & {
+ *   id: number
+ *   registeredAt: Date
+ * }} AdminEntity
+ */
