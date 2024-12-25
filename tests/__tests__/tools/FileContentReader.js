@@ -826,3 +826,77 @@ describe('FileContentReader', () => {
     })
   })
 })
+
+describe('FileContentReader', () => {
+  describe('#hasFile()', () => {
+    describe('should be truthy', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     file: import('graphql-upload/processRequest.mjs').FileUpload
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          params: {
+            file: {
+              filename: 'alpha.png',
+              mimetype: 'image/png',
+              encoding: '7bit',
+            },
+          },
+        },
+        {
+          params: {
+            file: {
+              filename: 'beta.jpg',
+              mimetype: 'image/jpeg',
+              encoding: '8bit',
+            },
+          },
+        },
+      ])
+
+      test.each(cases)('filename: $params.file.filename', ({ params }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.hasFile()
+
+        expect(actual)
+          .toBeTruthy()
+      })
+    })
+
+    describe('should be falsy', () => {
+      const cases = [
+        {
+          params: {
+            file: undefined,
+          },
+        },
+        {
+          params: {
+            // file: undefined,
+          },
+        },
+      ]
+
+      test.each(cases)('file: $params.file', ({ params }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.hasFile()
+
+        expect(actual)
+          .toBeFalsy()
+      })
+    })
+  })
+})
