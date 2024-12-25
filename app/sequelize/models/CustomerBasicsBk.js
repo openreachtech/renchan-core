@@ -1,9 +1,12 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatRoom extends RenchanModel {
+/**
+ * CustomerBasicsBk model.
+ */
+export default class CustomerBasicsBk extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -11,10 +14,17 @@ export default class ChatRoom extends RenchanModel {
     return {
       ...factory.ID_BIGINT,
 
-      name: {
+      CustomerId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+      username: {
         type: DataTypes.STRING(191),
         allowNull: false,
-        unique: true,
+      },
+      savedAt: {
+        type: DataTypes.DATE(3),
+        allowNull: false,
       },
     }
   }
@@ -23,6 +33,8 @@ export default class ChatRoom extends RenchanModel {
   static createOptions (sequelizeClient) {
     return {
       ...super.createOptions(sequelizeClient),
+
+      tableName: 'customer_basics_bk',
     }
   }
 
@@ -30,7 +42,7 @@ export default class ChatRoom extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsTo(this._.Customer)
   }
 
   /** @override */
@@ -56,8 +68,10 @@ export default class ChatRoom extends RenchanModel {
 }
 
 /**
- * @typedef {{
+ * @typedef {CustomerBasicsBk & {
  *   id: number
- *   name: string
- * }} ChatRoomEntity
+ *   CustomerId: number
+ *   username: string
+ *   savedAt: Date
+ * }} CustomerBasicsBkEntity
  */

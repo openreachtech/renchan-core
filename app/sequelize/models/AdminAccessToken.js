@@ -1,9 +1,12 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatRoom extends RenchanModel {
+/**
+ * AdminAccessToken model.
+ */
+export default class AdminAccessToken extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -11,10 +14,22 @@ export default class ChatRoom extends RenchanModel {
     return {
       ...factory.ID_BIGINT,
 
-      name: {
+      // ForeignKey must start with upper case.
+      AdminId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+      accessToken: {
         type: DataTypes.STRING(191),
         allowNull: false,
-        unique: true,
+      },
+      generatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      expiredAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
       },
     }
   }
@@ -30,7 +45,7 @@ export default class ChatRoom extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsTo(this._.Admin)
   }
 
   /** @override */
@@ -56,8 +71,16 @@ export default class ChatRoom extends RenchanModel {
 }
 
 /**
- * @typedef {{
- *   id: number
- *   name: string
- * }} ChatRoomEntity
+ * @typedef {AdminAccessToken & {
+ *   AdminId: number
+ *   accessToken: string
+ *   generatedAt: Date
+ *   expiredAt: Date
+ * }} AdminAccessTokenEntity
+ */
+
+/**
+ * @typedef {AdminAccessTokenEntity & {
+ *   Admin: import('./Admin').AdminEntity
+ * }} AdminAccessTokenAssociatedEntity
  */

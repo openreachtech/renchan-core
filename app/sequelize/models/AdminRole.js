@@ -1,20 +1,22 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatRoom extends RenchanModel {
+/**
+ * AdminRole model.
+ */
+export default class AdminRole extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
 
     return {
-      ...factory.ID_BIGINT,
+      ...factory.ID_INTEGER,
 
       name: {
         type: DataTypes.STRING(191),
         allowNull: false,
-        unique: true,
       },
     }
   }
@@ -30,7 +32,9 @@ export default class ChatRoom extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsToMany(this._.Admin, {
+      through: this._.AdminRoleAssignment,
+    })
   }
 
   /** @override */
@@ -56,8 +60,8 @@ export default class ChatRoom extends RenchanModel {
 }
 
 /**
- * @typedef {{
+ * @typedef {AdminRole & {
  *   id: number
  *   name: string
- * }} ChatRoomEntity
+ * }} AdminRoleEntity
  */

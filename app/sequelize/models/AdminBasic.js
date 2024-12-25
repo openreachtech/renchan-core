@@ -1,31 +1,13 @@
 import {
-  Sequelize,
-} from 'sequelize'
-
-import {
-  ModelAttributeFactory,
+  BackupMixinModel,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-import FertileForest from '@steweucen/fertile-forest-sequelize'
-
 /**
- * @type {typeof Sequelize}
+ * AdminBasic model.
  */
-const SequelizeWithFFModel = /** @type {any} */ ({
-  __proto__: Sequelize,
-
-  Model: RenchanModel,
-})
-
-FertileForest.init(SequelizeWithFFModel)
-
-/**
- * @type {typeof RenchanModel}
- */
-const FFModel = FertileForest.Model
-
-export default class ReferralNode extends FFModel {
+export default class AdminBasic extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -33,16 +15,16 @@ export default class ReferralNode extends FFModel {
     return {
       ...factory.ID_BIGINT,
 
-      CustomerId: {
+      AdminId: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      ffQueue: {
-        type: DataTypes.BIGINT,
+      username: {
+        type: DataTypes.STRING(191),
         allowNull: false,
       },
-      ffDepth: {
-        type: DataTypes.INTEGER,
+      savedAt: {
+        type: DataTypes.DATE(3),
         allowNull: false,
       },
     }
@@ -59,12 +41,19 @@ export default class ReferralNode extends FFModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsTo(this._.Admin)
   }
 
   /** @override */
   static defineScopes (Op) {
     super.defineScopes?.(Op)
+
+    // noop
+  }
+
+  /** @override */
+  static setupHooks () {
+    super.setupHooks?.()
 
     // noop
   }
@@ -77,9 +66,27 @@ export default class ReferralNode extends FFModel {
   }
 
   /** @override */
-  static setupHooks () {
-    super.setupHooks?.()
+  static get Mixins () {
+    return [
+      BackupMixinModel,
+    ]
+  }
 
-    // noop
+  /**
+   * get: Backup model for BackupMixinModel
+   *
+   * @returns {typeof import('./AdminBasicsBk')} - Backup model declaration
+   */
+  static get BackupModel () {
+    return this._.AdminBasicsBk
   }
 }
+
+/**
+ * @typedef {AdminBasic & {
+ *   id: number
+ *   AdminId: number
+ *   username: string
+ *   savedAt: Date
+ * }} AdminBasicEntity
+ */
