@@ -750,3 +750,79 @@ describe('FileContentReader', () => {
     })
   })
 })
+
+describe('FileContentReader', () => {
+  describe('#get:encoding', () => {
+    describe('should return #file.encoding', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     file: import('graphql-upload/processRequest.mjs').FileUpload
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          params: {
+            file: {
+              filename: 'alpha.png',
+              mimetype: 'image/png',
+              encoding: '7bit',
+            },
+          },
+          expected: '7bit',
+        },
+        {
+          params: {
+            file: {
+              filename: 'beta.jpg',
+              mimetype: 'image/jpeg',
+              encoding: '8bit',
+            },
+          },
+          expected: '8bit',
+        },
+      ])
+
+      test.each(cases)('file: $params.file', ({ params, expected }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.encoding
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should return null when #file is not set', () => {
+      const cases = [
+        {
+          params: {
+            file: undefined,
+          },
+        },
+        {
+          params: {
+            // file: undefined,
+          },
+        },
+      ]
+
+      test.each(cases)('file: $params.file', ({ params }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.encoding
+
+        expect(actual)
+          .toBeNull()
+      })
+    })
+  })
+})
