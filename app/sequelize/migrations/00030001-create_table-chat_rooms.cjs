@@ -26,6 +26,8 @@ module.exports = {
 
       ...factory.TIMESTAMPS_WITH_DELETED_AT,
     })
+
+    return Promise.resolve()
   },
 
   async down (
