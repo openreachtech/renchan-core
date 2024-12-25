@@ -42,11 +42,24 @@ export default class CustomerGraphqlContext extends BaseGraphqlContext {
   static async findUser ({
     expressRequest,
     accessToken,
+    requestedAt,
   }) {
-    return super.findUser({
-      expressRequest,
+    const customerAccessTokenEntity = await this.findCustomerAccessToken({
       accessToken,
     })
+
+    if (!customerAccessTokenEntity) {
+      return null
+    }
+
+    if (customerAccessTokenEntity.isExpired({
+      pointsAt: requestedAt,
+    })) {
+      return null
+    }
+
+    return customerAccessTokenEntity.Customer
+      ?? null
   }
 
   /**
