@@ -39,6 +39,9 @@ type Mutation {
 
   # for scalar sample ----------------------------------------------------------
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
+
+  # for sign-in sample ---------------------------------------------------------
+  renewAccessToken: RenewAccessTokenResult!
 }
 
 ################################################################################
@@ -164,6 +167,14 @@ type Appointment {
 type CustomerAmountsResult {
   stakedAmount: BigNumber!
   rewardsAmount: BigNumber!
+}
+
+# for sign-in sample -----------------------------------------------------------
+
+type RenewAccessTokenResult {
+  accessToken: String # null: expired or not found
+
+  # TODO: add here customer information (e.g. username, avatar, etc.)
 }
 
 ################################################################################
