@@ -598,3 +598,79 @@ describe('FileContentReader', () => {
     })
   })
 })
+
+describe('FileContentReader', () => {
+  describe('#get:filename', () => {
+    describe('should return #file.filename', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     file: import('graphql-upload/processRequest.mjs').FileUpload
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          params: {
+            file: {
+              filename: 'alpha.png',
+              mimetype: 'image/png',
+              encoding: '7bit',
+            },
+          },
+          expected: 'alpha.png',
+        },
+        {
+          params: {
+            file: {
+              filename: 'beta.jpg',
+              mimetype: 'image/jpeg',
+              encoding: '7bit',
+            },
+          },
+          expected: 'beta.jpg',
+        },
+      ])
+
+      test.each(cases)('file: $params.file', ({ params, expected }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.filename
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should return null when #file is not set', () => {
+      const cases = [
+        {
+          params: {
+            file: undefined,
+          },
+        },
+        {
+          params: {
+            // file: undefined,
+          },
+        },
+      ]
+
+      test.each(cases)('file: $params.file', ({ params }) => {
+        const args = {
+          file: params.file,
+        }
+        const reader = new FileContentReader(args)
+
+        const actual = reader.filename
+
+        expect(actual)
+          .toBeNull()
+      })
+    })
+  })
+})
