@@ -742,6 +742,149 @@ describe('BaseGraphqlContext', () => {
 })
 
 describe('BaseGraphqlContext', () => {
+  describe('#get:Ctor', () => {
+    /** @type {ExpressType.Request} */
+    const expressRequestMock = /** @type {*} */ ({})
+
+    /** @type {GraphqlType.ServerEngine} */
+    const engineMock = /** @type {*} */ ({})
+
+    /** @type {GraphqlType.Visa} */
+    const visaMock = /** @type {*} */ ({})
+
+    describe('to return own class', () => {
+      const cases = [
+        {
+          params: {
+            userEntity: {
+              id: 10001,
+              username: 'JohnDoe',
+            },
+          },
+        },
+        {
+          params: {
+            userEntity: {
+              id: 10002,
+              username: 'JaneSmith',
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('userId: $params.userEntity.id', ({ params }) => {
+        const context = new BaseGraphqlContext({
+          expressRequest: expressRequestMock,
+          engine: engineMock,
+          userEntity: params.userEntity,
+          visa: visaMock,
+          requestedAt: new Date(),
+          uuid: '98765432-abcd-0000-1234-000000000001',
+        })
+
+        const actual = context.Ctor
+
+        expect(actual)
+          .toBe(BaseGraphqlContext) // same reference
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlContext', () => {
+  describe('#get:accessToken', () => {
+    /** @type {ExpressType.Request} */
+    const expressRequestMock = /** @type {*} */ ({})
+
+    /** @type {GraphqlType.ServerEngine} */
+    const engineMock = /** @type {*} */ ({})
+
+    /** @type {renchan.UserEntity} */
+    const userEntityMock = {
+      id: 10001,
+    }
+
+    /** @type {GraphqlType.Visa} */
+    const visaMock = /** @type {*} */ ({})
+
+    describe('to return id of #userEntity', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     expressRequest: ExpressType.Request
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {*} */ ([
+        {
+          params: {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'alpha',
+              },
+            },
+          },
+          expected: 'alpha',
+        },
+        {
+          params: {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'beta',
+              },
+            },
+          },
+          expected: 'beta',
+        },
+      ])
+
+      test.each(cases)('headers: $params.expressRequest.headers', ({ params, expected }) => {
+        const context = new BaseGraphqlContext({
+          expressRequest: params.expressRequest,
+          engine: engineMock,
+          userEntity: userEntityMock,
+          visa: visaMock,
+          requestedAt: new Date(),
+          uuid: '98765432-abcd-0000-1234-000000000001',
+        })
+
+        const actual = context.accessToken
+
+        expect(actual)
+          .toBe(expected)
+      })
+    })
+
+    describe('to be null', () => {
+      const cases = [
+        {
+          params: {
+            userEntity: null,
+          },
+        },
+      ]
+
+      test.each(cases)('userEntity: $params.userEntity', ({ params, expected }) => {
+        const context = new BaseGraphqlContext({
+          expressRequest: expressRequestMock,
+          engine: engineMock,
+          userEntity: params.userEntity,
+          visa: visaMock,
+          requestedAt: new Date(),
+          uuid: '98765432-abcd-0000-1234-000000000001',
+        })
+
+        const actual = context.accessToken
+
+        expect(actual)
+          .toBeNull()
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlContext', () => {
   describe('#get:userId', () => {
     /** @type {ExpressType.Request} */
     const expressRequestMock = /** @type {*} */ ({})
