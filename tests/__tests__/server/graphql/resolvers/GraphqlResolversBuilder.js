@@ -845,6 +845,8 @@ describe('GraphqlResolversBuilder', () => {
 
             createChatRoom: expect.any(BaseMutationResolver),
             sendChatMessage: expect.any(BaseMutationResolver),
+
+            renewAccessToken: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
 
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
@@ -1554,6 +1556,7 @@ describe('GraphqlResolversBuilder', () => {
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
               signUp: expect.any(Function),
