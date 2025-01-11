@@ -32,6 +32,7 @@ type Mutation {
 
   # for furo boilerplate -------------------------------------------------------
   uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
+  uploadImage (input: UploadImageInput!): UploadImageResult!
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
@@ -105,6 +106,12 @@ type SignUpResult {
 
 type UploadCustomerForumPostImageResult {
   imageUrl: String!
+}
+
+type UploadImageResult {
+  filename: String
+  mimetype: String
+  encoding: String
 }
 
 type Pagination {
@@ -200,6 +207,10 @@ input CurriculumsSearchInput {
 }
 
 input UploadCustomerForumPostImageInput {
+  image: Upload!
+}
+
+input UploadImageInput {
   image: Upload!
 }
 
