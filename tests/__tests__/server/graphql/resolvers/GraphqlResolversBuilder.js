@@ -848,6 +848,7 @@ describe('GraphqlResolversBuilder', () => {
 
             renewAccessToken: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
+            uploadImage: expect.any(BaseMutationResolver),
 
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
           },
@@ -865,6 +866,7 @@ describe('GraphqlResolversBuilder', () => {
             signIn: expect.any(BaseMutationResolver),
             signUp: expect.any(BaseMutationResolver),
             uploadCustomerForumPostImage: expect.any(BaseMutationResolver),
+            uploadImage: expect.any(BaseMutationResolver),
           },
         },
         {
@@ -1561,6 +1563,7 @@ describe('GraphqlResolversBuilder', () => {
               signIn: expect.any(Function),
               signUp: expect.any(Function),
               uploadCustomerForumPostImage: expect.any(Function),
+              uploadImage: expect.any(Function),
             },
             Subscription: {
               onReceiveMessage: {

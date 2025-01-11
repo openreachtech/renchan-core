@@ -250,6 +250,7 @@ describe('GraphqlSchemaBuilder', () => {
               signIn: expect.any(Function),
               signUp: expect.any(Function),
               uploadCustomerForumPostImage: expect.any(Function),
+              uploadImage: expect.any(Function),
             },
             Subscription: {
               onReceiveMessage: {
