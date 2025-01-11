@@ -900,6 +900,19 @@ describe('GraphqlResolversBuilder', () => {
           .toEqual(expected)
       })
     })
+
+    describe('to be null', () => {
+      test('poolPath: null', async () => {
+        const args = {
+          poolPath: null,
+        }
+
+        const actual = await GraphqlResolversBuilder.buildResolverSchemaHash(args)
+
+        expect(actual)
+          .toBeNull()
+      })
+    })
   })
 })
 
