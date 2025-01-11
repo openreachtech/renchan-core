@@ -240,8 +240,8 @@ describe('UploadImageMutationResolver', () => {
        *         image: import('graphql-upload/Upload.mjs').default
        *       }
        *     }
-       *     uploadTally: import('graphql-upload/processRequest.mjs').FileUpload
        *   }
+       *   uploadTally: import('graphql-upload/processRequest.mjs').FileUpload
        *   expected: {
        *     filename: string
        *     mimetype: string
