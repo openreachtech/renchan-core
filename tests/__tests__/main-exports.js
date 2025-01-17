@@ -41,6 +41,8 @@ import { default as ChannelGeneratorActual } from '../../lib/server/graphql/subs
 import { default as SubscriptionBrokerActual } from '../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import { default as TopicReceiverActual } from '../../lib/server/graphql/subscription/TopicReceiver.js'
 
+import { default as graphqlUploadExpressWithResolvingContentTypeActual } from '../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
+
 /**
  * For RESTful API server.
  */
@@ -115,6 +117,8 @@ import {
   ChannelGenerator,
   SubscriptionBroker,
   TopicReceiver,
+
+  graphqlUploadExpressWithResolvingContentType,
 
   RestfulApiServerBuilder,
   RestfulApiRoutesBuilder,
@@ -217,6 +221,21 @@ describe('main exports', () => {
     test.each(cases)('Class: $ExportedClass.name', ({ ExportedClass, ActualClass }) => {
       expect(ExportedClass)
         .toBe(ActualClass)
+    })
+  })
+})
+
+describe('main exports', () => {
+  describe('functions', () => {
+    const cases = [
+      { ExportFunction: graphqlUploadExpressWithResolvingContentType, ActualFunction: graphqlUploadExpressWithResolvingContentTypeActual },
+    ]
+
+    describe('to have property', () => {
+      test.each(cases)('function: $ExportFunction.name', ({ ExportFunction, ActualFunction }) => {
+        expect(ExportFunction)
+          .toBe(ActualFunction) // sam reference
+      })
     })
   })
 })
