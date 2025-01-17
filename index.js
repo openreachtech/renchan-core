@@ -38,6 +38,8 @@ export { default as BaseScalar } from './lib/server/graphql/scalars/BaseScalar.j
 export { default as BigNumberScalar } from './lib/server/graphql/scalars/concretes/BigNumberScalar.js'
 export { default as DateTimeScalar } from './lib/server/graphql/scalars/concretes/DateTimeScalar.js'
 
+export { default as graphqlUploadExpressWithResolvingContentType } from './lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
+
 /*
  * For Subscription.
  */
