@@ -41,15 +41,15 @@ export default class ChatRoom extends RenchanModel {
   }
 
   /** @override */
-  static defineSubqueries () {
-    super.defineSubqueries?.()
+  static setupHooks () {
+    super.setupHooks?.()
 
     // noop
   }
 
   /** @override */
-  static setupHooks () {
-    super.setupHooks?.()
+  static defineSubqueries () {
+    super.defineSubqueries?.()
 
     // noop
   }

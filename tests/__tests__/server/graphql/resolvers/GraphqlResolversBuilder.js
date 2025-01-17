@@ -845,7 +845,10 @@ describe('GraphqlResolversBuilder', () => {
 
             createChatRoom: expect.any(BaseMutationResolver),
             sendChatMessage: expect.any(BaseMutationResolver),
+
+            renewAccessToken: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
+            uploadImage: expect.any(BaseMutationResolver),
 
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
           },
@@ -863,6 +866,7 @@ describe('GraphqlResolversBuilder', () => {
             signIn: expect.any(BaseMutationResolver),
             signUp: expect.any(BaseMutationResolver),
             uploadCustomerForumPostImage: expect.any(BaseMutationResolver),
+            uploadImage: expect.any(BaseMutationResolver),
           },
         },
         {
@@ -894,6 +898,19 @@ describe('GraphqlResolversBuilder', () => {
 
         expect(actual)
           .toEqual(expected)
+      })
+    })
+
+    describe('to be null', () => {
+      test('poolPath: null', async () => {
+        const args = {
+          poolPath: null,
+        }
+
+        const actual = await GraphqlResolversBuilder.buildResolverSchemaHash(args)
+
+        expect(actual)
+          .toBeNull()
       })
     })
   })
@@ -1554,10 +1571,12 @@ describe('GraphqlResolversBuilder', () => {
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
               signUp: expect.any(Function),
               uploadCustomerForumPostImage: expect.any(Function),
+              uploadImage: expect.any(Function),
             },
             Subscription: {
               onReceiveMessage: {

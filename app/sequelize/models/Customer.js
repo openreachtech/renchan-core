@@ -1,8 +1,11 @@
 import {
-  ModelAttributeFactory,
   RenchanModel,
+  ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
+/**
+ * Customer model.
+ */
 export default class Customer extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
@@ -10,14 +13,7 @@ export default class Customer extends RenchanModel {
 
     return {
       ...factory.ID_BIGINT,
-      username: {
-        type: DataTypes.STRING(191),
-        allowNull: false,
-      },
-      inviteCode: {
-        type: DataTypes.STRING(191),
-        allowNull: false,
-      },
+
       registeredAt: {
         type: DataTypes.DATE(3),
         allowNull: false,
@@ -26,17 +22,11 @@ export default class Customer extends RenchanModel {
   }
 
   /** @override */
-  static createOptions (sequelizeClient) {
-    return {
-      ...super.createOptions(sequelizeClient),
-    }
-  }
-
-  /** @override */
   static associate () {
     super.associate?.()
 
-    // noop
+    this.hasOne(this._.CustomerBasic)
+    this.hasOne(this._.CustomerPasswordHash)
   }
 
   /** @override */
@@ -47,16 +37,23 @@ export default class Customer extends RenchanModel {
   }
 
   /** @override */
-  static defineSubqueries () {
-    super.defineSubqueries?.()
-
-    // noop
-  }
-
-  /** @override */
   static setupHooks () {
     super.setupHooks?.()
 
     // noop
   }
+
+  /** @override */
+  static defineSubqueries () {
+    super.defineSubqueries?.()
+
+    // noop
+  }
 }
+
+/**
+ * @typedef {Customer & {
+ *   id: number
+ *   registeredAt: Date
+ * }} CustomerEntity
+ */

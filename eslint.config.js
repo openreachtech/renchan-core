@@ -22,6 +22,8 @@ export default [
         sequelize: 'readonly', // namespace
 
         setTimeout: 'readonly',
+
+        Buffer: 'readonly',
       },
     },
   },

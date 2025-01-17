@@ -32,6 +32,7 @@ type Mutation {
 
   # for furo boilerplate -------------------------------------------------------
   uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
+  uploadImage (input: UploadImageInput!): UploadImageResult!
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
@@ -39,6 +40,9 @@ type Mutation {
 
   # for scalar sample ----------------------------------------------------------
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
+
+  # for sign-in sample ---------------------------------------------------------
+  renewAccessToken: RenewAccessTokenResult!
 }
 
 ################################################################################
@@ -104,6 +108,12 @@ type UploadCustomerForumPostImageResult {
   imageUrl: String!
 }
 
+type UploadImageResult {
+  filename: String
+  mimetype: String
+  encoding: String
+}
+
 type Pagination {
   limit: Int!
   offset: Int!
@@ -166,6 +176,14 @@ type CustomerAmountsResult {
   rewardsAmount: BigNumber!
 }
 
+# for sign-in sample -----------------------------------------------------------
+
+type RenewAccessTokenResult {
+  accessToken: String # null: expired or not found
+
+  # TODO: add here customer information (e.g. username, avatar, etc.)
+}
+
 ################################################################################
 #### INPUT
 ################################################################################
@@ -189,6 +207,10 @@ input CurriculumsSearchInput {
 }
 
 input UploadCustomerForumPostImageInput {
+  image: Upload!
+}
+
+input UploadImageInput {
   image: Upload!
 }
 
