@@ -848,6 +848,8 @@ describe('GraphqlResolversBuilder', () => {
 
             renewAccessToken: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
+            uploadArrayImages: expect.any(BaseMutationResolver),
+            uploadDeepPropertyImages: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
 
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
