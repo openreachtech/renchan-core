@@ -33,6 +33,7 @@ type Mutation {
   # for furo boilerplate -------------------------------------------------------
   uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
   uploadImage (input: UploadImageInput!): UploadImageResult!
+  uploadArrayImages (input: UploadArrayImagesInput!): [UploadImageResult!]!
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
@@ -212,6 +213,10 @@ input UploadCustomerForumPostImageInput {
 
 input UploadImageInput {
   image: Upload!
+}
+
+input UploadArrayImagesInput {
+  images: [Upload!]!
 }
 
 input PaginationInput {
