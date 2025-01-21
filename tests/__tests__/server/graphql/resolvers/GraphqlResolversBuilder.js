@@ -1569,6 +1569,7 @@ describe('GraphqlResolversBuilder', () => {
               customer: expect.any(Function),
               customerAmounts: expect.any(Function),
               messages: expect.any(Function),
+              paginationArticles: expect.any(Function),
             },
             Mutation: {
               createChatRoom: expect.any(Function),
