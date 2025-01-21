@@ -863,6 +863,7 @@ describe('GraphqlResolversBuilder', () => {
             companySponsors: expect.any(BaseQueryResolver),
             curriculums: expect.any(BaseQueryResolver),
             customerAmounts: expect.any(BaseQueryResolver),
+            paginationArticles: expect.any(BaseQueryResolver),
 
             postAppointment: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
@@ -1569,6 +1570,7 @@ describe('GraphqlResolversBuilder', () => {
               customer: expect.any(Function),
               customerAmounts: expect.any(Function),
               messages: expect.any(Function),
+              paginationArticles: expect.any(Function),
             },
             Mutation: {
               createChatRoom: expect.any(Function),

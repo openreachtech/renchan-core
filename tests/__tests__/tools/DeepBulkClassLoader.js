@@ -280,6 +280,7 @@ describe('DeepBulkClassLoader', () => {
             rootPath.to('app/server/graphql/resolvers/customer/stub/queries/CompanySponsorsQueryResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/stub/queries/CurriculumsQueryResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/stub/queries/CustomerAmountsQueryResolver.js'),
+            rootPath.to('app/server/graphql/resolvers/customer/stub/queries/PaginationArticlesQueryResolver.js'),
           ],
         },
       ]
