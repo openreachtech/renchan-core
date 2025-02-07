@@ -31,7 +31,7 @@ export default class PaginationArticlesQueryResolver extends BaseQueryResolver {
   }) {
     await sleep(300)
 
-    const articles = this.extractArticles({
+    const args = {
       category,
       pagination: {
         limit,
@@ -41,7 +41,10 @@ export default class PaginationArticlesQueryResolver extends BaseQueryResolver {
           orderBy,
         },
       },
-    })
+    }
+
+    const articles = this.extractArticles(args)
+    const totalRecords = this.resolveTotalRecords(args)
 
     return {
       articles,
@@ -52,13 +55,13 @@ export default class PaginationArticlesQueryResolver extends BaseQueryResolver {
           targetColumn,
           orderBy,
         },
-        totalRecords: 6,
+        totalRecords,
       },
     }
   }
 
   /**
-   * Extracts the curriculums from the haystacks.
+   * Extract the articles.
    *
    * @param {{
    *   category: string
@@ -112,6 +115,33 @@ export default class PaginationArticlesQueryResolver extends BaseQueryResolver {
       .toSorted(sortFunction)
 
     return articles
+  }
+
+  /**
+   * Resolves the sort key.
+   *
+   * @param {{
+   *   category: string
+   *   pagination: paginationType
+   * }} params - Parameters.
+   * @returns {number} - The total records.
+   */
+  resolveTotalRecords ({
+    category,
+    pagination: {
+      limit,
+      offset,
+      sort: {
+        targetColumn,
+        orderBy,
+      },
+    },
+  }) {
+    if (category in paginationArticlesHash) {
+      return paginationArticlesHash[category].length
+    }
+
+    return Math.ceil(limit * 12.3)
   }
 
   /**
