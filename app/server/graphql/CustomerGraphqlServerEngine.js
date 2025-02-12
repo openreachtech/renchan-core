@@ -89,6 +89,7 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
       'signIn',
 
       'createChatRoom',
+      'postNotification',
       'sendChatMessage',
       'chatMessages',
       'chatRooms',

@@ -41,6 +41,8 @@ type Mutation {
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
   sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
 
+  postNotification (input: PostNotificationInput!): PostNotificationResult!
+
   # for scalar sample ----------------------------------------------------------
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
 
@@ -170,6 +172,10 @@ type CreateChatRoomResult {
   rooms: [ChatRoom!]!
 }
 
+type PostNotificationResult {
+  notification: Notification!
+}
+
 type OnReceiveMessageResult {
   message: ChatMessage!
 }
@@ -183,6 +189,11 @@ type ChatMessage {
 type ChatRoom {
   id: Int!
   name: String!
+}
+
+type Notification {
+  message: String!
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------
@@ -290,6 +301,11 @@ input SendMessageInput {
   roomId: Int!
   content: String!
   sender: String! # username
+}
+
+input PostNotificationInput {
+  message: String!
+  segment: String!
 }
 
 input OnReceiveMessageInput {
