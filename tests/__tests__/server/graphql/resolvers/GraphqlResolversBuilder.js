@@ -25,8 +25,8 @@ describe('GraphqlResolversBuilder', () => {
           {
             params: {
               filterSchemaHash: {
-                customer: BaseResolver.create(),
-                products: BaseResolver.create(),
+                customer: () => {},
+                products: () => {},
               },
             },
           },
