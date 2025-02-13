@@ -853,6 +853,7 @@ describe('GraphqlResolversBuilder', () => {
             uploadDeepPropertyImages: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
 
+            onBroadcastNotifications: expect.any(BaseSubscriptionResolver),
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
           },
         },
