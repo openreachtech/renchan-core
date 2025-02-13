@@ -257,6 +257,10 @@ describe('GraphqlSchemaBuilder', () => {
               uploadImage: expect.any(Function),
             },
             Subscription: {
+              onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
