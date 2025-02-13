@@ -56,6 +56,8 @@ type Mutation {
 
 type Subscription {
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
+
+  onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
 
 ################################################################################
@@ -191,6 +193,10 @@ type ChatRoom {
   name: String!
 }
 
+type OnBroadcastNotificationsResult {
+  notification: Notification!
+}
+
 type Notification {
   message: String!
   segment: String!
@@ -310,6 +316,10 @@ input PostNotificationInput {
 
 input OnReceiveMessageInput {
   roomId: Int!
+}
+
+input OnBroadcastNotificationsInput {
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------
