@@ -273,6 +273,7 @@ describe('DeepBulkClassLoader', () => {
             rootPath.to('app/server/graphql/resolvers/customer/actual/queries/MessagesQueryResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnBroadcastNotificationsSubscriptionResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnReceiveMessageSubscriptionResolver.js'),
+            rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnUpdateChatRoomsSubscriptionResolver.js'),
 
             rootPath.to('app/server/graphql/resolvers/customer/stub/mutations/PostAppointmentMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/stub/mutations/SignInMutationResolver.js'),

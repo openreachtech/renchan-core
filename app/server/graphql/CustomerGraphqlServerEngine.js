@@ -95,6 +95,7 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
       'chatRooms',
 
       'onReceiveMessage',
+      'onUpdateChatRooms',
       'onBroadcastNotifications',
     ]
   }
