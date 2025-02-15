@@ -56,6 +56,7 @@ type Mutation {
 
 type Subscription {
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
+  onUpdateChatRooms: OnUpdateChatRoomsResult!
 
   onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
@@ -186,6 +187,10 @@ type ChatMessage {
   id: Int! # for edit/delete
   content: String!
   sender: String!
+}
+
+type OnUpdateChatRoomsResult {
+  rooms: [ChatRoom!]!
 }
 
 type ChatRoom {
