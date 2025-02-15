@@ -1596,6 +1596,10 @@ describe('GraphqlResolversBuilder', () => {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },
+              onUpdateChatRooms: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
             },
           },
         },
