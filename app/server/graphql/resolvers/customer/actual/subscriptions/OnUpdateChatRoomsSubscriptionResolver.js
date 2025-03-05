@@ -15,9 +15,7 @@ export default class OnUpdateChatRoomsSubscriptionResolver extends BaseSubscript
   generateChannelQuery ({
     context,
   }) {
-    return {
-      customerId: context.customerId,
-    }
+    return {}
   }
 }
 
