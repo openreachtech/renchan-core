@@ -192,6 +192,117 @@ describe('BaseSubscriptionResolver', () => {
 })
 
 describe('BaseSubscriptionResolver', () => {
+  describe('.publishTopic()', () => {
+    describe('to call members', () => {
+      /** @type {GraphqlType.ResolverInputContext} */
+      const contextMock = /** @type {*} */ ({
+        broker: SubscriptionBroker.create({
+          config: /** @type {*} */ ({
+            redisOptions: null,
+          }),
+        }),
+      })
+
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+            payload: {
+              message: 'Alpha message.',
+            },
+            channelQuery: {},
+          },
+          topicTally: {
+            channel: 'alpha',
+            message: {
+              alpha: {
+                message: 'Alpha message.',
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+            payload: {
+              message: 'Beta message.',
+            },
+            channelQuery: {
+              roomId: 1002,
+              maxNumber: 10,
+            },
+          },
+          topicTally: {
+            channel: 'beta?roomId=1002&maxNumber=10',
+            message: {
+              beta: {
+                message: 'Beta message.',
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class GammaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'gamma'
+              }
+            },
+            payload: {
+              message: 'Gamma message.',
+            },
+            channelQuery: {
+              roomId: 1003,
+              maxNumber: 2,
+            },
+          },
+          topicTally: {
+            channel: 'gamma?roomId=1003&maxNumber=2',
+            message: {
+              gamma: {
+                message: 'Gamma message.',
+              },
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params, topicTally }) => {
+        const buildTopicArgsExpected = {
+          payload: params.payload,
+          channelQuery: params.channelQuery,
+        }
+
+        const buildTopicSpy = jest.spyOn(params.Resolver, 'buildTopic')
+          .mockReturnValue(topicTally)
+        const publishSpy = jest.spyOn(contextMock.broker, 'publish')
+
+        const args = {
+          context: contextMock,
+          payload: params.payload,
+          channelQuery: params.channelQuery,
+        }
+
+        await params.Resolver.publishTopic(args)
+
+        expect(buildTopicSpy)
+          .toHaveBeenCalledWith(buildTopicArgsExpected)
+        expect(publishSpy)
+          .toHaveBeenCalledWith(topicTally)
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
   describe('.buildTopic()', () => {
     describe('to return generated topic', () => {
       const cases = [
