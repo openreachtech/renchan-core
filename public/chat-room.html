@@ -98,6 +98,16 @@
         }
       }
     `
+    const onUpdateChatRoomsSubscription = `
+      subscription OnUpdateChatRooms {
+        onUpdateChatRooms {
+          rooms {
+            id
+            name
+          }
+        }
+      }
+    `
 
     const sendMessageMutation = `
       mutation SendMessageMutation ($input: SendMessageInput!) {
@@ -197,6 +207,47 @@
             console.error('💀💀💀💀💀💀💀💀 Subscription error:', error)
           },
           complete: () => {},
+        }
+      )
+    }
+
+    // ✅ ルーム一覧購読開始
+    let unsubscribeChatRooms
+
+    function subscribeChatRooms () {
+      if (unsubscribeChatRooms) {
+        unsubscribeChatRooms()
+      }
+
+      unsubscribeChatRooms = client.subscribe(
+        {
+          query: onUpdateChatRoomsSubscription,
+        },
+        {
+          next: (args) => {
+            console.log('🚀🚀🚀🚀🚀🚀🚀xxx subscribeChatRooms()', args)
+
+            const { data } = args
+
+            if (
+              !data
+              || !data.onUpdateChatRooms
+            ) {
+              return
+            }
+
+            const rooms = data.onUpdateChatRooms.rooms
+
+            updateRoomList({
+              rooms,
+            })
+          },
+          error: error => {
+            // console.error('💀💀💀💀💀💀💀💀xxx subscribeChatRooms()', error)
+          },
+          complete: () => {
+            // console.log('complete: subscribeChatRooms() 🔥🔥🔥🔥🔥🔥🔥')
+          },
         }
       )
     }
