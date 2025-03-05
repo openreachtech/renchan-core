@@ -1,4 +1,5 @@
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
+import OnBroadcastNotificationsSubscriptionResolver from '../subscriptions/OnBroadcastNotificationsSubscriptionResolver.js'
 
 export default class PostNotificationMutationResolver extends BaseMutationResolver {
   /** @override */
@@ -21,9 +22,44 @@ export default class PostNotificationMutationResolver extends BaseMutationResolv
       segment,
     }
 
+    await this.broadcastNotification({
+      context,
+      notification,
+    })
+
     return {
       notification,
     }
+  }
+
+  /**
+   * Broadcast notification.
+   *
+   * @param {{
+   *   context: GraphqlType.Context
+   *   notification: Notification
+   * }} params - Parameters.
+   * @returns {Promise<void>} - Returns nothing.
+   */
+  async broadcastNotification ({
+    context,
+    notification,
+  }) {
+    const payload = {
+      notification,
+    }
+    const channelQuery = {
+      segment: notification.segment,
+    }
+    const topic = OnBroadcastNotificationsSubscriptionResolver.buildTopic({
+      payload,
+      channelQuery,
+    })
+
+    return this.publishTopic({
+      context,
+      topic,
+    })
   }
 }
 
