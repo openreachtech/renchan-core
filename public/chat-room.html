@@ -86,7 +86,7 @@
   </div>
 
   <script src="https://unpkg.com/graphql-ws/umd/graphql-ws.js"></script>
-  <script>
+  <script type="module">
     const onReceiveMessageSubscription = `
       subscription OnReceiveMessage ($input: OnReceiveMessageInput!) {
         onReceiveMessage (input: $input) {
@@ -238,7 +238,7 @@
 
             const rooms = data.onUpdateChatRooms.rooms
 
-            updateRoomList({
+            updateChatRoomSelector({
               rooms,
             })
           },
@@ -269,17 +269,22 @@
     }
 
     // ✅ ルーム一覧表示関数
-    async function updateRoomList () {
-      const rooms = await fetchRooms()
+    async function updateChatRoomSelector ({
+      rooms,
+    }) {
+      const fragment = document.createDocumentFragment()
+      fragment.append(
+        ...rooms.map(room => {
+          const option = document.createElement('option')
+          option.value = room.id
+          option.textContent = room.name
+
+          return option
+        })
+      )
 
       roomSelect.innerHTML = ''
-
-      rooms.forEach(room => {
-        const option = document.createElement('option')
-        option.value = room.id
-        option.textContent = room.name
-        roomSelect.appendChild(option)
-      })
+      roomSelect.appendChild(fragment)
 
       if (rooms.length > 0 && !currentRoomId) {
         currentRoomId = rooms[0].id
@@ -290,7 +295,13 @@
     }
 
     initializeClient()
-    updateRoomList()
+
+    const rooms = await fetchRooms()
+    updateChatRoomSelector({
+      rooms,
+    })
+
+    subscribeChatRooms()
 
     // メッセージ送信処理
     messageForm.addEventListener('submit', async event => {
@@ -396,8 +407,6 @@
         })
 
         newRoomInput.value = ''
-
-        await updateRoomList()
       } catch (error) {
         console.error('Error creating room:', error)
       }
