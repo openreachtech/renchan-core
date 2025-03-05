@@ -109,6 +109,17 @@
       }
     `
 
+    const onBroadcastNotificationsSubscription = `
+      subscription onBroadcastNotifications ($input: OnBroadcastNotificationsInput!) {
+        onBroadcastNotifications (input: $input) {
+          notification {
+            segment
+            message
+          }
+        }
+      }
+    `
+
     const sendMessageMutation = `
       mutation SendMessageMutation ($input: SendMessageInput!) {
         sendChatMessage (input: $input) {
@@ -292,6 +303,42 @@
 
         subscribeToRoom(currentRoomId)
       }
+    }
+
+    // ✅ 通知開始
+    let unsubscribeNotifications
+
+    async function subscribeNotifications (segment = 'notifications') {
+      if (unsubscribeNotifications) {
+        unsubscribeNotifications()
+      }
+
+      unsubscribeNotifications = client.subscribe(
+        {
+          query: onBroadcastNotificationsSubscription,
+          variables: {
+            input: {
+              segment,
+            },
+          },
+        },
+        {
+          next: (args) => {
+console.log('next: Notification（トースト出して終了）', args)
+            const { data } = args
+
+            // if (data && data.onReceiveMessage) {
+            //   displayMessage(data.onReceiveMessage.message)
+            // }
+          },
+          error: error => {
+            console.error('💀💀💀💀💀💀💀💀 Notification error:', error)
+          },
+          complete: () => {
+console.log('complete: Notification')
+          },
+        }
+      )
     }
 
     initializeClient()
