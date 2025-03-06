@@ -37,7 +37,8 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
       sender,
     }
 
-    const topic = OnReceiveMessageSubscriptionResolver.buildTopic({
+    await this.broadcastChatMessage({
+      context,
       payload: {
         message,
       },
@@ -46,13 +47,38 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
       },
     })
 
-    await this.publishTopic({
-      context,
-      topic,
-    })
-
     return {
       message,
     }
+  }
+
+  /**
+   * Broadcast chat message.
+   *
+   * @param {{
+   *   context: GraphqlType.Context
+   *   payload: {
+   *     message: {
+   *       id: number
+   *       content: string
+   *       sender: string
+   *     }
+   *   }
+   *   channelQuery: {
+   *     roomId: number
+   *   }
+   * }} params - Parameters.
+   * @returns {Promise<void>} - Returns nothing.
+   */
+  async broadcastChatMessage ({
+    context,
+    payload,
+    channelQuery,
+  }) {
+    return OnReceiveMessageSubscriptionResolver.publishTopic({
+      context,
+      payload,
+      channelQuery,
+    })
   }
 }

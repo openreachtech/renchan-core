@@ -73,13 +73,10 @@ export default class CreateChatRoomMutationResolver extends BaseMutationResolver
     const payload = {
       rooms,
     }
-    const topic = OnUpdateChatRoomsSubscriptionResolver.buildTopic({
-      payload,
-    })
 
-    return this.publishTopic({
+    return OnUpdateChatRoomsSubscriptionResolver.publishTopic({
       context,
-      topic,
+      payload,
     })
   }
 
