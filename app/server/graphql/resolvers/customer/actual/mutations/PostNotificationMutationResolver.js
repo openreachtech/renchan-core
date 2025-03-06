@@ -51,14 +51,11 @@ export default class PostNotificationMutationResolver extends BaseMutationResolv
     const channelQuery = {
       segment: notification.segment,
     }
-    const topic = OnBroadcastNotificationsSubscriptionResolver.buildTopic({
+
+    return OnBroadcastNotificationsSubscriptionResolver.publishTopic({
+      context,
       payload,
       channelQuery,
-    })
-
-    return this.publishTopic({
-      context,
-      topic,
     })
   }
 }
