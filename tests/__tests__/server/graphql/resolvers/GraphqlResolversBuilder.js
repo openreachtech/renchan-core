@@ -844,6 +844,7 @@ describe('GraphqlResolversBuilder', () => {
             messages: expect.any(BaseQueryResolver),
 
             createChatRoom: expect.any(BaseMutationResolver),
+            postNotification: expect.any(BaseMutationResolver),
             sendChatMessage: expect.any(BaseMutationResolver),
 
             renewAccessToken: expect.any(BaseMutationResolver),
@@ -852,7 +853,9 @@ describe('GraphqlResolversBuilder', () => {
             uploadDeepPropertyImages: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
 
+            onBroadcastNotifications: expect.any(BaseSubscriptionResolver),
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
+            onUpdateChatRooms: expect.any(BaseSubscriptionResolver),
           },
         },
         {
@@ -1575,6 +1578,7 @@ describe('GraphqlResolversBuilder', () => {
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              postNotification: expect.any(Function),
               renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
@@ -1585,7 +1589,15 @@ describe('GraphqlResolversBuilder', () => {
               uploadImage: expect.any(Function),
             },
             Subscription: {
+              onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onUpdateChatRooms: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },

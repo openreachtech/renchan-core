@@ -246,6 +246,7 @@ describe('GraphqlSchemaBuilder', () => {
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              postNotification: expect.any(Function),
               renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
@@ -256,7 +257,15 @@ describe('GraphqlSchemaBuilder', () => {
               uploadImage: expect.any(Function),
             },
             Subscription: {
+              onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onUpdateChatRooms: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },

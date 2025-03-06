@@ -259,6 +259,7 @@ describe('DeepBulkClassLoader', () => {
             rootPath.to('app/server/graphql/resolvers/admin/stub/queries/CustomersQueryResolver.js'),
 
             rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/CreateChatRoomMutationResolver.js'),
+            rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/PostNotificationMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/RenewAccessTokenMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/SendChatMessageMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/SignInMutationResolver.js'),
@@ -270,7 +271,9 @@ describe('DeepBulkClassLoader', () => {
             rootPath.to('app/server/graphql/resolvers/customer/actual/queries/CompanySponsorsQueryResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/queries/CustomerQueryResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/queries/MessagesQueryResolver.js'),
+            rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnBroadcastNotificationsSubscriptionResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnReceiveMessageSubscriptionResolver.js'),
+            rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/OnUpdateChatRoomsSubscriptionResolver.js'),
 
             rootPath.to('app/server/graphql/resolvers/customer/stub/mutations/PostAppointmentMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/customer/stub/mutations/SignInMutationResolver.js'),

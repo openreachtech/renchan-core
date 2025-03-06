@@ -41,6 +41,8 @@ type Mutation {
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
   sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
 
+  postNotification (input: PostNotificationInput!): PostNotificationResult!
+
   # for scalar sample ----------------------------------------------------------
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
 
@@ -54,6 +56,9 @@ type Mutation {
 
 type Subscription {
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
+  onUpdateChatRooms: OnUpdateChatRoomsResult!
+
+  onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
 
 ################################################################################
@@ -170,6 +175,10 @@ type CreateChatRoomResult {
   rooms: [ChatRoom!]!
 }
 
+type PostNotificationResult {
+  notification: Notification!
+}
+
 type OnReceiveMessageResult {
   message: ChatMessage!
 }
@@ -180,9 +189,22 @@ type ChatMessage {
   sender: String!
 }
 
+type OnUpdateChatRoomsResult {
+  rooms: [ChatRoom!]!
+}
+
 type ChatRoom {
   id: Int!
   name: String!
+}
+
+type OnBroadcastNotificationsResult {
+  notification: Notification!
+}
+
+type Notification {
+  message: String!
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------
@@ -292,8 +314,17 @@ input SendMessageInput {
   sender: String! # username
 }
 
+input PostNotificationInput {
+  message: String!
+  segment: String!
+}
+
 input OnReceiveMessageInput {
   roomId: Int!
+}
+
+input OnBroadcastNotificationsInput {
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------
