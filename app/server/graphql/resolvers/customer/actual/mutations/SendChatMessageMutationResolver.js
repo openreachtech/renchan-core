@@ -13,17 +13,18 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
   async resolve ({
     variables: {
       input: {
-        roomId,
+        chatRoomId,
+        customerId,
         content,
-        sender,
       },
     },
     context,
   }) {
     const attributeHash = {
+      ChatRoomId: chatRoomId,
+      CustomerId: customerId,
       content,
-      sender,
-      RoomId: roomId,
+      postedAt: context.now,
     }
 
     /** @type {import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageEntity | null} */
@@ -34,7 +35,7 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
     const message = {
       id: result.id,
       content,
-      sender,
+      sender: `[${customerId}]`,
     }
 
     await this.broadcastChatMessage({
@@ -43,7 +44,7 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
         message,
       },
       channelQuery: {
-        roomId,
+        roomId: chatRoomId,
       },
     })
 
