@@ -386,8 +386,14 @@ console.log('complete: Notification')
                   resolve(args.data.sendChatMessage)
                 }
               },
-              error: reject,
-              complete: () => {}
+              error: (error) => {
+                console.error('Error sending message:', error)
+
+                reject(error)
+              },
+              complete: () => {
+                console.log('complete: sendMessageMutation() 🔥🔥🔥🔥🔥🔥🔥')
+              }
             }
           )
         })
