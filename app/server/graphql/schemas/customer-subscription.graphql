@@ -309,9 +309,9 @@ input CreateChatRoomInput {
 }
 
 input SendChatMessageInput {
-  roomId: Int!
+  chatRoomId: Int!
+  customerId: Int!
   content: String!
-  sender: String! # username
 }
 
 input PostNotificationInput {
