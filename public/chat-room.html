@@ -78,7 +78,7 @@
     <div id="messages"></div>
     <form id="message-form">
       <input type="text" id="message-input" placeholder="メッセージを入力" required>
-      <input type="text" id="sender-input" placeholder="送信者名" required>
+      <input type="text" id="customer-id-input" placeholder="Customer ID" required>
       <button type="submit">送信</button>
     </form>
     <button id="stop-button">通信停止</button>
@@ -121,7 +121,7 @@
     `
 
     const sendMessageMutation = `
-      mutation SendMessageMutation ($input: SendMessageInput!) {
+      mutation SendMessageMutation ($input: SendChatMessageInput!) {
         sendChatMessage (input: $input) {
           message {
             id
@@ -157,7 +157,7 @@
     const messagesDiv = document.getElementById('messages')
     const messageForm = document.getElementById('message-form')
     const messageInput = document.getElementById('message-input')
-    const senderInput = document.getElementById('sender-input')
+    const customerIdInput = document.getElementById('customer-id-input')
     const stopButton = document.getElementById('stop-button')
     const resumeButton = document.getElementById('resume-button')
     const roomSelect = document.getElementById('room-select')
@@ -355,9 +355,15 @@ console.log('complete: Notification')
     messageForm.addEventListener('submit', async event => {
       event.preventDefault()
       const content = messageInput.value.trim()
-      const sender = senderInput.value.trim()
+      const customerId = Number(
+        customerIdInput.value.trim()
+      )
 
-      if (!content || !sender || !currentRoomId) {
+      if (
+        !content
+        || !customerId
+        || !currentRoomId
+      ) {
         return
       }
 
@@ -368,9 +374,9 @@ console.log('complete: Notification')
               query: sendMessageMutation,
               variables: {
                 input: {
-                  content: content,
-                  sender: sender,
-                  roomId: currentRoomId,
+                  chatRoomId: currentRoomId,
+                  customerId,
+                  content,
                 },
               },
             },
