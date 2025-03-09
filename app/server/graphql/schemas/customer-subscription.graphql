@@ -39,7 +39,7 @@ type Mutation {
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
-  sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
+  sendChatMessage (input: SendChatMessageInput!): SendChatMessageResult!
 
   postNotification (input: PostNotificationInput!): PostNotificationResult!
 
@@ -308,10 +308,10 @@ input CreateChatRoomInput {
   name: String! # room name
 }
 
-input SendMessageInput {
-  roomId: Int!
+input SendChatMessageInput {
+  chatRoomId: Int!
+  customerId: Int!
   content: String!
-  sender: String! # username
 }
 
 input PostNotificationInput {
