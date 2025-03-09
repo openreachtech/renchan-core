@@ -11,7 +11,13 @@ export default class ChatMessage extends RenchanModel {
     return {
       ...factory.ID_BIGINT,
 
-      RoomId: {
+      // ForeignKey must start with upper case.
+      ChatRoomId: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+      },
+      // ForeignKey must start with upper case.
+      CustomerId: {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
@@ -19,8 +25,8 @@ export default class ChatMessage extends RenchanModel {
         type: DataTypes.STRING(191),
         allowNull: false,
       },
-      sender: {
-        type: DataTypes.STRING(191),
+      postedAt: {
+        type: DataTypes.DATE(3),
         allowNull: false,
       },
     }

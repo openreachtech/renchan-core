@@ -4,9 +4,10 @@ const MigrationAttributeFactory = require('@openreachtech/renchan-sequelize/lib/
 
 const TABLE_NAME = 'chat_messages'
 const COLUMN_NAME = {
-  ROOM_ID: 'room_id',
+  CHAT_ROOM_ID: 'chat_room_id',
+  CUSTOMER_ID: 'customer_id',
   CONTENT: 'content',
-  SENDER: 'sender',
+  POSTED_AT: 'posted_at',
 }
 
 module.exports = {
@@ -20,9 +21,15 @@ module.exports = {
       ...factory.ID_BIGINT,
 
       // ForeignKey must start with upper case.
-      RoomId: {
+      ChatRoomId: {
         type: Sequelize.BIGINT,
-        field: COLUMN_NAME.ROOM_ID,
+        field: COLUMN_NAME.CHAT_ROOM_ID,
+        allowNull: false,
+      },
+      // ForeignKey must start with upper case.
+      CustomerId: {
+        type: Sequelize.BIGINT,
+        field: COLUMN_NAME.CUSTOMER_ID,
         allowNull: false,
       },
       content: {
@@ -30,9 +37,9 @@ module.exports = {
         field: COLUMN_NAME.CONTENT,
         allowNull: false,
       },
-      sender: {
-        type: Sequelize.STRING(191),
-        field: COLUMN_NAME.SENDER,
+      postedAt: {
+        type: Sequelize.DATE,
+        field: COLUMN_NAME.POSTED_AT,
         allowNull: false,
       },
 
@@ -41,11 +48,13 @@ module.exports = {
 
     await Promise.all([
       queryInterface.addIndex(TABLE_NAME, [
-        COLUMN_NAME.ROOM_ID,
+        COLUMN_NAME.CHAT_ROOM_ID,
+        COLUMN_NAME.POSTED_AT,
       ], {
         name: [
           TABLE_NAME,
-          COLUMN_NAME.ROOM_ID,
+          COLUMN_NAME.CHAT_ROOM_ID,
+          COLUMN_NAME.POSTED_AT,
           'index',
         ].join('_'),
       }),
