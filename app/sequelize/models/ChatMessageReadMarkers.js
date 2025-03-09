@@ -3,7 +3,7 @@ import {
   RenchanModel,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatMessage extends RenchanModel {
+export default class ChatRoomsCustomersLinkage extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -19,14 +19,6 @@ export default class ChatMessage extends RenchanModel {
       // ForeignKey must start with upper case.
       CustomerId: {
         type: DataTypes.BIGINT,
-        allowNull: false,
-      },
-      content: {
-        type: DataTypes.STRING(191),
-        allowNull: false,
-      },
-      postedAt: {
-        type: DataTypes.DATE(3),
         allowNull: false,
       },
     }
@@ -71,8 +63,7 @@ export default class ChatMessage extends RenchanModel {
 /**
  * @typedef {{
  *   id: number
- *   RoomId: number
- *   content: string
- *   sender: string
- * }} ChatMessageEntity
+ *   ChatRoomId: number
+ *   CustomerId: number
+ * }} ChatRoomsCustomersLinkageEntity
  */
