@@ -10,6 +10,15 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
   }
 
   /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+
+      FailToSave: '204.M010.001',
+    }
+  }
+
+  /** @override */
   async resolve ({
     variables: {
       input: {
@@ -27,10 +36,16 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
       postedAt: context.now,
     }
 
+    const callback = await this.generateTransactionCallback({
+      attributeHash,
+    })
+
     /** @type {import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageEntity | null} */
-    const result = /** @type {*} */ (
-      await ChatMessage.create(attributeHash)
-    )
+    const result = await ChatMessage.beginTransaction(callback)
+
+    if (!result) {
+      throw new this.Error.FailToSave()
+    }
 
     const message = {
       id: result.id,
@@ -51,6 +66,26 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
     return {
       message,
     }
+  }
+
+  /**
+   * Generate transaction callback.
+   *
+   * @param {{
+   *   attributeHash,
+   * }} params
+   * @returns {function(): Promise<import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageEntity>} - Returns transaction callback.
+   */
+  generateTransactionCallback ({
+    attributeHash,
+  }) {
+    const chatMessageEntity = ChatMessage.build(attributeHash)
+
+    return async transaction => /** @type {*} */ (
+      chatMessageEntity.save({
+        transaction,
+      })
+    )
   }
 
   /**
