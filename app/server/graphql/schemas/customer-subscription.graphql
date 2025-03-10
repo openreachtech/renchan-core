@@ -301,7 +301,7 @@ input SortInput {
 # for subscription -------------------------------------------------------------
 
 input ChatMessagesInput {
-  roomId: Int!
+  chatRoomId: Int!
 }
 
 input CreateChatRoomInput {

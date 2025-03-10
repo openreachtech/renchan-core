@@ -13,7 +13,7 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
   async resolve ({
     variables: {
       input: {
-        roomId,
+        chatRoomId,
       },
     },
     context,
@@ -22,7 +22,7 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
     const chatMessageEntities = /** @type {Array<*>} */ (
       await ChatMessage.findAll({
         where: {
-          ChatRoomId: roomId,
+          ChatRoomId: chatRoomId,
         },
         include: [
           {
