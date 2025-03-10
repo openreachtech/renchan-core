@@ -160,6 +160,18 @@
       }
     `
 
+    const chatMessagesQuery = `
+      query ChatMessagesQuery ($input: ChatMessagesInput!) {
+        chatMessages (input: $input) {
+          messages {
+            id
+            content
+            sender
+          }
+        }
+      }
+    `
+
     const messagesDiv = document.getElementById('messages')
     const messageForm = document.getElementById('message-form')
     const messageInput = document.getElementById('message-input')
@@ -175,11 +187,20 @@
     let currentRoomId
 
     // ✅ メッセージ表示関数
-    function displayMessage (message) {
-      const messageElement = document.createElement('div')
-      messageElement.className = 'message'
-      messageElement.textContent = `${message.sender}: ${message.content}`
-      messagesDiv.appendChild(messageElement)
+    function displayMessages (...messages) {
+      const fragment = document.createDocumentFragment()
+
+      const messageElements = messages.map(message => {
+        const messageElement = document.createElement('div')
+        messageElement.className = 'message'
+        messageElement.textContent = `${message.sender}: ${message.content}`
+
+        return messageElement
+      })
+
+      fragment.append(...messageElements.reverse())
+
+      messagesDiv.appendChild(fragment)
       messagesDiv.scrollTop = messagesDiv.scrollHeight
     }
 
@@ -193,6 +214,8 @@
 
     // ✅ ルーム購読関数
     function subscribeToRoom (roomId) {
+      fetchMessages(roomId)
+
       if (unsubscribe) {
         unsubscribe()
       }
@@ -217,7 +240,7 @@
             const { data } = args
 
             if (data && data.onReceiveMessage) {
-              displayMessage(data.onReceiveMessage.message)
+              displayMessages(data.onReceiveMessage.message)
             }
           },
           error: error => {
@@ -309,6 +332,39 @@
 
         subscribeToRoom(currentRoomId)
       }
+    }
+
+    // ✅ メッセージ取得関数
+    async function fetchMessages (roomId) {
+      new Promise((resolve, reject) => {
+        client.subscribe(
+          {
+            query: chatMessagesQuery,
+            variables: {
+              input: {
+                chatRoomId: roomId,
+              },
+            },
+          },
+          {
+            next: ({ data }) => {
+              resolve(data.chatMessages.messages)
+            },
+            error: error => {
+              reject(error)
+            },
+            complete: () => {
+              console.log('complete: fetchMessages() ✅️🔥🔥🔥🔥🔥🔥🔥')
+            },
+          }
+        )
+      })
+        .then(messages => {
+          displayMessages(...messages)
+        })
+        .catch(error => {
+          console.error('✅️💀💀💀💀💀💀💀💀 Error fetching messages:', error)
+        })
     }
 
     // ✅ 通知開始
