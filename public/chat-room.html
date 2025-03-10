@@ -160,6 +160,18 @@
       }
     `
 
+    const chatMessagesQuery = `
+      query ChatMessagesQuery ($input: ChatMessagesInput!) {
+        chatMessages (input: $input) {
+          messages {
+            id
+            content
+            sender
+          }
+        }
+      }
+    `
+
     const messagesDiv = document.getElementById('messages')
     const messageForm = document.getElementById('message-form')
     const messageInput = document.getElementById('message-input')
@@ -309,6 +321,39 @@
 
         subscribeToRoom(currentRoomId)
       }
+    }
+
+    // ✅ メッセージ取得関数
+    async function fetchMessages (roomId) {
+      new Promise((resolve, reject) => {
+        client.subscribe(
+          {
+            query: chatMessagesQuery,
+            variables: {
+              input: {
+                chatRoomId: roomId,
+              },
+            },
+          },
+          {
+            next: ({ data }) => {
+              resolve(data.chatMessages.messages)
+            },
+            error: error => {
+              reject(error)
+            },
+            complete: () => {
+              console.log('complete: fetchMessages() ✅️🔥🔥🔥🔥🔥🔥🔥')
+            },
+          }
+        )
+      })
+        .then(messages => {
+          displayMessage(...messages)
+        })
+        .catch(error => {
+          console.error('✅️💀💀💀💀💀💀💀💀 Error fetching messages:', error)
+        })
     }
 
     // ✅ 通知開始
