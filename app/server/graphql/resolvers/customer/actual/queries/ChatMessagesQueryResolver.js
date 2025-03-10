@@ -1,5 +1,7 @@
 import BaseQueryResolver from '../../../../../../../lib/server/graphql/resolvers/BaseQueryResolver.js'
 import ChatMessage from '../../../../../../sequelize/models/ChatMessage.js'
+import Customer from '../../../../../../sequelize/models/Customer.js'
+import CustomerBasic from '../../../../../../sequelize/models/CustomerBasic.js'
 
 export default class ChatMessagesQueryResolver extends BaseQueryResolver {
   /** @override */
@@ -16,12 +18,23 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
     },
     context,
   }) {
-    /** @type {Array<import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageEntity>} */
+    /** @type {Array<import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageAssociatedEntity>} */
     const chatMessageEntities = /** @type {Array<*>} */ (
       await ChatMessage.findAll({
         where: {
-          RoomId: roomId,
+          ChatRoomId: roomId,
         },
+        include: [
+          {
+            model: Customer,
+            include: [
+              CustomerBasic,
+            ],
+          },
+        ],
+        order: [
+          ['postedAt', 'DESC'],
+        ],
       })
     )
 
@@ -29,11 +42,17 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
       .map(({
         id,
         content,
-        sender,
+        CustomerId,
+        postedAt,
+        Customer: {
+          CustomerBasic: {
+            username,
+          },
+        },
       }) => ({
         id,
         content,
-        sender,
+        sender: `${username} [${CustomerId}]`,
       }))
 
     return {

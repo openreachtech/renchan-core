@@ -43,7 +43,7 @@ export default class ChatMessage extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    // noop
+    this.belongsTo(this._.Customer)
   }
 
   /** @override */
@@ -71,8 +71,29 @@ export default class ChatMessage extends RenchanModel {
 /**
  * @typedef {{
  *   id: number
- *   RoomId: number
+ *   ChatRoomId: number
+ *   CustomerId: number
  *   content: string
- *   sender: string
+ *   postedAt: Date
  * }} ChatMessageEntity
+ */
+
+/**
+ * @typedef {{
+ *   id: number
+ *   ChatRoomId: number
+ *   CustomerId: number
+ *   content: string
+ *   postedAt: Date
+ *   Customer: {
+ *     id: number
+ *     registeredAt: Date
+ *     CustomerBasic: {
+ *       id: number
+ *       CustomerId: number
+ *       username: string
+ *       savedAt: Date
+ *     }
+ *   }
+ * }} ChatMessageAssociatedEntity
  */
