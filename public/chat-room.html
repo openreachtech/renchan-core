@@ -214,6 +214,8 @@
 
     // ✅ ルーム購読関数
     function subscribeToRoom (roomId) {
+      fetchMessages(roomId)
+
       if (unsubscribe) {
         unsubscribe()
       }
