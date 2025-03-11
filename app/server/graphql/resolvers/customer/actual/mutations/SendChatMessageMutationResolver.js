@@ -1,7 +1,7 @@
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
 
 import ChatMessage from '../../../../../../sequelize/models/ChatMessage.js'
-import OnReceiveMessageSubscriptionResolver from '../subscriptions/OnReceiveMessageSubscriptionResolver.js'
+import OnObserveChatStatesSubscriptionResolver from '../subscriptions/OnObserveChatStatesSubscriptionResolver.js'
 
 export default class SendChatMessageMutationResolver extends BaseMutationResolver {
   /** @override */
@@ -93,13 +93,6 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
    *
    * @param {{
    *   context: GraphqlType.Context
-   *   payload: {
-   *     message: {
-   *       id: number
-   *       content: string
-   *       sender: string
-   *     }
-   *   }
    *   channelQuery: {
    *     roomId: number
    *   }
@@ -108,13 +101,20 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
    */
   async broadcastChatMessage ({
     context,
-    payload,
     channelQuery,
   }) {
-    return OnReceiveMessageSubscriptionResolver.publishTopic({
+    await OnObserveChatStatesSubscriptionResolver.publishTopic({
       context,
-      payload,
-      channelQuery,
+      payload: {
+        hasUnreadMessages: true,
+        isUpdatedRooms: false,
+        isUpdatedMembers: false,
+      },
+      channelQuery: {
+        chatRoomId: channelQuery.roomId,
+      },
     })
+
+    return Promise.resolve()
   }
 }
