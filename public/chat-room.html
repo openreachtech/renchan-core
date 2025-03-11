@@ -390,7 +390,7 @@
         currentRoomId = rooms[0].id
         roomSelect.value = currentRoomId
 
-        subscribeToRoom(currentRoomId)
+        subscribeChatStates(currentRoomId)
       }
     }
 
@@ -542,7 +542,8 @@ console.log('complete: Notification')
     resumeButton.addEventListener('click', () => {
       initializeClient()
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
+
       stopButton.style.display = 'inline-block'
       resumeButton.style.display = 'none'
     })
@@ -551,7 +552,7 @@ console.log('complete: Notification')
     roomSelect.addEventListener('change', (event) => {
       currentRoomId = Number(event.target.value)
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
 
       messagesDiv.innerHTML = ''
     })
