@@ -55,6 +55,7 @@ type Mutation {
 ################################################################################
 
 type Subscription {
+  onObserveChatStates (input: OnObserveChatStatesInput!): OnObserveChatStatesResult!
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
   onUpdateChatRooms: OnUpdateChatRoomsResult!
 
@@ -177,6 +178,12 @@ type CreateChatRoomResult {
 
 type PostNotificationResult {
   notification: Notification!
+}
+
+type OnObserveChatStatesResult {
+  hasUnreadMessages: Boolean!
+  isUpdatedRooms: Boolean!
+  isUpdatedMembers: Boolean!
 }
 
 type OnReceiveMessageResult {
@@ -317,6 +324,10 @@ input SendChatMessageInput {
 input PostNotificationInput {
   message: String!
   segment: String!
+}
+
+input OnObserveChatStatesInput {
+  chatRoomId: Int!
 }
 
 input OnReceiveMessageInput {
