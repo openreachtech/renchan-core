@@ -93,6 +93,16 @@
 
   <script src="https://unpkg.com/graphql-ws/umd/graphql-ws.js"></script>
   <script type="module">
+    const observeChatStatesSubscription = `
+      subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+        onObserveChatStates (input: $input) {
+          hasUnreadMessages
+          isUpdatedRooms
+          isUpdatedMembers
+        }
+      }
+    `
+
     const onReceiveMessageSubscription = `
       subscription OnReceiveMessage ($input: OnReceiveMessageInput!) {
         onReceiveMessage (input: $input) {
@@ -212,7 +222,7 @@
       })
     }
 
-    // ✅ ルーム購読関数
+    // ✅ チャットメッセージ購読関数
     function subscribeToRoom (roomId) {
       fetchMessages(roomId)
 
@@ -292,6 +302,56 @@
       )
     }
 
+    // 🏆️ チャット状態監視購読
+    let unsubscribeChatStates
+
+    function subscribeChatStates (chatRoomId) {
+      fetchMessages(chatRoomId)
+
+      if (unsubscribeChatStates) {
+        unsubscribeChatStates()
+      }
+
+      unsubscribeChatStates = client.subscribe(
+        {
+          query: observeChatStatesSubscription,
+          variables: {
+            input: {
+              chatRoomId,
+            },
+          },
+        },
+        {
+          next: (args) => {
+            const { data } = args
+
+            if (
+              !data
+              || !data.onObserveChatStates
+            ) {
+              return
+            }
+
+            const {
+              hasUnreadMessages,
+              // isUpdatedRooms,
+              // isUpdatedMessages,
+            } = data.onObserveChatStates
+
+            if (hasUnreadMessages) {
+              fetchMessages(chatRoomId)
+            }
+          },
+          error: error => {
+            console.error('🏆️🏆️ 💀💀💀💀💀💀💀💀xxx subscribeChatStates()', error)
+          },
+          complete: () => {
+            console.log('complete: subscribeChatStates() 🏆️🏆️ 🔥🔥🔥🔥🔥🔥🔥')
+          },
+        }
+      )
+    }
+
     // ✅ ルーム一覧取得関数
     async function fetchRooms () {
       return new Promise((resolve, reject) => {
@@ -330,7 +390,7 @@
         currentRoomId = rooms[0].id
         roomSelect.value = currentRoomId
 
-        subscribeToRoom(currentRoomId)
+        subscribeChatStates(currentRoomId)
       }
     }
 
@@ -482,7 +542,8 @@ console.log('complete: Notification')
     resumeButton.addEventListener('click', () => {
       initializeClient()
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
+
       stopButton.style.display = 'inline-block'
       resumeButton.style.display = 'none'
     })
@@ -491,7 +552,7 @@ console.log('complete: Notification')
     roomSelect.addEventListener('change', (event) => {
       currentRoomId = Number(event.target.value)
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
 
       messagesDiv.innerHTML = ''
     })

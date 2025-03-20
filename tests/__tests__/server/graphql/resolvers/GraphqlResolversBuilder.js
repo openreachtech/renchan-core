@@ -854,6 +854,7 @@ describe('GraphqlResolversBuilder', () => {
             uploadImage: expect.any(BaseMutationResolver),
 
             onBroadcastNotifications: expect.any(BaseSubscriptionResolver),
+            onObserveChatStates: expect.any(BaseSubscriptionResolver),
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
             onUpdateChatRooms: expect.any(BaseSubscriptionResolver),
           },
@@ -1590,6 +1591,10 @@ describe('GraphqlResolversBuilder', () => {
             },
             Subscription: {
               onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onObserveChatStates: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },

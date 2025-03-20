@@ -261,6 +261,10 @@ describe('GraphqlSchemaBuilder', () => {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },
+              onObserveChatStates: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
