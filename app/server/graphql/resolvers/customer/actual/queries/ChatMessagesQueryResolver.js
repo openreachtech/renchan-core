@@ -18,14 +18,24 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
     variables: {
       input: {
         chatRoomId,
+        offsetDateTime = null,
+        fetchDirection = 'after',
+        limit = null,
       },
     },
     context,
   }) {
+    const whereClause = this.generateWhereClause({
+      offsetDateTime,
+      fetchDirection,
+    })
+
     /** @type {Array<import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageAssociatedEntity>} */
     const chatMessageEntities = /** @type {Array<*>} */ (
       await ChatMessage.findAll({
         where: {
+          ...whereClause,
+
           ChatRoomId: chatRoomId,
         },
         include: [
@@ -37,8 +47,9 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
           },
         ],
         order: [
-          ['postedAt', 'DESC'],
+          ['postedAt', 'ASC'],
         ],
+        limit,
       })
     )
 
