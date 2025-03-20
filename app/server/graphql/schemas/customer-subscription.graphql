@@ -192,6 +192,7 @@ type OnReceiveMessageResult {
 
 type ChatMessage {
   id: Int! # for edit/delete
+  postedAt: DateTime!
   content: String!
   sender: String!
 }
