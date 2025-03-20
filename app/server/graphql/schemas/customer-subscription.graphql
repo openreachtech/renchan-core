@@ -310,6 +310,9 @@ input SortInput {
 
 input ChatMessagesInput {
   chatRoomId: Int!
+  offsetDateTime: DateTime
+  fetchDirection: String
+  limit: Int
 }
 
 input CreateChatRoomInput {
