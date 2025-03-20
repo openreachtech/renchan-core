@@ -51,6 +51,7 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
         },
       }) => ({
         id,
+        postedAt,
         content,
         sender: `${username} [${CustomerId}]`,
       }))
