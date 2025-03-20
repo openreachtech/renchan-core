@@ -1,3 +1,7 @@
+import {
+  Op,
+} from 'sequelize'
+
 import BaseQueryResolver from '../../../../../../../lib/server/graphql/resolvers/BaseQueryResolver.js'
 import ChatMessage from '../../../../../../sequelize/models/ChatMessage.js'
 import Customer from '../../../../../../sequelize/models/Customer.js'
@@ -58,6 +62,36 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
 
     return {
       messages,
+    }
+  }
+
+  /**
+   * Generate where clause.
+   *
+   * @param {{
+   *   offsetDateTime: Date
+   *   fetchDirection: string
+   * }} options - Options.
+   * @returns {{
+   *   [key: string]: *
+   * }} - Where clause.
+   */
+  generateWhereClause ({
+    offsetDateTime,
+    fetchDirection,
+  }) {
+    if (!offsetDateTime) {
+      return {}
+    }
+
+    const operator = fetchDirection === 'after'
+      ? Op.gte
+      : Op.lte
+
+    return {
+      postedAt: {
+        [operator]: offsetDateTime,
+      },
     }
   }
 }
