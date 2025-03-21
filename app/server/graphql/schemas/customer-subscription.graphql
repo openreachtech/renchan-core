@@ -32,7 +32,6 @@ type Mutation {
   signIn(input: SignInInput): AuthResult!
 
   # for furo boilerplate -------------------------------------------------------
-  uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
   uploadImage (input: UploadImageInput!): UploadImageResult!
   uploadArrayImages (input: UploadArrayImagesInput!): [UploadImageResult!]!
   uploadDeepPropertyImages (input: UploadDeepPropertyImagesInput!): UploadDeepPropertyImagesResult!
@@ -123,10 +122,6 @@ type Article {
 
 type SignUpResult {
   sentTo: String!
-}
-
-type UploadCustomerForumPostImageResult {
-  imageUrl: String!
 }
 
 type UploadImageResult {
@@ -265,10 +260,6 @@ input CurriculumsSearchInput {
 input PaginationArticlesInput {
   category: String!
   pagination: PaginationInput!
-}
-
-input UploadCustomerForumPostImageInput {
-  image: Upload!
 }
 
 input UploadImageInput {
