@@ -1,6 +1,7 @@
 import BaseSubscriptionResolver from '../../../../../lib/server/graphql/resolvers/BaseSubscriptionResolver.js'
 import BaseResolver from '../../../../../lib/server/graphql/resolvers/BaseResolver.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
+import RenchanGraphqlError from '../../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 describe('BaseSubscriptionResolver', () => {
   describe('super class', () => {
@@ -267,6 +268,46 @@ describe('BaseSubscriptionResolver', () => {
 
         expect(actual)
           .toBeTruthy()
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
+  describe('#createCanNotSubscribeError()', () => {
+    describe('to be fixed value', () => {
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
+        const expected = '102.S000.001'
+
+        const resolver = params.Resolver.create()
+
+        const actual = resolver.createCanNotSubscribeError()
+
+        expect(actual)
+          .toBeInstanceOf(RenchanGraphqlError)
+        expect(actual)
+          .toHaveProperty('message', expected)
       })
     })
   })
