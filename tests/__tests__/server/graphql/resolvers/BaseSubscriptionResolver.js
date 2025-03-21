@@ -207,6 +207,72 @@ describe('BaseSubscriptionResolver', () => {
 })
 
 describe('BaseSubscriptionResolver', () => {
+  describe('#canSubscribe()', () => {
+    describe('to be fixed value', () => {
+      /** @type {GraphqlType.ResolverInputContext} */
+      const contextMock = /** @type {*} */ ({
+        broker: SubscriptionBroker.create({
+          config: /** @type {*} */ ({
+            redisOptions: null,
+          }),
+        }),
+      })
+
+      /** @type {GraphqlType.ResolverInputInformation} */
+      const informationMock = /** @type {*} */ ({})
+
+      /** @type {GraphqlType.ResolverOutput} */
+      const parentMock = /** @type {*} */ ({})
+
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+            variables: {
+              input: {
+                roomId: 10001,
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+            variables: {
+              input: {
+                roomId: 10002,
+              },
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
+        const resolver = params.Resolver.create()
+
+        const actual = resolver.canSubscribe({
+          variables: params.variables,
+          context: contextMock,
+          information: informationMock,
+          parent: parentMock,
+        })
+
+        expect(actual)
+          .toBeTruthy()
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
   describe('.publishTopic()', () => {
     describe('to call members', () => {
       /** @type {GraphqlType.ResolverInputContext} */
