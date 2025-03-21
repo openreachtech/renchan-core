@@ -27,6 +27,21 @@ describe('BaseSubscriptionResolver', () => {
 })
 
 describe('BaseSubscriptionResolver', () => {
+  describe('.get:errorCodeHash', () => {
+    test('to be fixed value', () => {
+      const expected = {
+        CanNotSubscribe: '102.S000.001',
+      }
+
+      const actual = BaseSubscriptionResolver.errorCodeHash
+
+      expect(actual)
+        .toEqual(expected)
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
   describe('.get:channelPrefix', () => {
     describe('to return same value as .get:schema', () => {
       const cases = [
