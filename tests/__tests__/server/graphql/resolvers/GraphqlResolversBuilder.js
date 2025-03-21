@@ -872,7 +872,6 @@ describe('GraphqlResolversBuilder', () => {
             postAppointment: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
             signUp: expect.any(BaseMutationResolver),
-            uploadCustomerForumPostImage: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
           },
         },
