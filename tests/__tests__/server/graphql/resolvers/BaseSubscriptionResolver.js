@@ -162,46 +162,97 @@ describe('BaseSubscriptionResolver', () => {
         },
       ]
 
-      test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
-        const resolver = params.Resolver.create()
+      describe('when can subscribe', () => {
+        test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
+          const resolver = params.Resolver.create()
 
-        const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
+          const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
 
-        const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
-          .mockReturnValue(tally.channelQuery)
-        const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
-          .mockReturnValue(channelTally)
-        const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
+          const canSubscribeSpy = jest.spyOn(resolver, 'canSubscribe')
+          const createCanNotSubscribeErrorSpy = jest.spyOn(resolver, 'createCanNotSubscribeError')
+          const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
+            .mockReturnValue(tally.channelQuery)
+          const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
+            .mockReturnValue(channelTally)
+          const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
 
-        const argsTally = {
-          variables: params.variables,
-          context: contextMock,
-          information: informationMock,
-          parent: parentMock,
-        }
+          const argsTally = {
+            variables: params.variables,
+            context: contextMock,
+            information: informationMock,
+            parent: parentMock,
+          }
 
-        const subscribeExpected = {
-          [Symbol.asyncIterator]: expect.any(Function),
-        }
-        const generateChannelArgsExpected = {
-          query: tally.channelQuery,
-        }
-        const generateAsyncIterableArgsExpected = {
-          context: contextMock,
-          channel: expected.channel,
-        }
+          const subscribeExpected = {
+            [Symbol.asyncIterator]: expect.any(Function),
+          }
+          const generateChannelArgsExpected = {
+            query: tally.channelQuery,
+          }
+          const generateAsyncIterableArgsExpected = {
+            context: contextMock,
+            channel: expected.channel,
+          }
 
-        const actual = await resolver.subscribe(argsTally)
+          const actual = await resolver.subscribe(argsTally)
 
-        expect(actual)
-          .toEqual(subscribeExpected)
+          expect(actual)
+            .toEqual(subscribeExpected)
 
-        expect(generateChannelQuerySpy)
-          .toHaveBeenCalledWith(argsTally)
-        expect(generateChannelSpy)
-          .toHaveBeenCalledWith(generateChannelArgsExpected)
-        expect(generateAsyncIterableSpy)
-          .toHaveBeenCalledWith(generateAsyncIterableArgsExpected)
+          expect(canSubscribeSpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(createCanNotSubscribeErrorSpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateChannelQuerySpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(generateChannelSpy)
+            .toHaveBeenCalledWith(generateChannelArgsExpected)
+          expect(generateAsyncIterableSpy)
+            .toHaveBeenCalledWith(generateAsyncIterableArgsExpected)
+        })
+      })
+
+      describe('when can not subscribe', () => {
+        test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
+          const resolver = params.Resolver.create()
+
+          const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
+
+          const canSubscribeSpy = jest.spyOn(resolver, 'canSubscribe')
+            .mockReturnValue(false) // ✅️
+          const createCanNotSubscribeErrorSpy = jest.spyOn(resolver, 'createCanNotSubscribeError')
+          const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
+            .mockReturnValue(tally.channelQuery)
+          const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
+            .mockReturnValue(channelTally)
+          const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
+
+          const argsTally = {
+            variables: params.variables,
+            context: contextMock,
+            information: informationMock,
+            parent: parentMock,
+          }
+
+          await expect(resolver.subscribe(argsTally))
+            .rejects
+            .toThrow(RenchanGraphqlError)
+
+          expect(canSubscribeSpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(createCanNotSubscribeErrorSpy)
+            .toHaveBeenCalledWith()
+          expect(generateChannelQuerySpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateChannelSpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateAsyncIterableSpy)
+            .not
+            .toHaveBeenCalled()
+        })
       })
     })
   })
