@@ -3,7 +3,7 @@ import {
   RenchanModel,
 } from '@openreachtech/renchan-sequelize'
 
-export default class ChatMessage extends RenchanModel {
+export default class ChatRoomsCustomersLinkage extends RenchanModel {
   /** @override */
   static createAttributes (DataTypes) {
     const factory = ModelAttributeFactory.create(DataTypes)
@@ -21,14 +21,6 @@ export default class ChatMessage extends RenchanModel {
         type: DataTypes.BIGINT,
         allowNull: false,
       },
-      content: {
-        type: DataTypes.STRING(191),
-        allowNull: false,
-      },
-      postedAt: {
-        type: DataTypes.DATE(3),
-        allowNull: false,
-      },
     }
   }
 
@@ -43,7 +35,7 @@ export default class ChatMessage extends RenchanModel {
   static associate () {
     super.associate?.()
 
-    this.belongsTo(this._.Customer)
+    // noop
   }
 
   /** @override */
@@ -73,27 +65,5 @@ export default class ChatMessage extends RenchanModel {
  *   id: number
  *   ChatRoomId: number
  *   CustomerId: number
- *   content: string
- *   postedAt: Date
- * }} ChatMessageEntity
- */
-
-/**
- * @typedef {{
- *   id: number
- *   ChatRoomId: number
- *   CustomerId: number
- *   content: string
- *   postedAt: Date
- *   Customer: {
- *     id: number
- *     registeredAt: Date
- *     CustomerBasic: {
- *       id: number
- *       CustomerId: number
- *       username: string
- *       savedAt: Date
- *     }
- *   }
- * }} ChatMessageAssociatedEntity
+ * }} ChatRoomsCustomersLinkageEntity
  */

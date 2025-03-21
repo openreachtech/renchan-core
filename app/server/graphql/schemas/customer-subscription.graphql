@@ -39,7 +39,7 @@ type Mutation {
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
-  sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
+  sendChatMessage (input: SendChatMessageInput!): SendChatMessageResult!
 
   postNotification (input: PostNotificationInput!): PostNotificationResult!
 
@@ -55,6 +55,7 @@ type Mutation {
 ################################################################################
 
 type Subscription {
+  onObserveChatStates (input: OnObserveChatStatesInput!): OnObserveChatStatesResult!
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
   onUpdateChatRooms: OnUpdateChatRoomsResult!
 
@@ -179,12 +180,19 @@ type PostNotificationResult {
   notification: Notification!
 }
 
+type OnObserveChatStatesResult {
+  hasUnreadMessages: Boolean!
+  isUpdatedRooms: Boolean!
+  isUpdatedMembers: Boolean!
+}
+
 type OnReceiveMessageResult {
   message: ChatMessage!
 }
 
 type ChatMessage {
   id: Int! # for edit/delete
+  postedAt: DateTime!
   content: String!
   sender: String!
 }
@@ -301,22 +309,29 @@ input SortInput {
 # for subscription -------------------------------------------------------------
 
 input ChatMessagesInput {
-  roomId: Int!
+  chatRoomId: Int!
+  offsetDateTime: DateTime
+  fetchDirection: String
+  limit: Int
 }
 
 input CreateChatRoomInput {
   name: String! # room name
 }
 
-input SendMessageInput {
-  roomId: Int!
+input SendChatMessageInput {
+  chatRoomId: Int!
+  customerId: Int!
   content: String!
-  sender: String! # username
 }
 
 input PostNotificationInput {
   message: String!
   segment: String!
+}
+
+input OnObserveChatStatesInput {
+  chatRoomId: Int!
 }
 
 input OnReceiveMessageInput {
