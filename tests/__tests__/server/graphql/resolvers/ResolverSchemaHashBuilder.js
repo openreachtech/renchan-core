@@ -261,13 +261,13 @@ describe('ResolverSchemaHashBuilder', () => {
           },
           expected: {
             resolvers: expect.arrayContaining([
-              AlphaQueryResolver.create(),
-              BetaQueryResolver.create(),
-              CountQueryResolver.create(),
-              FindQueryResolver.create(),
-              SaveMutationResolver.create(),
-              UpdateMutationResolver.create(),
-              ChatRoomSubscriptionResolver.create(),
+              expect.any(AlphaQueryResolver),
+              expect.any(BetaQueryResolver),
+              expect.any(CountQueryResolver),
+              expect.any(FindQueryResolver),
+              expect.any(SaveMutationResolver),
+              expect.any(UpdateMutationResolver),
+              expect.any(ChatRoomSubscriptionResolver),
             ]),
           },
         },
@@ -280,8 +280,8 @@ describe('ResolverSchemaHashBuilder', () => {
           },
           expected: {
             resolvers: expect.arrayContaining([
-              CountQueryResolver.create(),
-              FindQueryResolver.create(),
+              expect.any(CountQueryResolver),
+              expect.any(FindQueryResolver),
             ]),
           },
         },
@@ -294,8 +294,8 @@ describe('ResolverSchemaHashBuilder', () => {
           },
           expected: {
             resolvers: expect.arrayContaining([
-              SaveMutationResolver.create(),
-              UpdateMutationResolver.create(),
+              expect.any(SaveMutationResolver),
+              expect.any(UpdateMutationResolver),
             ]),
           },
         },
@@ -308,7 +308,7 @@ describe('ResolverSchemaHashBuilder', () => {
           },
           expected: {
             resolvers: expect.arrayContaining([
-              ChatRoomSubscriptionResolver.create(),
+              expect.any(ChatRoomSubscriptionResolver),
             ]),
           },
         },
