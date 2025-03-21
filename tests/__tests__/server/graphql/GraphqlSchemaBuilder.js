@@ -241,19 +241,34 @@ describe('GraphqlSchemaBuilder', () => {
               customer: expect.any(Function),
               customerAmounts: expect.any(Function),
               messages: expect.any(Function),
+              paginationArticles: expect.any(Function),
             },
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              postNotification: expect.any(Function),
               renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
               signUp: expect.any(Function),
-              uploadCustomerForumPostImage: expect.any(Function),
+              uploadArrayImages: expect.any(Function),
+              uploadDeepPropertyImages: expect.any(Function),
               uploadImage: expect.any(Function),
             },
             Subscription: {
+              onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onObserveChatStates: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onUpdateChatRooms: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },

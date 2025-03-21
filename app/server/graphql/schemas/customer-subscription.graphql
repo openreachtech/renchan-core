@@ -13,6 +13,7 @@ type Query {
   # for furo boilerplate -------------------------------------------------------
   companySponsors: CompanySponsorsResult!
   curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
+  paginationArticles (input: PaginationArticlesInput!): PaginationArticlesResult!
 
   # for subscription -----------------------------------------------------------
   chatMessages (input: ChatMessagesInput!): ChatMessagesResult!
@@ -31,12 +32,15 @@ type Mutation {
   signIn(input: SignInInput): AuthResult!
 
   # for furo boilerplate -------------------------------------------------------
-  uploadCustomerForumPostImage(input: UploadCustomerForumPostImageInput!): UploadCustomerForumPostImageResult!
   uploadImage (input: UploadImageInput!): UploadImageResult!
+  uploadArrayImages (input: UploadArrayImagesInput!): [UploadImageResult!]!
+  uploadDeepPropertyImages (input: UploadDeepPropertyImagesInput!): UploadDeepPropertyImagesResult!
 
   # for subscription -----------------------------------------------------------
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
-  sendChatMessage (input: SendMessageInput!): SendChatMessageResult!
+  sendChatMessage (input: SendChatMessageInput!): SendChatMessageResult!
+
+  postNotification (input: PostNotificationInput!): PostNotificationResult!
 
   # for scalar sample ----------------------------------------------------------
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
@@ -50,7 +54,11 @@ type Mutation {
 ################################################################################
 
 type Subscription {
+  onObserveChatStates (input: OnObserveChatStatesInput!): OnObserveChatStatesResult!
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
+  onUpdateChatRooms: OnUpdateChatRoomsResult!
+
+  onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
 
 ################################################################################
@@ -100,15 +108,34 @@ type Curriculum {
   postedAt: String!
 }
 
+type PaginationArticlesResult {
+  articles: [Article!]!
+  pagination: Pagination!
+}
+
+type Article {
+  id: Int!
+  title: String!
+  description: String!
+  postedAt: DateTime!
+}
+
 type SignUpResult {
   sentTo: String!
 }
 
-type UploadCustomerForumPostImageResult {
-  imageUrl: String!
+type UploadImageResult {
+  filename: String
+  mimetype: String
+  encoding: String
 }
 
-type UploadImageResult {
+type UploadDeepPropertyImagesResult {
+  avatarImage: FileParameters!
+  coverImage: FileParameters!
+}
+
+type FileParameters {
   filename: String
   mimetype: String
   encoding: String
@@ -144,19 +171,43 @@ type CreateChatRoomResult {
   rooms: [ChatRoom!]!
 }
 
+type PostNotificationResult {
+  notification: Notification!
+}
+
+type OnObserveChatStatesResult {
+  hasUnreadMessages: Boolean!
+  isUpdatedRooms: Boolean!
+  isUpdatedMembers: Boolean!
+}
+
 type OnReceiveMessageResult {
   message: ChatMessage!
 }
 
 type ChatMessage {
   id: Int! # for edit/delete
+  postedAt: DateTime!
   content: String!
   sender: String!
+}
+
+type OnUpdateChatRoomsResult {
+  rooms: [ChatRoom!]!
 }
 
 type ChatRoom {
   id: Int!
   name: String!
+}
+
+type OnBroadcastNotificationsResult {
+  notification: Notification!
+}
+
+type Notification {
+  message: String!
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------
@@ -206,12 +257,33 @@ input CurriculumsSearchInput {
   pagination: PaginationInput!
 }
 
-input UploadCustomerForumPostImageInput {
-  image: Upload!
+input PaginationArticlesInput {
+  category: String!
+  pagination: PaginationInput!
 }
 
 input UploadImageInput {
   image: Upload!
+}
+
+input UploadArrayImagesInput {
+  images: [Upload!]!
+}
+
+input UploadDeepPropertyImagesInput {
+  profile: UploadDeepPropertyImagesProfileInput
+  config: UploadDeepPropertyImagesConfigInput
+}
+
+input UploadDeepPropertyImagesProfileInput {
+  nickname: String!
+  bio: String!
+  avatarImage: Upload
+}
+
+input UploadDeepPropertyImagesConfigInput {
+  themeColor: String!
+  coverImage: Upload
 }
 
 input PaginationInput {
@@ -228,21 +300,37 @@ input SortInput {
 # for subscription -------------------------------------------------------------
 
 input ChatMessagesInput {
-  roomId: Int!
+  chatRoomId: Int!
+  offsetDateTime: DateTime
+  fetchDirection: String
+  limit: Int
 }
 
 input CreateChatRoomInput {
   name: String! # room name
 }
 
-input SendMessageInput {
-  roomId: Int!
+input SendChatMessageInput {
+  chatRoomId: Int!
+  customerId: Int!
   content: String!
-  sender: String! # username
+}
+
+input PostNotificationInput {
+  message: String!
+  segment: String!
+}
+
+input OnObserveChatStatesInput {
+  chatRoomId: Int!
 }
 
 input OnReceiveMessageInput {
   roomId: Int!
+}
+
+input OnBroadcastNotificationsInput {
+  segment: String!
 }
 
 # for scalar sample ------------------------------------------------------------

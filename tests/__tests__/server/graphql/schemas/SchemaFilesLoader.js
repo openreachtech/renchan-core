@@ -83,6 +83,7 @@ type Query {
   # for furo boilerplate -------------------------------------------------------
   companySponsors: CompanySponsorsResult!
   curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
+  paginationArticles (input: PaginationArticlesInput!): PaginationArticlesResult!
 
   # for subscription -----------------------------------------------------------
   chatMessages (input: ChatMessagesInput!): ChatMessagesResult!
@@ -134,6 +135,7 @@ type Query {
   # for furo boilerplate -------------------------------------------------------
   companySponsors: CompanySponsorsResult!
   curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
+  paginationArticles (input: PaginationArticlesInput!): PaginationArticlesResult!
 
   # for subscription -----------------------------------------------------------
   chatMessages (input: ChatMessagesInput!): ChatMessagesResult!

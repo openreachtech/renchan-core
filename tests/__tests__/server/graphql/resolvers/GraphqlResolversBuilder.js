@@ -25,8 +25,8 @@ describe('GraphqlResolversBuilder', () => {
           {
             params: {
               filterSchemaHash: {
-                customer: BaseResolver.create(),
-                products: BaseResolver.create(),
+                customer: () => {},
+                products: () => {},
               },
             },
           },
@@ -844,13 +844,19 @@ describe('GraphqlResolversBuilder', () => {
             messages: expect.any(BaseQueryResolver),
 
             createChatRoom: expect.any(BaseMutationResolver),
+            postNotification: expect.any(BaseMutationResolver),
             sendChatMessage: expect.any(BaseMutationResolver),
 
             renewAccessToken: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
+            uploadArrayImages: expect.any(BaseMutationResolver),
+            uploadDeepPropertyImages: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
 
+            onBroadcastNotifications: expect.any(BaseSubscriptionResolver),
+            onObserveChatStates: expect.any(BaseSubscriptionResolver),
             onReceiveMessage: expect.any(BaseSubscriptionResolver),
+            onUpdateChatRooms: expect.any(BaseSubscriptionResolver),
           },
         },
         {
@@ -861,11 +867,11 @@ describe('GraphqlResolversBuilder', () => {
             companySponsors: expect.any(BaseQueryResolver),
             curriculums: expect.any(BaseQueryResolver),
             customerAmounts: expect.any(BaseQueryResolver),
+            paginationArticles: expect.any(BaseQueryResolver),
 
             postAppointment: expect.any(BaseMutationResolver),
             signIn: expect.any(BaseMutationResolver),
             signUp: expect.any(BaseMutationResolver),
-            uploadCustomerForumPostImage: expect.any(BaseMutationResolver),
             uploadImage: expect.any(BaseMutationResolver),
           },
         },
@@ -1567,19 +1573,34 @@ describe('GraphqlResolversBuilder', () => {
               customer: expect.any(Function),
               customerAmounts: expect.any(Function),
               messages: expect.any(Function),
+              paginationArticles: expect.any(Function),
             },
             Mutation: {
               createChatRoom: expect.any(Function),
               postAppointment: expect.any(Function),
+              postNotification: expect.any(Function),
               renewAccessToken: expect.any(Function),
               sendChatMessage: expect.any(Function),
               signIn: expect.any(Function),
               signUp: expect.any(Function),
-              uploadCustomerForumPostImage: expect.any(Function),
+              uploadArrayImages: expect.any(Function),
+              uploadDeepPropertyImages: expect.any(Function),
               uploadImage: expect.any(Function),
             },
             Subscription: {
+              onBroadcastNotifications: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onObserveChatStates: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
               onReceiveMessage: {
+                subscribe: expect.any(Function),
+                resolve: expect.any(Function),
+              },
+              onUpdateChatRooms: {
                 subscribe: expect.any(Function),
                 resolve: expect.any(Function),
               },

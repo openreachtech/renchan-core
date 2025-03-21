@@ -2,11 +2,15 @@
 
 const MigrationAttributeFactory = require('@openreachtech/renchan-sequelize/lib/tools/MigrationAttributeFactory.cjs')
 
-const TABLE_NAME = 'chat_messages'
+const TABLE_NAME = 'chat_messages_read_markers'
 const COLUMN_NAME = {
-  ROOM_ID: 'room_id',
-  CONTENT: 'content',
-  SENDER: 'sender',
+  CHAT_ROOM_ID: 'chat_room_id',
+  CUSTOMER_ID: 'customer_id',
+}
+
+const SHORT_COLUMN_NAME = {
+  CHAT_ROOM_ID: 'cri',
+  CUSTOMER_ID: 'ci',
 }
 
 module.exports = {
@@ -20,19 +24,15 @@ module.exports = {
       ...factory.ID_BIGINT,
 
       // ForeignKey must start with upper case.
-      RoomId: {
+      ChatRoomId: {
         type: Sequelize.BIGINT,
-        field: COLUMN_NAME.ROOM_ID,
+        field: COLUMN_NAME.CHAT_ROOM_ID,
         allowNull: false,
       },
-      content: {
-        type: Sequelize.STRING(191),
-        field: COLUMN_NAME.CONTENT,
-        allowNull: false,
-      },
-      sender: {
-        type: Sequelize.STRING(191),
-        field: COLUMN_NAME.SENDER,
+      // ForeignKey must start with upper case.
+      CustomerId: {
+        type: Sequelize.BIGINT,
+        field: COLUMN_NAME.CUSTOMER_ID,
         allowNull: false,
       },
 
@@ -41,11 +41,20 @@ module.exports = {
 
     await Promise.all([
       queryInterface.addIndex(TABLE_NAME, [
-        COLUMN_NAME.ROOM_ID,
+        COLUMN_NAME.CHAT_ROOM_ID,
       ], {
         name: [
           TABLE_NAME,
-          COLUMN_NAME.ROOM_ID,
+          SHORT_COLUMN_NAME.CHAT_ROOM_ID,
+          'index',
+        ].join('_'),
+      }),
+      queryInterface.addIndex(TABLE_NAME, [
+        COLUMN_NAME.CUSTOMER_ID,
+      ], {
+        name: [
+          TABLE_NAME,
+          SHORT_COLUMN_NAME.CUSTOMER_ID,
           'index',
         ].join('_'),
       }),

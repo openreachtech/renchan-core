@@ -78,7 +78,13 @@
     <div id="messages"></div>
     <form id="message-form">
       <input type="text" id="message-input" placeholder="メッセージを入力" required>
-      <input type="text" id="sender-input" placeholder="送信者名" required>
+      <input
+        type="text"
+        id="customer-id-input"
+        placeholder="Customer ID"
+        value="100001"
+        required
+      >
       <button type="submit">送信</button>
     </form>
     <button id="stop-button">通信停止</button>
@@ -86,7 +92,17 @@
   </div>
 
   <script src="https://unpkg.com/graphql-ws/umd/graphql-ws.js"></script>
-  <script>
+  <script type="module">
+    const observeChatStatesSubscription = `
+      subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+        onObserveChatStates (input: $input) {
+          hasUnreadMessages
+          isUpdatedRooms
+          isUpdatedMembers
+        }
+      }
+    `
+
     const onReceiveMessageSubscription = `
       subscription OnReceiveMessage ($input: OnReceiveMessageInput!) {
         onReceiveMessage (input: $input) {
@@ -98,9 +114,30 @@
         }
       }
     `
+    const onUpdateChatRoomsSubscription = `
+      subscription OnUpdateChatRooms {
+        onUpdateChatRooms {
+          rooms {
+            id
+            name
+          }
+        }
+      }
+    `
+
+    const onBroadcastNotificationsSubscription = `
+      subscription onBroadcastNotifications ($input: OnBroadcastNotificationsInput!) {
+        onBroadcastNotifications (input: $input) {
+          notification {
+            segment
+            message
+          }
+        }
+      }
+    `
 
     const sendMessageMutation = `
-      mutation SendMessageMutation ($input: SendMessageInput!) {
+      mutation SendMessageMutation ($input: SendChatMessageInput!) {
         sendChatMessage (input: $input) {
           message {
             id
@@ -133,10 +170,22 @@
       }
     `
 
+    const chatMessagesQuery = `
+      query ChatMessagesQuery ($input: ChatMessagesInput!) {
+        chatMessages (input: $input) {
+          messages {
+            id
+            content
+            sender
+          }
+        }
+      }
+    `
+
     const messagesDiv = document.getElementById('messages')
     const messageForm = document.getElementById('message-form')
     const messageInput = document.getElementById('message-input')
-    const senderInput = document.getElementById('sender-input')
+    const customerIdInput = document.getElementById('customer-id-input')
     const stopButton = document.getElementById('stop-button')
     const resumeButton = document.getElementById('resume-button')
     const roomSelect = document.getElementById('room-select')
@@ -148,11 +197,20 @@
     let currentRoomId
 
     // ✅ メッセージ表示関数
-    function displayMessage (message) {
-      const messageElement = document.createElement('div')
-      messageElement.className = 'message'
-      messageElement.textContent = `${message.sender}: ${message.content}`
-      messagesDiv.appendChild(messageElement)
+    function displayMessages (...messages) {
+      const fragment = document.createDocumentFragment()
+
+      const messageElements = messages.map(message => {
+        const messageElement = document.createElement('div')
+        messageElement.className = 'message'
+        messageElement.textContent = `${message.sender}: ${message.content}`
+
+        return messageElement
+      })
+
+      fragment.append(...messageElements.reverse())
+
+      messagesDiv.appendChild(fragment)
       messagesDiv.scrollTop = messagesDiv.scrollHeight
     }
 
@@ -164,8 +222,10 @@
       })
     }
 
-    // ✅ ルーム購読関数
+    // ✅ チャットメッセージ購読関数
     function subscribeToRoom (roomId) {
+      fetchMessages(roomId)
+
       if (unsubscribe) {
         unsubscribe()
       }
@@ -190,13 +250,104 @@
             const { data } = args
 
             if (data && data.onReceiveMessage) {
-              displayMessage(data.onReceiveMessage.message)
+              displayMessages(data.onReceiveMessage.message)
             }
           },
           error: error => {
             console.error('💀💀💀💀💀💀💀💀 Subscription error:', error)
           },
           complete: () => {},
+        }
+      )
+    }
+
+    // ✅ ルーム一覧購読開始
+    let unsubscribeChatRooms
+
+    function subscribeChatRooms () {
+      if (unsubscribeChatRooms) {
+        unsubscribeChatRooms()
+      }
+
+      unsubscribeChatRooms = client.subscribe(
+        {
+          query: onUpdateChatRoomsSubscription,
+        },
+        {
+          next: (args) => {
+            console.log('🚀🚀🚀🚀🚀🚀🚀xxx subscribeChatRooms()', args)
+
+            const { data } = args
+
+            if (
+              !data
+              || !data.onUpdateChatRooms
+            ) {
+              return
+            }
+
+            const rooms = data.onUpdateChatRooms.rooms
+
+            updateChatRoomSelector({
+              rooms,
+            })
+          },
+          error: error => {
+            // console.error('💀💀💀💀💀💀💀💀xxx subscribeChatRooms()', error)
+          },
+          complete: () => {
+            // console.log('complete: subscribeChatRooms() 🔥🔥🔥🔥🔥🔥🔥')
+          },
+        }
+      )
+    }
+
+    // 🏆️ チャット状態監視購読
+    let unsubscribeChatStates
+
+    function subscribeChatStates (chatRoomId) {
+      fetchMessages(chatRoomId)
+
+      if (unsubscribeChatStates) {
+        unsubscribeChatStates()
+      }
+
+      unsubscribeChatStates = client.subscribe(
+        {
+          query: observeChatStatesSubscription,
+          variables: {
+            input: {
+              chatRoomId,
+            },
+          },
+        },
+        {
+          next: (args) => {
+            const { data } = args
+
+            if (
+              !data
+              || !data.onObserveChatStates
+            ) {
+              return
+            }
+
+            const {
+              hasUnreadMessages,
+              // isUpdatedRooms,
+              // isUpdatedMessages,
+            } = data.onObserveChatStates
+
+            if (hasUnreadMessages) {
+              fetchMessages(chatRoomId)
+            }
+          },
+          error: error => {
+            console.error('🏆️🏆️ 💀💀💀💀💀💀💀💀xxx subscribeChatStates()', error)
+          },
+          complete: () => {
+            console.log('complete: subscribeChatStates() 🏆️🏆️ 🔥🔥🔥🔥🔥🔥🔥')
+          },
         }
       )
     }
@@ -218,36 +369,123 @@
     }
 
     // ✅ ルーム一覧表示関数
-    async function updateRoomList () {
-      const rooms = await fetchRooms()
+    async function updateChatRoomSelector ({
+      rooms,
+    }) {
+      const fragment = document.createDocumentFragment()
+      fragment.append(
+        ...rooms.map(room => {
+          const option = document.createElement('option')
+          option.value = room.id
+          option.textContent = room.name
+
+          return option
+        })
+      )
 
       roomSelect.innerHTML = ''
-
-      rooms.forEach(room => {
-        const option = document.createElement('option')
-        option.value = room.id
-        option.textContent = room.name
-        roomSelect.appendChild(option)
-      })
+      roomSelect.appendChild(fragment)
 
       if (rooms.length > 0 && !currentRoomId) {
         currentRoomId = rooms[0].id
         roomSelect.value = currentRoomId
 
-        subscribeToRoom(currentRoomId)
+        subscribeChatStates(currentRoomId)
       }
     }
 
+    // ✅ メッセージ取得関数
+    async function fetchMessages (roomId) {
+      new Promise((resolve, reject) => {
+        client.subscribe(
+          {
+            query: chatMessagesQuery,
+            variables: {
+              input: {
+                chatRoomId: roomId,
+              },
+            },
+          },
+          {
+            next: ({ data }) => {
+              resolve(data.chatMessages.messages)
+            },
+            error: error => {
+              reject(error)
+            },
+            complete: () => {
+              console.log('complete: fetchMessages() ✅️🔥🔥🔥🔥🔥🔥🔥')
+            },
+          }
+        )
+      })
+        .then(messages => {
+          displayMessages(...messages)
+        })
+        .catch(error => {
+          console.error('✅️💀💀💀💀💀💀💀💀 Error fetching messages:', error)
+        })
+    }
+
+    // ✅ 通知開始
+    let unsubscribeNotifications
+
+    async function subscribeNotifications (segment = 'notifications') {
+      if (unsubscribeNotifications) {
+        unsubscribeNotifications()
+      }
+
+      unsubscribeNotifications = client.subscribe(
+        {
+          query: onBroadcastNotificationsSubscription,
+          variables: {
+            input: {
+              segment,
+            },
+          },
+        },
+        {
+          next: (args) => {
+console.log('next: Notification（トースト出して終了）', args)
+            const { data } = args
+
+            // if (data && data.onReceiveMessage) {
+            //   displayMessage(data.onReceiveMessage.message)
+            // }
+          },
+          error: error => {
+            console.error('💀💀💀💀💀💀💀💀 Notification error:', error)
+          },
+          complete: () => {
+console.log('complete: Notification')
+          },
+        }
+      )
+    }
+
     initializeClient()
-    updateRoomList()
+
+    const rooms = await fetchRooms()
+    updateChatRoomSelector({
+      rooms,
+    })
+
+    subscribeChatRooms()
+    subscribeNotifications()
 
     // メッセージ送信処理
     messageForm.addEventListener('submit', async event => {
       event.preventDefault()
       const content = messageInput.value.trim()
-      const sender = senderInput.value.trim()
+      const customerId = Number(
+        customerIdInput.value.trim()
+      )
 
-      if (!content || !sender || !currentRoomId) {
+      if (
+        !content
+        || !customerId
+        || !currentRoomId
+      ) {
         return
       }
 
@@ -258,9 +496,9 @@
               query: sendMessageMutation,
               variables: {
                 input: {
-                  content: content,
-                  sender: sender,
-                  roomId: currentRoomId,
+                  chatRoomId: currentRoomId,
+                  customerId,
+                  content,
                 },
               },
             },
@@ -270,8 +508,14 @@
                   resolve(args.data.sendChatMessage)
                 }
               },
-              error: reject,
-              complete: () => {}
+              error: (error) => {
+                console.error('Error sending message:', error)
+
+                reject(error)
+              },
+              complete: () => {
+                console.log('complete: sendMessageMutation() 🔥🔥🔥🔥🔥🔥🔥')
+              }
             }
           )
         })
@@ -298,7 +542,8 @@
     resumeButton.addEventListener('click', () => {
       initializeClient()
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
+
       stopButton.style.display = 'inline-block'
       resumeButton.style.display = 'none'
     })
@@ -307,7 +552,7 @@
     roomSelect.addEventListener('change', (event) => {
       currentRoomId = Number(event.target.value)
 
-      subscribeToRoom(currentRoomId)
+      subscribeChatStates(currentRoomId)
 
       messagesDiv.innerHTML = ''
     })
@@ -345,8 +590,6 @@
         })
 
         newRoomInput.value = ''
-
-        await updateRoomList()
       } catch (error) {
         console.error('Error creating room:', error)
       }

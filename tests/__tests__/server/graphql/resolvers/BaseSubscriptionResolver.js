@@ -1,6 +1,7 @@
 import BaseSubscriptionResolver from '../../../../../lib/server/graphql/resolvers/BaseSubscriptionResolver.js'
 import BaseResolver from '../../../../../lib/server/graphql/resolvers/BaseResolver.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
+import RenchanGraphqlError from '../../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 describe('BaseSubscriptionResolver', () => {
   describe('super class', () => {
@@ -22,6 +23,21 @@ describe('BaseSubscriptionResolver', () => {
 
       expect(actual)
         .toBe(expected)
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
+  describe('.get:errorCodeHash', () => {
+    test('to be fixed value', () => {
+      const expected = {
+        CanNotSubscribe: '102.S000.001',
+      }
+
+      const actual = BaseSubscriptionResolver.errorCodeHash
+
+      expect(actual)
+        .toEqual(expected)
     })
   })
 })
@@ -146,46 +162,314 @@ describe('BaseSubscriptionResolver', () => {
         },
       ]
 
-      test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
+      describe('when can subscribe', () => {
+        test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
+          const resolver = params.Resolver.create()
+
+          const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
+
+          const canSubscribeSpy = jest.spyOn(resolver, 'canSubscribe')
+          const createCanNotSubscribeErrorSpy = jest.spyOn(resolver, 'createCanNotSubscribeError')
+          const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
+            .mockReturnValue(tally.channelQuery)
+          const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
+            .mockReturnValue(channelTally)
+          const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
+
+          const argsTally = {
+            variables: params.variables,
+            context: contextMock,
+            information: informationMock,
+            parent: parentMock,
+          }
+
+          const subscribeExpected = {
+            [Symbol.asyncIterator]: expect.any(Function),
+          }
+          const generateChannelArgsExpected = {
+            query: tally.channelQuery,
+          }
+          const generateAsyncIterableArgsExpected = {
+            context: contextMock,
+            channel: expected.channel,
+          }
+
+          const actual = await resolver.subscribe(argsTally)
+
+          expect(actual)
+            .toEqual(subscribeExpected)
+
+          expect(canSubscribeSpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(createCanNotSubscribeErrorSpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateChannelQuerySpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(generateChannelSpy)
+            .toHaveBeenCalledWith(generateChannelArgsExpected)
+          expect(generateAsyncIterableSpy)
+            .toHaveBeenCalledWith(generateAsyncIterableArgsExpected)
+        })
+      })
+
+      describe('when can not subscribe', () => {
+        test.each(cases)('Resolver: $params.Resolver.name', async ({ params, tally, expected }) => {
+          const resolver = params.Resolver.create()
+
+          const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
+
+          const canSubscribeSpy = jest.spyOn(resolver, 'canSubscribe')
+            .mockReturnValue(false) // ✅️
+          const createCanNotSubscribeErrorSpy = jest.spyOn(resolver, 'createCanNotSubscribeError')
+          const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
+            .mockReturnValue(tally.channelQuery)
+          const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
+            .mockReturnValue(channelTally)
+          const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
+
+          const argsTally = {
+            variables: params.variables,
+            context: contextMock,
+            information: informationMock,
+            parent: parentMock,
+          }
+
+          await expect(resolver.subscribe(argsTally))
+            .rejects
+            .toThrow(RenchanGraphqlError)
+
+          expect(canSubscribeSpy)
+            .toHaveBeenCalledWith(argsTally)
+          expect(createCanNotSubscribeErrorSpy)
+            .toHaveBeenCalledWith()
+          expect(generateChannelQuerySpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateChannelSpy)
+            .not
+            .toHaveBeenCalled()
+          expect(generateAsyncIterableSpy)
+            .not
+            .toHaveBeenCalled()
+        })
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
+  describe('#canSubscribe()', () => {
+    describe('to be fixed value', () => {
+      /** @type {GraphqlType.ResolverInputContext} */
+      const contextMock = /** @type {*} */ ({
+        broker: SubscriptionBroker.create({
+          config: /** @type {*} */ ({
+            redisOptions: null,
+          }),
+        }),
+      })
+
+      /** @type {GraphqlType.ResolverInputInformation} */
+      const informationMock = /** @type {*} */ ({})
+
+      /** @type {GraphqlType.ResolverOutput} */
+      const parentMock = /** @type {*} */ ({})
+
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+            variables: {
+              input: {
+                roomId: 10001,
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+            variables: {
+              input: {
+                roomId: 10002,
+              },
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
         const resolver = params.Resolver.create()
 
-        const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
-
-        const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
-          .mockReturnValue(tally.channelQuery)
-        const generateChannelSpy = jest.spyOn(resolver, 'generateChannel')
-          .mockReturnValue(channelTally)
-        const generateAsyncIterableSpy = jest.spyOn(resolver, 'generateAsyncIterable')
-
-        const argsTally = {
+        const actual = resolver.canSubscribe({
           variables: params.variables,
           context: contextMock,
           information: informationMock,
           parent: parentMock,
-        }
-
-        const subscribeExpected = {
-          [Symbol.asyncIterator]: expect.any(Function),
-        }
-        const generateChannelArgsExpected = {
-          query: tally.channelQuery,
-        }
-        const generateAsyncIterableArgsExpected = {
-          context: contextMock,
-          channel: expected.channel,
-        }
-
-        const actual = await resolver.subscribe(argsTally)
+        })
 
         expect(actual)
-          .toEqual(subscribeExpected)
+          .toBeTruthy()
+      })
+    })
+  })
+})
 
-        expect(generateChannelQuerySpy)
-          .toHaveBeenCalledWith(argsTally)
-        expect(generateChannelSpy)
-          .toHaveBeenCalledWith(generateChannelArgsExpected)
-        expect(generateAsyncIterableSpy)
-          .toHaveBeenCalledWith(generateAsyncIterableArgsExpected)
+describe('BaseSubscriptionResolver', () => {
+  describe('#createCanNotSubscribeError()', () => {
+    describe('to be fixed value', () => {
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
+        const expected = '102.S000.001'
+
+        const resolver = params.Resolver.create()
+
+        const actual = resolver.createCanNotSubscribeError()
+
+        expect(actual)
+          .toBeInstanceOf(RenchanGraphqlError)
+        expect(actual)
+          .toHaveProperty('message', expected)
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
+  describe('.publishTopic()', () => {
+    describe('to call members', () => {
+      /** @type {GraphqlType.ResolverInputContext} */
+      const contextMock = /** @type {*} */ ({
+        broker: SubscriptionBroker.create({
+          config: /** @type {*} */ ({
+            redisOptions: null,
+          }),
+        }),
+      })
+
+      const cases = [
+        {
+          params: {
+            Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'alpha'
+              }
+            },
+            payload: {
+              message: 'Alpha message.',
+            },
+            channelQuery: {},
+          },
+          topicTally: {
+            channel: 'alpha',
+            message: {
+              alpha: {
+                message: 'Alpha message.',
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class BetaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'beta'
+              }
+            },
+            payload: {
+              message: 'Beta message.',
+            },
+            channelQuery: {
+              roomId: 1002,
+              maxNumber: 10,
+            },
+          },
+          topicTally: {
+            channel: 'beta?roomId=1002&maxNumber=10',
+            message: {
+              beta: {
+                message: 'Beta message.',
+              },
+            },
+          },
+        },
+        {
+          params: {
+            Resolver: class GammaSubscriptionResolver extends BaseSubscriptionResolver {
+              static get schema () {
+                return 'gamma'
+              }
+            },
+            payload: {
+              message: 'Gamma message.',
+            },
+            channelQuery: {
+              roomId: 1003,
+              maxNumber: 2,
+            },
+          },
+          topicTally: {
+            channel: 'gamma?roomId=1003&maxNumber=2',
+            message: {
+              gamma: {
+                message: 'Gamma message.',
+              },
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Resolver: $params.Resolver.name', async ({ params, topicTally }) => {
+        const buildTopicArgsExpected = {
+          payload: params.payload,
+          channelQuery: params.channelQuery,
+        }
+
+        const buildTopicSpy = jest.spyOn(params.Resolver, 'buildTopic')
+          .mockReturnValue(topicTally)
+        const publishSpy = jest.spyOn(contextMock.broker, 'publish')
+
+        const args = {
+          context: contextMock,
+          payload: params.payload,
+          channelQuery: params.channelQuery,
+        }
+
+        await params.Resolver.publishTopic(args)
+
+        expect(buildTopicSpy)
+          .toHaveBeenCalledWith(buildTopicArgsExpected)
+        expect(publishSpy)
+          .toHaveBeenCalledWith(topicTally)
       })
     })
   })
