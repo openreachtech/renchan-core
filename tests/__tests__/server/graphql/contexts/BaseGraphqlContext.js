@@ -20,6 +20,32 @@ describe('BaseGraphqlContext', () => {
         StubExpressRequest.create()
       )
 
+      const queryMock = `
+        subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+          onObserveChatStates (input: $input) {
+            hasUnreadMessages
+            isUpdatedMembers
+          }
+        }
+      `
+
+      /** @type {GraphqlType.WebSocketRequestParams} */
+      const stubRequestParams = {
+        id: '98765432-abcd-0000-1234-000000000001',
+        type: 'subscribe',
+        payload: {
+          query: queryMock,
+          context: {
+            headers: {
+              'x-renchan-access-token': 'omega',
+            },
+          },
+          variables: {
+            roomId: 999999,
+          },
+        },
+      }
+
       /** @type {renchan.UserEntity} */
       const mockUser = /** @type {*} */ ({})
 
@@ -57,6 +83,7 @@ describe('BaseGraphqlContext', () => {
         test.each(cases)('req.path: $params.expressRequest.path', ({ params }) => {
           const args = {
             expressRequest: params.expressRequest,
+            requestParams: stubRequestParams,
             engine: mockEngine,
             userEntity: mockUser,
             visa: mockVisa,
@@ -68,6 +95,73 @@ describe('BaseGraphqlContext', () => {
 
           expect(context)
             .toHaveProperty('expressRequest', params.expressRequest)
+        })
+      })
+
+      describe('#requestParams', () => {
+        /**
+         * @type {Array<{
+         *   params: {
+         *     requestParams: GraphqlType.WebSocketRequestParams
+         *   }
+         * }>}
+         */
+        const cases = [
+          {
+            params: {
+              requestParams: {
+                id: '98765432-abcd-0000-1234-000000000001',
+                type: 'subscribe',
+                payload: {
+                  query: queryMock,
+                  context: {
+                    headers: {
+                      'x-renchan-access-token': 'alpha',
+                    },
+                  },
+                  variables: {
+                    roomId: 1000001,
+                  },
+                },
+              },
+            },
+          },
+          {
+            params: {
+              requestParams: {
+                id: '98765432-abcd-0000-1234-000000000002',
+                type: 'subscribe',
+                payload: {
+                  query: queryMock,
+                  context: {
+                    headers: {
+                      'x-renchan-access-token': 'beta',
+                    },
+                  },
+                  variables: {
+                    roomId: 1000002,
+                  },
+                },
+              },
+            },
+          },
+        ]
+
+        test.each(cases)('headers: $params.requestParams.payload.context.headers', ({ params }) => {
+          const args = {
+            expressRequest: stubExpressRequest,
+            requestParams: params.requestParams,
+            engine: mockEngine,
+            userEntity: mockUser,
+            visa: mockVisa,
+            requestedAt: new Date(),
+            uuid: '98765432-abcd-0000-1234-999999999991',
+          }
+
+          const context = new BaseGraphqlContext(args)
+
+          expect(context)
+            .toHaveProperty('requestParams', params.requestParams)
         })
       })
 
@@ -101,6 +195,7 @@ describe('BaseGraphqlContext', () => {
         test.each(cases)('userId: $params.userEntity.id', ({ params }) => {
           const args = {
             expressRequest: stubExpressRequest,
+            requestParams: stubRequestParams,
             engine: mockEngine,
             userEntity: params.userEntity,
             visa: mockVisa,
@@ -156,6 +251,7 @@ describe('BaseGraphqlContext', () => {
         test.each(cases)('hasAuthenticated: $params.hasAuthenticated, hasAuthorized: $params.hasAuthorized', ({ params }) => {
           const args = {
             expressRequest: stubExpressRequest,
+            requestParams: stubRequestParams,
             engine: mockEngine,
             userEntity: mockUser,
             visa: params.visa,
@@ -201,6 +297,7 @@ describe('BaseGraphqlContext', () => {
 
           const args = {
             expressRequest: stubExpressRequest,
+            requestParams: stubRequestParams,
             engine,
             userEntity: mockUser,
             visa: mockVisa,
@@ -232,6 +329,7 @@ describe('BaseGraphqlContext', () => {
         test.each(cases)('requestedAt: $params.requestedAt', ({ params }) => {
           const args = {
             expressRequest: stubExpressRequest,
+            requestParams: stubRequestParams,
             engine: mockEngine,
             userEntity: mockUser,
             visa: mockVisa,
@@ -263,6 +361,7 @@ describe('BaseGraphqlContext', () => {
         test.each(cases)('uuid: $params.uuid', ({ params }) => {
           const args = {
             expressRequest: stubExpressRequest,
+            requestParams: stubRequestParams,
             engine: mockEngine,
             userEntity: mockUser,
             visa: mockVisa,
