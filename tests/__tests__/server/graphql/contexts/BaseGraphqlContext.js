@@ -637,6 +637,68 @@ describe('BaseGraphqlContext', () => {
 })
 
 describe('BaseGraphqlContext', () => {
+  describe('.extractHeadersFromRequestParams()', () => {
+    describe('to return access token', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     requestParams: {
+       *       payload?: {
+       *         context?: {
+       *           headers?: Record<string, string>
+       *         }
+       *       }
+       *     }
+       *   }
+       *   expected: string
+       * }>}
+       */
+      const cases = /** @type {*} */ ([
+        {
+          params: {
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'alpha',
+                  },
+                },
+              },
+            },
+          },
+          expected: {
+            'x-renchan-access-token': 'alpha',
+          },
+        },
+        {
+          params: {
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
+              },
+            },
+          },
+          expected: {
+            'x-renchan-access-token': 'beta',
+          },
+        },
+      ])
+
+      test.each(cases)('x-renchan-access-token: $params.requestParams.payload.context.headers["x-renchan-access-token"]', ({ params, expected }) => {
+        const accessToken = BaseGraphqlContext.extractHeadersFromRequestParams(params)
+
+        expect(accessToken)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlContext', () => {
   describe('.get:Visa', () => {
     test('to be bridge class', () => {
       const actual = BaseGraphqlContext.Visa
