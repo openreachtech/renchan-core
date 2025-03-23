@@ -411,6 +411,15 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-customer',
             },
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'alpha',
+                  },
+                },
+              },
+            },
             EngineCtor: CustomerGraphqlServerEngine,
           },
           mocks: {
@@ -428,6 +437,15 @@ describe('BaseGraphqlContext', () => {
           params: {
             expressRequest: {
               path: '/graphql-admin',
+            },
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
+              },
             },
             EngineCtor: AdminGraphqlServerEngine,
           },
@@ -452,7 +470,7 @@ describe('BaseGraphqlContext', () => {
 
         const args = {
           expressRequest: params.expressRequest,
-          requestParams: null,
+          requestParams: params.requestParams,
           engine,
           requestedAt: new Date(),
         }
@@ -470,12 +488,9 @@ describe('BaseGraphqlContext', () => {
       /** @type {GraphqlType.ServerEngine} */
       const mockEngine = /** @type {*} */ ({})
 
-      /** @type {GraphqlType.HttpRequestParams} */
-      const mockExpressRequest = /** @type {*} */ ({})
-
       /**
        * @type {Array<{
-       *   params: import('../../../../../lib/server/graphql/contexts/BaseGraphqlContext.js').BaseGraphqlContextFactoryParams
+       *   params: import('../../../../../lib/server/graphql/contexts/BaseGraphqlContext.js').BaseGraphqlContextAsyncFactoryParams
        *   mocks: {
        *     userEntity: renchan.UserEntity
        *     visa: GraphqlType.Visa
@@ -487,6 +502,18 @@ describe('BaseGraphqlContext', () => {
           params: {
             expressRequest: {
               path: '/graphql-customer',
+              headers: {
+                'x-renchan-access-token': 'alpha',
+              },
+            },
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'omega',
+                  },
+                },
+              },
             },
             requestedAt: new Date('2024-11-01T01:00:01.001Z'),
           },
@@ -504,11 +531,23 @@ describe('BaseGraphqlContext', () => {
               },
             }),
           },
+          expected: {
+            accessToken: 'alpha',
+          },
         },
         {
           params: {
             expressRequest: {
               path: '/graphql-admin',
+            },
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
+              },
             },
             requestedAt: new Date('2024-11-02T02:00:02.002Z'),
           },
@@ -526,10 +565,13 @@ describe('BaseGraphqlContext', () => {
               },
             }),
           },
+          expected: {
+            accessToken: 'beta',
+          },
         },
       ])
 
-      test.each(cases)('path: $params.expressRequest.path', async ({ params, mocks }) => {
+      test.each(cases)('path: $params.expressRequest.path', async ({ params, mocks, expected }) => {
         const expectedCreateArgs = {
           expressRequest: params.expressRequest,
           engine: mockEngine,
@@ -537,9 +579,13 @@ describe('BaseGraphqlContext', () => {
           visa: mocks.visa,
           requestedAt: params.requestedAt,
         }
+        const expectedExtractAccessTokenArgs = {
+          expressRequest: params.expressRequest,
+          requestParams: params.requestParams,
+        }
         const expectedFindUserArgs = {
           expressRequest: params.expressRequest,
-          accessToken: null,
+          accessToken: expected.accessToken,
           requestedAt: params.requestedAt,
         }
         const expectedCreateVisaArgs = {
@@ -550,6 +596,7 @@ describe('BaseGraphqlContext', () => {
         }
 
         const createSpy = jest.spyOn(BaseGraphqlContext, 'create')
+        const extractAccessTokenSpy = jest.spyOn(BaseGraphqlContext, 'extractAccessToken')
         const findUserSpy = jest.spyOn(BaseGraphqlContext, 'findUser')
           .mockResolvedValue(mocks.userEntity)
         const createVisaSpy = jest.spyOn(BaseGraphqlContext, 'createVisa')
@@ -557,7 +604,7 @@ describe('BaseGraphqlContext', () => {
 
         const args = {
           expressRequest: params.expressRequest,
-          requestParams: mockExpressRequest,
+          requestParams: params.requestParams,
           engine: mockEngine,
           requestedAt: params.requestedAt,
         }
@@ -566,6 +613,8 @@ describe('BaseGraphqlContext', () => {
 
         expect(createSpy)
           .toHaveBeenCalledWith(expectedCreateArgs)
+        expect(extractAccessTokenSpy)
+          .toHaveBeenCalledWith(expectedExtractAccessTokenArgs)
         expect(findUserSpy)
           .toHaveBeenCalledWith(expectedFindUserArgs)
         expect(createVisaSpy)
@@ -595,10 +644,146 @@ describe('BaseGraphqlContext', () => {
 describe('BaseGraphqlContext', () => {
   describe('.extractAccessToken()', () => {
     describe('to return access token', () => {
+      describe('from expressRequest', () => {
+        /**
+         * @type {GraphqlType.HttpRequestParams & {
+         *   payload?: {
+         *     context?: {
+         *       headers?: Record<string, string>
+         *     }
+         *   }
+         * }}
+         */
+        const requestParamsMock = /** @type {*} */ ({
+          payload: {
+            context: {
+              headers: {
+                'x-renchan-access-token': 'omega',
+              },
+            },
+          },
+        })
+
+        /**
+         * @type {Array<{
+         *   params: {
+         *     expressRequest: ExpressType.Request
+         *   }
+         *   expected: string
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              expressRequest: {
+                headers: {
+                  'x-renchan-access-token': 'alpha',
+                },
+              },
+            },
+            expected: 'alpha',
+          },
+          {
+            params: {
+              expressRequest: {
+                headers: {
+                  'x-renchan-access-token': 'beta',
+                },
+              },
+            },
+            expected: 'beta',
+          },
+        ])
+
+        test.each(cases)('x-renchan-access-token: $params.expressRequest.headers["x-renchan-access-token"]', ({ params, expected }) => {
+          const args = {
+            expressRequest: params.expressRequest,
+            requestParams: requestParamsMock,
+          }
+          const accessToken = BaseGraphqlContext.extractAccessToken(args)
+
+          expect(accessToken)
+            .toBe(expected)
+        })
+      })
+
+      describe('from requestParams', () => {
+        /** @type {ExpressType.Request} */
+        const expressRequestMock = /** @type {*} */ ({})
+
+        /**
+         * @type {Array<{
+         *   params: {
+         *     requestParams: GraphqlType.HttpRequestParams & {
+         *       payload?: {
+         *         context?: {
+         *           headers?: Record<string, string>
+         *         }
+         *       }
+         *     }
+         *   }
+         *   expected: string
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              requestParams: {
+                payload: {
+                  context: {
+                    headers: {
+                      'x-renchan-access-token': 'alpha',
+                    },
+                  },
+                },
+              },
+            },
+            expected: 'alpha',
+          },
+          {
+            params: {
+              requestParams: {
+                payload: {
+                  context: {
+                    headers: {
+                      'x-renchan-access-token': 'beta',
+                    },
+                  },
+                },
+              },
+            },
+            expected: 'beta',
+          },
+        ])
+
+        test.each(cases)('x-renchan-access-token: $params.expressRequest.headers["x-renchan-access-token"]', ({ params, expected }) => {
+          const args = {
+            expressRequest: expressRequestMock,
+            requestParams: params.requestParams,
+          }
+          const accessToken = BaseGraphqlContext.extractAccessToken(args)
+
+          expect(accessToken)
+            .toBe(expected)
+        })
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlContext', () => {
+  describe('.extractHeadersFromRequestParams()', () => {
+    describe('to return access token', () => {
       /**
        * @type {Array<{
        *   params: {
-       *     expressRequest: ExpressType.Request
+       *     requestParams: {
+       *       payload?: {
+       *         context?: {
+       *           headers?: Record<string, string>
+       *         }
+       *       }
+       *     }
        *   }
        *   expected: string
        * }>}
@@ -606,31 +791,43 @@ describe('BaseGraphqlContext', () => {
       const cases = /** @type {*} */ ([
         {
           params: {
-            expressRequest: {
-              headers: {
-                'x-renchan-access-token': 'alpha',
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'alpha',
+                  },
+                },
               },
             },
           },
-          expected: 'alpha',
+          expected: {
+            'x-renchan-access-token': 'alpha',
+          },
         },
         {
           params: {
-            expressRequest: {
-              headers: {
-                'x-renchan-access-token': 'beta',
+            requestParams: {
+              payload: {
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
               },
             },
           },
-          expected: 'beta',
+          expected: {
+            'x-renchan-access-token': 'beta',
+          },
         },
       ])
 
-      test.each(cases)('x-renchan-access-token: $params.expressRequest.headers["x-renchan-access-token"]', ({ params, expected }) => {
-        const accessToken = BaseGraphqlContext.extractAccessToken(params)
+      test.each(cases)('x-renchan-access-token: $params.requestParams.payload.context.headers["x-renchan-access-token"]', ({ params, expected }) => {
+        const accessToken = BaseGraphqlContext.extractHeadersFromRequestParams(params)
 
         expect(accessToken)
-          .toBe(expected)
+          .toEqual(expected)
       })
     })
   })
