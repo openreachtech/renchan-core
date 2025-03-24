@@ -1192,6 +1192,15 @@ describe('BaseGraphqlContext', () => {
 
 describe('BaseGraphqlContext', () => {
   describe('#get:accessToken', () => {
+    const queryMock = `
+      subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+        onObserveChatStates (input: $input) {
+          hasUnreadMessages
+          isUpdatedMembers
+        }
+      }
+    `
+
     /** @type {ExpressType.Request} */
     const expressRequestMock = /** @type {*} */ ({})
 
@@ -1206,11 +1215,12 @@ describe('BaseGraphqlContext', () => {
     /** @type {GraphqlType.Visa} */
     const visaMock = /** @type {*} */ ({})
 
-    describe('to return id of #userEntity', () => {
+    describe('to be available string', () => {
       /**
        * @type {Array<{
        *   params: {
        *     expressRequest: ExpressType.Request
+       *     requestParams: GraphqlType.WebSocketRequestParams
        *   }
        *   expected: string
        * }>}
@@ -1223,14 +1233,40 @@ describe('BaseGraphqlContext', () => {
                 'x-renchan-access-token': 'alpha',
               },
             },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000001',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                variables: {
+                  roomId: 1000001,
+                },
+                context: {
+                  // headers: {},
+                },
+              },
+            },
           },
           expected: 'alpha',
         },
         {
           params: {
             expressRequest: {
-              headers: {
-                'x-renchan-access-token': 'beta',
+              // headers: {},
+            },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000002',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                variables: {
+                  roomId: 1000002,
+                },
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
               },
             },
           },
@@ -1241,11 +1277,12 @@ describe('BaseGraphqlContext', () => {
       test.each(cases)('headers: $params.expressRequest.headers', ({ params, expected }) => {
         const context = new BaseGraphqlContext({
           expressRequest: params.expressRequest,
+          requestParams: params.requestParams,
           engine: engineMock,
           userEntity: userEntityMock,
           visa: visaMock,
           requestedAt: new Date(),
-          uuid: '98765432-abcd-0000-1234-000000000001',
+          uuid: '98765432-abcd-0000-1234-aaaaaaaaaaaa',
         })
 
         const actual = context.accessToken
@@ -1259,14 +1296,28 @@ describe('BaseGraphqlContext', () => {
       const cases = [
         {
           params: {
-            userEntity: null,
+            expressRequest: {},
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000003',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                variables: {
+                  roomId: 1000003,
+                },
+                context: {
+                  headers: {},
+                },
+              },
+            },
           },
         },
       ]
 
-      test.each(cases)('userEntity: $params.userEntity', ({ params, expected }) => {
+      test.each(cases)('expressRequest: $params.expressRequest', ({ params }) => {
         const context = new BaseGraphqlContext({
           expressRequest: expressRequestMock,
+          requestParams: params.requestParams,
           engine: engineMock,
           userEntity: params.userEntity,
           visa: visaMock,
