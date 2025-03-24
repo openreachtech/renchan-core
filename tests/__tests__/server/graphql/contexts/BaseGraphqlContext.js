@@ -1363,6 +1363,32 @@ describe('BaseGraphqlContext', () => {
     /** @type {ExpressType.Request} */
     const expressRequestMock = /** @type {*} */ ({})
 
+    const queryMock = `
+      subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+        onObserveChatStates (input: $input) {
+          hasUnreadMessages
+          isUpdatedMembers
+        }
+      }
+    `
+
+    /** @type {GraphqlType.WebSocketRequestParams} */
+    const requestParamsMock = {
+      id: '98765432-abcd-0000-1234-999999999999',
+      type: 'subscribe',
+      payload: {
+        query: queryMock,
+        variables: {
+          roomId: 9999999,
+        },
+        context: {
+          headers: {
+            'x-renchan-access-token': 'omega',
+          },
+        },
+      },
+    }
+
     /** @type {GraphqlType.ServerEngine} */
     const engineMock = /** @type {*} */ ({})
 
@@ -1394,6 +1420,7 @@ describe('BaseGraphqlContext', () => {
       test.each(cases)('userId: $params.userEntity.id', ({ params, expected }) => {
         const context = new BaseGraphqlContext({
           expressRequest: expressRequestMock,
+          requestParams: requestParamsMock,
           engine: engineMock,
           userEntity: params.userEntity,
           visa: visaMock,
@@ -1420,6 +1447,7 @@ describe('BaseGraphqlContext', () => {
       test.each(cases)('userEntity: $params.userEntity', ({ params, expected }) => {
         const context = new BaseGraphqlContext({
           expressRequest: expressRequestMock,
+          requestParams: requestParamsMock,
           engine: engineMock,
           userEntity: params.userEntity,
           visa: visaMock,
