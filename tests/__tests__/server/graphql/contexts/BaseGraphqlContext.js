@@ -405,6 +405,15 @@ describe('BaseGraphqlContext', () => {
 
 describe('BaseGraphqlContext', () => {
   describe('.create()', () => {
+    const queryMock = `
+      subscription OnObserveChatStates ($input: OnObserveChatStatesInput!) {
+        onObserveChatStates (input: $input) {
+          hasUnreadMessages
+          isUpdatedMembers
+        }
+      }
+    `
+
     /** @type {renchan.UserEntity} */
     const mockUser = /** @type {*} */ ({})
 
@@ -423,6 +432,21 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-customer',
             },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000001',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'alpha',
+                  },
+                },
+                variables: {
+                  roomId: 100001,
+                },
+              },
+            },
             userEntity: mockUser,
             visa: mockVisa,
           },
@@ -431,6 +455,21 @@ describe('BaseGraphqlContext', () => {
           params: {
             expressRequest: {
               path: '/graphql-admin',
+            },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000002',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
+                variables: {
+                  roomId: 100002,
+                },
+              },
             },
             userEntity: mockUser,
             visa: mockVisa,
@@ -458,6 +497,21 @@ describe('BaseGraphqlContext', () => {
             expressRequest: {
               path: '/graphql-customer',
             },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000001',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'alpha',
+                  },
+                },
+                variables: {
+                  roomId: 100001,
+                },
+              },
+            },
             engine: null,
             userEntity: mockUser,
             visa: mockVisa,
@@ -469,6 +523,21 @@ describe('BaseGraphqlContext', () => {
           params: {
             expressRequest: {
               path: '/graphql-admin',
+            },
+            requestParams: {
+              id: '98765432-abcd-0000-1234-000000000002',
+              type: 'subscribe',
+              payload: {
+                query: queryMock,
+                context: {
+                  headers: {
+                    'x-renchan-access-token': 'beta',
+                  },
+                },
+                variables: {
+                  roomId: 100002,
+                },
+              },
             },
             engine: null,
             userEntity: mockUser,
