@@ -982,13 +982,7 @@ describe('BaseGraphqlContext', () => {
       /**
        * @type {Array<{
        *   params: {
-       *     requestParams: {
-       *       payload?: {
-       *         context?: {
-       *           headers?: Record<string, string>
-       *         }
-       *       }
-       *     }
+       *     requestParams: GraphqlType.WebSocketRequestParams
        *   }
        *   expected: string
        * }>}
