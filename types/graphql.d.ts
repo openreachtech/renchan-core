@@ -73,6 +73,17 @@ declare global {
 
     type Schema = GraphQLSchema
     type HttpRequestParams = RequestParams
+    type WebSocketRequestParams = {
+      id: string // '2aaaaaaa-1aaa-4aaa-a000-a00000000000'
+      type: string // 'subscribe'
+      payload: {
+        query: string
+        variables?: Record<string, *>
+        context?: {
+          headers: Record<string, *>
+        }
+      }
+    }
 
     type Share = BaseGraphqlShare
     type ShareCtor = typeof BaseGraphqlShare
