@@ -684,6 +684,9 @@ describe('BaseGraphqlContext', () => {
        *     userEntity: renchan.UserEntity
        *     visa: GraphqlType.Visa
        *   }
+       *   expected: {
+       *     accessToken: string
+       *   }
        * }>}
        */
       const cases = /** @type {Array<*>} */ ([
