@@ -33,6 +33,10 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
       fetchDirection,
     })
 
+    const direction = fetchDirection === 'after'
+      ? 'ASC'
+      : 'DESC'
+
     /** @type {Array<import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageAssociatedEntity>} */
     const chatMessageEntities = /** @type {Array<*>} */ (
       await ChatMessage.findAll({
@@ -50,7 +54,7 @@ export default class ChatMessagesQueryResolver extends BaseQueryResolver {
           },
         ],
         order: [
-          ['postedAt', 'ASC'],
+          ['postedAt', direction],
         ],
         limit,
       })
