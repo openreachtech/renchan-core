@@ -23,15 +23,16 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
     variables: {
       input: {
         chatRoomId,
-        customerId,
         content,
       },
     },
     context,
   }) {
+    const authenticatedCustomerId = context.customerId
+
     const attributeHash = {
       ChatRoomId: chatRoomId,
-      CustomerId: customerId,
+      CustomerId: authenticatedCustomerId,
       content,
       postedAt: context.now,
     }
@@ -49,8 +50,9 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
 
     const message = {
       id: result.id,
+      postedAt: context.now,
       content,
-      sender: `[${customerId}]`,
+      sender: `[${authenticatedCustomerId}]`,
     }
 
     await this.broadcastChatMessage({
