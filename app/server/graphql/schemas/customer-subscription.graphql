@@ -312,7 +312,6 @@ input CreateChatRoomInput {
 
 input SendChatMessageInput {
   chatRoomId: Int!
-  customerId: Int!
   content: String!
 }
 
