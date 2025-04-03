@@ -48,22 +48,21 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
       throw new this.Error.FailToSave()
     }
 
-    const message = {
-      id: result.id,
-      postedAt: context.now,
-      content,
-      sender: `[${authenticatedCustomerId}]`,
-    }
-
     await this.broadcastChatMessage({
       context,
-      payload: {
-        message,
-      },
       channelQuery: {
         roomId: chatRoomId,
       },
     })
+
+    const sender = context.username ?? ''
+
+    const message = {
+      id: result.id,
+      postedAt: context.now,
+      content,
+      sender,
+    }
 
     return {
       message,
