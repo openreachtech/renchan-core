@@ -70,7 +70,7 @@ export default class UploadDeepPropertyImagesMutationResolver extends BaseMutati
   }) {
     await sleep(300)
 
-    /** @type {import('../../../../../../../lib/tools/FileContentReader.js').default} */
+    /** @type {GraphqlType.FileContentReader} */
     const avatarImageContentReader = avatarImage
       ? await this.Ctor
         .createAsyncFileContentReader({
@@ -78,7 +78,7 @@ export default class UploadDeepPropertyImagesMutationResolver extends BaseMutati
         })
       : null
 
-    /** @type {import('../../../../../../../lib/tools/FileContentReader.js').default} */
+    /** @type {GraphqlType.FileContentReader} */
     const coverImageContentReader = coverImage
       ? await this.Ctor
         .createAsyncFileContentReader({
@@ -96,8 +96,8 @@ export default class UploadDeepPropertyImagesMutationResolver extends BaseMutati
    * Format response.
    *
    * @param {{
-   *   avatarImageContentReader: import('../../../../../../../lib/tools/FileContentReader.js').default | null
-   *   coverImageContentReader: import('../../../../../../../lib/tools/FileContentReader.js').default | null
+   *   avatarImageContentReader: GraphqlType.FileContentReader | null
+   *   coverImageContentReader: GraphqlType.FileContentReader | null
    * }} params - Parameters.
    * @returns {{
    *   avatarImage: {
