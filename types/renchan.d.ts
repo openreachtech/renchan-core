@@ -10,6 +10,7 @@ import './restfulapi.d.ts'
 
 import { default as DeepBulkClassLoaderActual } from '../lib/tools/DeepBulkClassLoader'
 import { default as RootPathActual } from '../lib/tools/RootPath'
+import { default as ValueTemplateHydratorActual } from '../lib/tools/ValueTemplateHydrator'
 
 /**
  * global types
@@ -26,5 +27,6 @@ declare global {
 
     type DeepBulkClassLoader = DeepBulkClassLoaderActual
     type RootPath = RootPathActual
+    type ValueTemplateHydrator = ValueTemplateHydratorActual
   }
 }
