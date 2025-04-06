@@ -47,7 +47,7 @@ export default class UploadArrayImagesMutationResolver extends BaseMutationResol
   }) {
     await sleep(300)
 
-    /** @type {Array<import('../../../../../../../lib/tools/FileContentReader.js').default>} */
+    /** @type {Array<GraphqlType.FileContentReader>} */
     const contentReaders = /** @type {Array<*>} */ (
       await Promise.all(
         images.map(
@@ -68,7 +68,7 @@ export default class UploadArrayImagesMutationResolver extends BaseMutationResol
    * Format response.
    *
    * @param {{
-   *   contentReaders: Array<import('../../../../../../../lib/tools/FileContentReader.js').default>
+   *   contentReaders: Array<GraphqlType.FileContentReader>
    * }} params - Parameters.
    * @returns {Array<{
    *   filename: string

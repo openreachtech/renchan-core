@@ -28,6 +28,8 @@ import TopicReceiver from '../lib/server/graphql/subscription/TopicReceiver'
 import BasePubSub from '../lib/server/graphql/subscription/pubsub/BasePubSub'
 import { default as EventHubActual } from '../lib/server/graphql/subscription/pubsub/tools/EventHub'
 
+import { default as FileContentReaderActual } from '../lib/tools/FileContentReader'
+
 /**
  * Renchan GraphQL types
  */
@@ -173,5 +175,7 @@ declare global {
 
     type ErrorMatcher = (error: *) => boolean
     type ErrorResolver = (error: *) => Error
+
+    type FileContentReader = FileContentReaderActual
   }
 }
