@@ -8,6 +8,10 @@ import './express.d.ts'
 import './graphql.d.ts'
 import './restfulapi.d.ts'
 
+import { default as DeepBulkClassLoaderActual } from '../lib/tools/DeepBulkClassLoader'
+import { default as RootPathActual } from '../lib/tools/RootPath'
+import { default as ValueTemplateHydratorActual } from '../lib/tools/ValueTemplateHydrator'
+
 /**
  * global types
  */
@@ -20,5 +24,9 @@ declare global {
     type UserEntity = object & {
       id: number
     }
+
+    type DeepBulkClassLoader = DeepBulkClassLoaderActual
+    type RootPath = RootPathActual
+    type ValueTemplateHydrator = ValueTemplateHydratorActual
   }
 }

@@ -44,7 +44,7 @@ export default class UploadImageMutationResolver extends BaseMutationResolver {
    * Format response.
    *
    * @param {{
-   *   contentReader: import('../../../../../../../lib/tools/FileContentReader.js').default
+   *   contentReader: GraphqlType.FileContentReader
    * }} params - Parameters.
    * @returns {{
    *   filename: string
