@@ -24,6 +24,16 @@ export default class OnObserveChatStatesSubscriptionResolver extends BaseSubscri
       chatRoomId,
     }
   }
+
+  /** @override */
+  canSubscribe ({
+    variables,
+    context,
+    information,
+    parent,
+  }) {
+    return context.hasAuthenticated()
+  }
 }
 
 /**
