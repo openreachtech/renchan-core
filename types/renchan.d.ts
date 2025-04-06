@@ -9,6 +9,7 @@ import './graphql.d.ts'
 import './restfulapi.d.ts'
 
 import { default as DeepBulkClassLoaderActual } from '../lib/tools/DeepBulkClassLoader'
+import { default as RootPathActual } from '../lib/tools/RootPath'
 
 /**
  * global types
@@ -24,5 +25,6 @@ declare global {
     }
 
     type DeepBulkClassLoader = DeepBulkClassLoaderActual
+    type RootPath = RootPathActual
   }
 }
