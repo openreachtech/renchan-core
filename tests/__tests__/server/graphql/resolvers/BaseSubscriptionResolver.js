@@ -220,7 +220,7 @@ describe('BaseSubscriptionResolver', () => {
           const channelTally = `${params.Resolver.schema}?roomId=${params.variables.input.roomId}`
 
           const canSubscribeSpy = jest.spyOn(resolver, 'canSubscribe')
-            .mockReturnValue(false) // ✅️
+            .mockResolvedValue(false) // ✅️
           const createCanNotSubscribeErrorSpy = jest.spyOn(resolver, 'createCanNotSubscribeError')
           const generateChannelQuerySpy = jest.spyOn(resolver, 'generateChannelQuery')
             .mockReturnValue(tally.channelQuery)
@@ -310,7 +310,7 @@ describe('BaseSubscriptionResolver', () => {
       test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
         const resolver = params.Resolver.create()
 
-        const actual = resolver.canSubscribe({
+        const actual = await resolver.canSubscribe({
           variables: params.variables,
           context: contextMock,
           information: informationMock,
