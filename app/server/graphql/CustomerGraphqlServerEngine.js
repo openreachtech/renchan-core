@@ -5,13 +5,13 @@ import rootPath from '../../../lib/globals/root-path.js'
 
 import BaseGraphqlServerEngine from '../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
-import CustomerGraphqlShare from './contexts/CustomerGraphqlShare.js'
-import CustomerGraphqlContext from './contexts/CustomerGraphqlContext.js'
-
 import BigNumberScalar from '../../../lib/server/graphql/scalars/concretes/BigNumberScalar.js'
 import DateTimeScalar from '../../../lib/server/graphql/scalars/concretes/DateTimeScalar.js'
 
 import graphqlUploadExpressWithResolvingContentType from '../../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
+
+import CustomerGraphqlShare from './contexts/CustomerGraphqlShare.js'
+import CustomerGraphqlContext from './contexts/CustomerGraphqlContext.js'
 
 /**
  * Renchan server engine for customer.
