@@ -12,6 +12,13 @@ export default class OnObserveChatStatesSubscriptionResolver extends BaseSubscri
   }
 
   /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
+  }
+
+  /** @override */
   generateChannelQuery ({
     variables: {
       input: {

@@ -8,6 +8,13 @@ export default class PostNotificationMutationResolver extends BaseMutationResolv
   }
 
   /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
+  }
+
+  /** @override */
   async resolve ({
     variables: {
       input: {
