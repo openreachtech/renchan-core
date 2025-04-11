@@ -73,7 +73,7 @@ describe('SchemaFilesLoader', () => {
       const cases = [
         {
           params: {
-            schemaPath: rootPath.to('app/server/graphql/schemas/customer-subscription.graphql'),
+            schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
           },
           expected: `
 type Query {
@@ -95,7 +95,7 @@ type Query {
         },
         {
           params: {
-            schemaPath: rootPath.to('app/server/graphql/schemas/admin-subscription.graphql'),
+            schemaPath: rootPath.to('app/server/graphql/schemas/admin.graphql'),
           },
           expected: `
 type Query {
@@ -153,10 +153,10 @@ type Query {
 }`,
             },
             {
-              match: '## customer-subscription.graphql',
+              match: '## customer.graphql',
             },
             {
-              match: '## admin-subscription.graphql',
+              match: '## admin.graphql',
             },
           ],
         },

@@ -1,10 +1,18 @@
 import BaseQueryResolver from '../../../../../../../lib/server/graphql/resolvers/BaseQueryResolver.js'
+
 import ChatRoom from '../../../../../../sequelize/models/ChatRoom.js'
 
 export default class ChatRoomsQueryResolver extends BaseQueryResolver {
   /** @override */
   static get schema () {
     return 'chatRooms'
+  }
+
+  /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
   }
 
   /** @override */
@@ -26,10 +34,9 @@ export default class ChatRoomsQueryResolver extends BaseQueryResolver {
         id,
         name,
       }))
-
-    rooms.sort((alpha, beta) =>
-      alpha.name.localeCompare(beta.name)
-    )
+      .toSorted((alpha, beta) =>
+        alpha.name.localeCompare(beta.name)
+      )
 
     return {
       rooms,

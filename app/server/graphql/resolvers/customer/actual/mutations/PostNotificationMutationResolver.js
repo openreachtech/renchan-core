@@ -1,10 +1,18 @@
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
+
 import OnBroadcastNotificationsSubscriptionResolver from '../subscriptions/OnBroadcastNotificationsSubscriptionResolver.js'
 
 export default class PostNotificationMutationResolver extends BaseMutationResolver {
   /** @override */
   static get schema () {
     return 'postNotification'
+  }
+
+  /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
   }
 
   /** @override */
