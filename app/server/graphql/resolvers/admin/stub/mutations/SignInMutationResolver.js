@@ -7,6 +7,13 @@ export default class SignInMutationResolver extends BaseMutationResolver {
   }
 
   /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
+  }
+
+  /** @override */
   async resolve () {
     return {
       accessToken: 'stub-access-token-0001',
