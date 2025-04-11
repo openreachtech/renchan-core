@@ -873,7 +873,7 @@ describe('GraphqlServerBuilder', () => {
           expected: {
             graphqlEndpoint: '/graphql-admin',
             staticPath: expect.stringMatching(/public$/u),
-            schemaPath: expect.stringMatching(/app\/server\/graphql\/schemas\/admin-subscription.graphql$/u),
+            schemaPath: expect.stringMatching(/app\/server\/graphql\/schemas\/admin.graphql$/u),
             actualResolversPath: expect.stringMatching(/app\/server\/graphql\/resolvers\/admin\/actual$/u),
             stubResolversPath: expect.stringMatching(/app\/server\/graphql\/resolvers\/admin\/stub$/u),
             redisOptions: null,
