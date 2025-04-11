@@ -52,6 +52,7 @@ export default class UploadArrayImagesMutationResolver extends BaseMutationResol
       await Promise.all(
         images.map(
           it =>
+            // @ts-expect-error
             this.Ctor.createAsyncFileContentReader({
               upload: it,
             })
