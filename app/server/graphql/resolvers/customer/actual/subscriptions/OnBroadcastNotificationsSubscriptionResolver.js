@@ -11,6 +11,13 @@ export default class OnBroadcastNotificationsSubscriptionResolver extends BaseSu
     return 'onBroadcastNotifications'
   }
 
+  /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
+  }
+
   /**
    * Generate channel query.
    *
