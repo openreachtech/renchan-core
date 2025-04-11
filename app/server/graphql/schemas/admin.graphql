@@ -1,4 +1,5 @@
 scalar DateTime
+scalar Upload
 
 ################################################################################
 #### QUERY
@@ -14,18 +15,13 @@ type Query {
 ################################################################################
 
 type Mutation {
-  signUp(input: SignUpInput): AuthResult!
   signIn(input: SignInInput): AuthResult!
+  signUp(input: SignUpInput): AuthResult!
 }
 
 ################################################################################
 #### TYPE
 ################################################################################
-
-type Admin {
-  id: Int!
-  name: String!
-}
 
 type Customer {
   id: Int!
@@ -41,7 +37,6 @@ type Asset {
 
 type AuthResult {
   accessToken: String!
-  admin: Admin!
 }
 
 ################################################################################

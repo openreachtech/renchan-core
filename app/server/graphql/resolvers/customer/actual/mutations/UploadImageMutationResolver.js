@@ -31,6 +31,7 @@ export default class UploadImageMutationResolver extends BaseMutationResolver {
     await sleep(300)
 
     const contentReader = await this.Ctor
+      // @ts-expect-error
       .createAsyncFileContentReader({
         upload: image,
       })

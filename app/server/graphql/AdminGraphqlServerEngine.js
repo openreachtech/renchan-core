@@ -5,12 +5,12 @@ import rootPath from '../../../lib/globals/root-path.js'
 
 import BaseGraphqlServerEngine from '../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
-import AdminGraphqlShare from './contexts/AdminGraphqlShare.js'
-import AdminGraphqlContext from './contexts/AdminGraphqlContext.js'
-
 import DateTimeScalar from '../../../lib/server/graphql/scalars/concretes/DateTimeScalar.js'
 
 import graphqlUploadExpressWithResolvingContentType from '../../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
+
+import AdminGraphqlShare from './contexts/AdminGraphqlShare.js'
+import AdminGraphqlContext from './contexts/AdminGraphqlContext.js'
 
 /**
  * Renchan server engine for admin.
@@ -21,7 +21,7 @@ export default class AdminGraphqlServerEngine extends BaseGraphqlServerEngine {
     return {
       graphqlEndpoint: '/graphql-admin',
       staticPath: rootPath.to('public/'),
-      schemaPath: rootPath.to('app/server/graphql/schemas/admin-subscription.graphql'),
+      schemaPath: rootPath.to('app/server/graphql/schemas/admin.graphql'),
       actualResolversPath: rootPath.to('app/server/graphql/resolvers/admin/actual/'),
       stubResolversPath: rootPath.to('app/server/graphql/resolvers/admin/stub/'),
 

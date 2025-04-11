@@ -26,7 +26,7 @@ describe('CustomerGraphqlServerEngine', () => {
       const expected = {
         graphqlEndpoint: '/graphql-customer',
         staticPath: rootPath.to('public/'),
-        schemaPath: rootPath.to('app/server/graphql/schemas/customer-subscription.graphql'),
+        schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
         redisOptions: null,

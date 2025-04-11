@@ -38,6 +38,7 @@ export default class AdminGraphqlContext extends BaseGraphqlContext {
     expressRequest,
     accessToken,
   }) {
+    // TODO: Must fulfill this method.
     return super.findUser({
       expressRequest,
       accessToken,

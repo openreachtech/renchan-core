@@ -5,7 +5,7 @@ import {
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
 
 /**
- * Upload array images mutation resolver.
+ * Upload deep property images mutation resolver.
  *
  * @extends {BaseMutationResolver}
  */
@@ -73,6 +73,7 @@ export default class UploadDeepPropertyImagesMutationResolver extends BaseMutati
     /** @type {GraphqlType.FileContentReader} */
     const avatarImageContentReader = avatarImage
       ? await this.Ctor
+        // @ts-expect-error
         .createAsyncFileContentReader({
           upload: avatarImage,
         })
@@ -81,6 +82,7 @@ export default class UploadDeepPropertyImagesMutationResolver extends BaseMutati
     /** @type {GraphqlType.FileContentReader} */
     const coverImageContentReader = coverImage
       ? await this.Ctor
+        // @ts-expect-error
         .createAsyncFileContentReader({
           upload: coverImage,
         })
