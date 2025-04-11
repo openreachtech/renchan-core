@@ -1,6 +1,7 @@
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
 
 import ChatMessage from '../../../../../../sequelize/models/ChatMessage.js'
+
 import OnObserveChatStatesSubscriptionResolver from '../subscriptions/OnObserveChatStatesSubscriptionResolver.js'
 
 export default class SendChatMessageMutationResolver extends BaseMutationResolver {
