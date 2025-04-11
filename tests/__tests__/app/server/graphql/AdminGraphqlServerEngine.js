@@ -25,7 +25,7 @@ describe('AdminGraphqlServerEngine', () => {
       const expected = {
         graphqlEndpoint: '/graphql-admin',
         staticPath: rootPath.to('public/'),
-        schemaPath: rootPath.to('app/server/graphql/schemas/admin-subscription.graphql'),
+        schemaPath: rootPath.to('app/server/graphql/schemas/admin.graphql'),
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/admin/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/admin/stub/'),
         redisOptions: null,
