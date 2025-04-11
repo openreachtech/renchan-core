@@ -5,7 +5,7 @@ import {
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
 
 /**
- * Upload array images mutation resolver.
+ * Upload deep property images mutation resolver.
  *
  * @extends {BaseMutationResolver}
  */
