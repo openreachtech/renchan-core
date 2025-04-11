@@ -3,6 +3,7 @@ import {
 } from 'sequelize'
 
 import BaseQueryResolver from '../../../../../../../lib/server/graphql/resolvers/BaseQueryResolver.js'
+
 import ChatMessage from '../../../../../../sequelize/models/ChatMessage.js'
 import Customer from '../../../../../../sequelize/models/Customer.js'
 import CustomerBasic from '../../../../../../sequelize/models/CustomerBasic.js'
