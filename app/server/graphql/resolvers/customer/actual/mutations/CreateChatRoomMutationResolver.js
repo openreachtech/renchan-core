@@ -1,7 +1,8 @@
-import ChatRoom from '../../../../../../sequelize/models/ChatRoom.js'
-
 import BaseMutationResolver from '../../../../../../../lib/server/graphql/resolvers/BaseMutationResolver.js'
+
 import OnUpdateChatRoomsSubscriptionResolver from '../subscriptions/OnUpdateChatRoomsSubscriptionResolver.js'
+
+import ChatRoom from '../../../../../../sequelize/models/ChatRoom.js'
 
 export default class CreateChatRoomMutationResolver extends BaseMutationResolver {
   /** @override */

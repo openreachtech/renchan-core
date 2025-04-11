@@ -1,4 +1,5 @@
 import BaseQueryResolver from '../../../../../../../lib/server/graphql/resolvers/BaseQueryResolver.js'
+
 import ChatRoom from '../../../../../../sequelize/models/ChatRoom.js'
 
 export default class ChatRoomsQueryResolver extends BaseQueryResolver {
