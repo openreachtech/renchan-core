@@ -35,7 +35,7 @@ export default class ChatRoomsQueryResolver extends BaseQueryResolver {
         name,
       }))
 
-    rooms.sort((alpha, beta) =>
+    rooms.toSorted((alpha, beta) =>
       alpha.name.localeCompare(beta.name)
     )
 
