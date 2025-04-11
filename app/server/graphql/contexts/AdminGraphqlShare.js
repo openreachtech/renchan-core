@@ -8,6 +8,12 @@ import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphq
  * please refer to this ExtraClient in this sample code.
  */
 const ExtraClient = class {
+  /**
+   * Factory method.
+   *
+   * @param {*} params - Parameters of this factory method.
+   * @returns {ExtraClient} - Instance of this constructor.
+   */
   static create ({
     config,
   }) {
@@ -81,7 +87,7 @@ export default class AdminGraphqlShare extends BaseGraphqlShare {
 }
 
 /**
- * @typedef {import('../../../../lib/server/graphql/contexts/BaseGraphqlShare.js').BaseGraphqlShareParams & {
+ * @typedef {ConstructorParameters<GraphqlType.ShareCtor>[0] & {
  *   extraClient: ExtraClient
  * }} AdminGraphqlShareParams
  */
@@ -91,5 +97,5 @@ export default class AdminGraphqlShare extends BaseGraphqlShare {
  */
 
 /**
- * @typedef {import('../../../../lib/server/graphql/contexts/BaseGraphqlShare.js').BaseGraphqlShareAsyncFactoryParams} AdminGraphqlShareAsyncFactoryParams
+ * @typedef {Parameters<GraphqlType.ShareCtor['createAsync']>[0]} AdminGraphqlShareAsyncFactoryParams
  */
