@@ -203,7 +203,7 @@ describe('GraphqlSchemaBuilder', () => {
           params: {
             Engine: AdminGraphqlServerEngine,
           },
-          expected: 'admin: Admin!',
+          expected: 'customers: [Customer!]!',
         },
       ]
 
