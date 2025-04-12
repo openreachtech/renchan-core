@@ -20,6 +20,23 @@ describe('validate-unique-error-code', () => {
           poolPath: rootPath.to('tests/haystacks/unique-errors/correct/'),
         },
       },
+
+      // app
+      {
+        params: {
+          poolPath: rootPath.to('app/server/graphql/resolvers/customer/actual/queries/'),
+        },
+      },
+      {
+        params: {
+          poolPath: rootPath.to('app/server/graphql/resolvers/customer/actual/mutations/'),
+        },
+      },
+      {
+        params: {
+          poolPath: rootPath.to('app/server/graphql/resolvers/customer/actual/subscriptions/'),
+        },
+      },
     ]
 
     test.each(cases)('poolPath: $params.poolPath', async ({ params }) => {
