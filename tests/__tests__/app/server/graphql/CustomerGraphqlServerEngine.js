@@ -102,6 +102,7 @@ describe('CustomerGraphqlServerEngine', () => {
 
     describe('to call members of context via generated function', () => {
       const expressRequestMock = /** @type {*} */ ({})
+      const requestParamsMock = /** @type {*} */ ({})
       const engineMock = /** @type {*} */ ({})
       const visaMock = /** @type {*} */ ({})
 
@@ -110,6 +111,7 @@ describe('CustomerGraphqlServerEngine', () => {
           params: {
             context: CustomerGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10001,
@@ -128,6 +130,7 @@ describe('CustomerGraphqlServerEngine', () => {
           params: {
             context: CustomerGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10002,
