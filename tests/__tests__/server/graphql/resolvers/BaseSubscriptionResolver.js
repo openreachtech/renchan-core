@@ -111,6 +111,13 @@ describe('BaseSubscriptionResolver', () => {
             redisOptions: null,
           }),
         }),
+        engine: {
+          errorHash: {
+            CanNotSubscribe: RenchanGraphqlError.declareGraphqlError({
+              code: '102.S000.001',
+            }),
+          },
+        },
       })
 
       /** @type {GraphqlType.ResolverInputInformation} */
@@ -246,7 +253,9 @@ describe('BaseSubscriptionResolver', () => {
           expect(canSubscribeSpy)
             .toHaveBeenCalledWith(argsTally)
           expect(createCanNotSubscribeErrorSpy)
-            .toHaveBeenCalledWith()
+            .toHaveBeenCalledWith({
+              context: contextMock,
+            })
           expect(generateChannelQuerySpy)
             .not
             .toHaveBeenCalled()
