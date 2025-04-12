@@ -50,6 +50,7 @@ describe('CustomerGraphqlServerEngine', () => {
         Unauthorized: '102.X000.002',
         DeniedSchemaPermission: '102.X000.003',
         Database: '104.X000.001',
+        CanNotSubscribe: '102.S000.001',
       }
       const actual = CustomerGraphqlServerEngine.standardErrorCodeHash
 
