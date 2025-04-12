@@ -26,7 +26,7 @@ describe('CustomerGraphqlServerEngine', () => {
       const expected = {
         graphqlEndpoint: '/graphql-customer',
         staticPath: rootPath.to('public/'),
-        schemaPath: rootPath.to('app/server/graphql/schemas/customer-subscription.graphql'),
+        schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
         redisOptions: null,
@@ -50,6 +50,7 @@ describe('CustomerGraphqlServerEngine', () => {
         Unauthorized: '102.X000.002',
         DeniedSchemaPermission: '102.X000.003',
         Database: '104.X000.001',
+        CanNotSubscribe: '102.S000.001',
       }
       const actual = CustomerGraphqlServerEngine.standardErrorCodeHash
 
@@ -101,6 +102,7 @@ describe('CustomerGraphqlServerEngine', () => {
 
     describe('to call members of context via generated function', () => {
       const expressRequestMock = /** @type {*} */ ({})
+      const requestParamsMock = /** @type {*} */ ({})
       const engineMock = /** @type {*} */ ({})
       const visaMock = /** @type {*} */ ({})
 
@@ -109,6 +111,7 @@ describe('CustomerGraphqlServerEngine', () => {
           params: {
             context: CustomerGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10001,
@@ -127,6 +130,7 @@ describe('CustomerGraphqlServerEngine', () => {
           params: {
             context: CustomerGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10002,

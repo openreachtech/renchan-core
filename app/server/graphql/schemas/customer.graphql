@@ -28,8 +28,8 @@ type Query {
 ################################################################################
 
 type Mutation {
-  signUp(input: SignUpInput): SignUpResult!
   signIn(input: SignInInput): AuthResult!
+  signUp(input: SignUpInput): SignUpResult!
 
   # for furo boilerplate -------------------------------------------------------
   uploadImage (input: UploadImageInput!): UploadImageResult!

@@ -25,7 +25,7 @@ describe('AdminGraphqlServerEngine', () => {
       const expected = {
         graphqlEndpoint: '/graphql-admin',
         staticPath: rootPath.to('public/'),
-        schemaPath: rootPath.to('app/server/graphql/schemas/admin-subscription.graphql'),
+        schemaPath: rootPath.to('app/server/graphql/schemas/admin.graphql'),
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/admin/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/admin/stub/'),
         redisOptions: null,
@@ -49,6 +49,7 @@ describe('AdminGraphqlServerEngine', () => {
         Unauthorized: '102.X000.002',
         DeniedSchemaPermission: '102.X000.003',
         Database: '104.X000.001',
+        CanNotSubscribe: '102.S000.001',
       }
       const actual = AdminGraphqlServerEngine.standardErrorCodeHash
 
@@ -100,6 +101,7 @@ describe('AdminGraphqlServerEngine', () => {
 
     describe('to call members of context via generated function', () => {
       const expressRequestMock = /** @type {*} */ ({})
+      const requestParamsMock = /** @type {*} */ ({})
       const engineMock = /** @type {*} */ ({})
       const visaMock = /** @type {*} */ ({})
 
@@ -108,6 +110,7 @@ describe('AdminGraphqlServerEngine', () => {
           params: {
             context: AdminGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10001,
@@ -126,6 +129,7 @@ describe('AdminGraphqlServerEngine', () => {
           params: {
             context: AdminGraphqlContext.create({
               expressRequest: expressRequestMock,
+              requestParams: requestParamsMock,
               engine: engineMock,
               userEntity: {
                 id: 10002,

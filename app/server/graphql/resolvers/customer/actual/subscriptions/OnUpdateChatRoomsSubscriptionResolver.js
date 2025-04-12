@@ -12,6 +12,13 @@ export default class OnUpdateChatRoomsSubscriptionResolver extends BaseSubscript
   }
 
   /** @override */
+  static get errorCodeHash () {
+    return {
+      ...super.errorCodeHash,
+    }
+  }
+
+  /** @override */
   generateChannelQuery ({
     context,
   }) {

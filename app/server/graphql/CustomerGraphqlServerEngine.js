@@ -5,13 +5,13 @@ import rootPath from '../../../lib/globals/root-path.js'
 
 import BaseGraphqlServerEngine from '../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
-import CustomerGraphqlShare from './contexts/CustomerGraphqlShare.js'
-import CustomerGraphqlContext from './contexts/CustomerGraphqlContext.js'
-
 import BigNumberScalar from '../../../lib/server/graphql/scalars/concretes/BigNumberScalar.js'
 import DateTimeScalar from '../../../lib/server/graphql/scalars/concretes/DateTimeScalar.js'
 
 import graphqlUploadExpressWithResolvingContentType from '../../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
+
+import CustomerGraphqlShare from './contexts/CustomerGraphqlShare.js'
+import CustomerGraphqlContext from './contexts/CustomerGraphqlContext.js'
 
 /**
  * Renchan server engine for customer.
@@ -22,7 +22,7 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
     return {
       graphqlEndpoint: '/graphql-customer',
       staticPath: rootPath.to('public/'),
-      schemaPath: rootPath.to('app/server/graphql/schemas/customer-subscription.graphql'),
+      schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
       actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
       stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
 
@@ -47,6 +47,8 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
       Unauthorized: '102.X000.002',
       DeniedSchemaPermission: '102.X000.003',
       Database: '104.X000.001',
+
+      CanNotSubscribe: '102.S000.001',
     }
   }
 

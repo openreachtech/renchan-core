@@ -3,6 +3,12 @@ import BaseResolver from '../../../../../lib/server/graphql/resolvers/BaseResolv
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import RenchanGraphqlError from '../../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
+import CustomerGraphqlContext from '../../../../../app/server/graphql/contexts/CustomerGraphqlContext.js'
+import AdminGraphqlContext from '../../../../../app/server/graphql/contexts/AdminGraphqlContext.js'
+
+import CustomerGraphqlServerEngine from '../../../../../app/server/graphql/CustomerGraphqlServerEngine.js'
+import AdminGraphqlServerEngine from '../../../../../app/server/graphql/AdminGraphqlServerEngine.js'
+
 describe('BaseSubscriptionResolver', () => {
   describe('super class', () => {
     test('to be BaseResolver', () => {
@@ -30,9 +36,7 @@ describe('BaseSubscriptionResolver', () => {
 describe('BaseSubscriptionResolver', () => {
   describe('.get:errorCodeHash', () => {
     test('to be fixed value', () => {
-      const expected = {
-        CanNotSubscribe: '102.S000.001',
-      }
+      const expected = {}
 
       const actual = BaseSubscriptionResolver.errorCodeHash
 
@@ -107,6 +111,13 @@ describe('BaseSubscriptionResolver', () => {
             redisOptions: null,
           }),
         }),
+        engine: {
+          errorHash: {
+            CanNotSubscribe: RenchanGraphqlError.declareGraphqlError({
+              code: '102.S000.001',
+            }),
+          },
+        },
       })
 
       /** @type {GraphqlType.ResolverInputInformation} */
@@ -242,7 +253,9 @@ describe('BaseSubscriptionResolver', () => {
           expect(canSubscribeSpy)
             .toHaveBeenCalledWith(argsTally)
           expect(createCanNotSubscribeErrorSpy)
-            .toHaveBeenCalledWith()
+            .toHaveBeenCalledWith({
+              context: contextMock,
+            })
           expect(generateChannelQuerySpy)
             .not
             .toHaveBeenCalled()
@@ -327,7 +340,18 @@ describe('BaseSubscriptionResolver', () => {
 describe('BaseSubscriptionResolver', () => {
   describe('#createCanNotSubscribeError()', () => {
     describe('to be fixed value', () => {
-      const cases = [
+      /** @type {ExpressType.Request} */
+      const expressRequestMock = /** @type {*} */ ({})
+
+      /** @type {GraphqlType.HttpRequestParams | GraphqlType.WebSocketRequestParams} */
+      const requestParamsMock = /** @type {*} */ ({})
+
+      /** @type {GraphqlType.Visa} */
+      const visaMock = /** @type {*} */ ({})
+
+      const uuidMock = '12345678-1234-5678-0000-123456789012'
+
+      const resolverCases = [
         {
           params: {
             Resolver: class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
@@ -348,17 +372,44 @@ describe('BaseSubscriptionResolver', () => {
         },
       ]
 
-      test.each(cases)('Resolver: $params.Resolver.name', async ({ params }) => {
-        const expected = '102.S000.001'
-
+      describe.each(resolverCases)('Resolver: $params.Resolver.name', ({ params }) => {
         const resolver = params.Resolver.create()
 
-        const actual = resolver.createCanNotSubscribeError()
+        const cases = [
+          {
+            Engine: CustomerGraphqlServerEngine,
+            Context: CustomerGraphqlContext,
+          },
+          {
+            Engine: AdminGraphqlServerEngine,
+            Context: AdminGraphqlContext,
+          },
+        ]
 
-        expect(actual)
-          .toBeInstanceOf(RenchanGraphqlError)
-        expect(actual)
-          .toHaveProperty('message', expected)
+        test.each(cases)('Engine: $Engine.constructor.name', async ({ Engine, Context }) => {
+          const expected = '102.S000.001'
+
+          const engine = await Engine.createAsync()
+
+          const context = Context.create({
+            expressRequest: expressRequestMock,
+            requestParams: requestParamsMock,
+            userEntity: null,
+            engine,
+            visa: visaMock,
+            requestedAt: new Date(),
+            uuid: uuidMock,
+          })
+
+          const actual = resolver.createCanNotSubscribeError({
+            context,
+          })
+
+          expect(actual)
+            .toBeInstanceOf(RenchanGraphqlError)
+          expect(actual)
+            .toHaveProperty('message', expected)
+        })
       })
     })
   })
