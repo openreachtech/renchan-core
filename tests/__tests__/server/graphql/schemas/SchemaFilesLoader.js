@@ -137,17 +137,23 @@ describe('SchemaFilesLoader', () => {
 type Query {
   customer: Customer!
   messages: [Message!]!
+}
 
-  # for furo boilerplate -------------------------------------------------------
+# for furo boilerplate ---------------------------------------------------------
+type Query {
   companySponsors: CompanySponsorsResult!
   curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
   paginationArticles (input: PaginationArticlesInput!): PaginationArticlesResult!
+}
 
-  # for subscription -----------------------------------------------------------
+# for subscription -------------------------------------------------------------
+type Query {
   chatMessages (input: ChatMessagesInput!): ChatMessagesResult!
   chatRooms: ChatRoomsResult!
+}
 
-  # for scalar sample ----------------------------------------------------------
+# for scalar sample ------------------------------------------------------------
+type Query {
   customerAmounts: CustomerAmountsResult!
 }`,
             },
