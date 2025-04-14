@@ -36,22 +36,30 @@ type Query {
 type Mutation {
   signIn(input: SignInInput): AuthResult!
   signUp(input: SignUpInput): SignUpResult!
+}
 
-  # for furo boilerplate -------------------------------------------------------
+# for furo boilerplate ---------------------------------------------------------
+type Mutation {
   uploadImage (input: UploadImageInput!): UploadImageResult!
   uploadArrayImages (input: UploadArrayImagesInput!): [UploadImageResult!]!
   uploadDeepPropertyImages (input: UploadDeepPropertyImagesInput!): UploadDeepPropertyImagesResult!
+}
 
-  # for subscription -----------------------------------------------------------
+# for subscription -------------------------------------------------------------
+type Mutation {
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
   sendChatMessage (input: SendChatMessageInput!): SendChatMessageResult!
 
   postNotification (input: PostNotificationInput!): PostNotificationResult!
+}
 
-  # for scalar sample ----------------------------------------------------------
+# for scalar sample ------------------------------------------------------------
+type Mutation {
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
+}
 
-  # for sign-in sample ---------------------------------------------------------
+# for sign-in sample -----------------------------------------------------------
+type Mutation {
   renewAccessToken: RenewAccessTokenResult!
 }
 
