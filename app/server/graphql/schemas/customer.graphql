@@ -9,17 +9,23 @@ scalar Upload
 type Query {
   customer: Customer!
   messages: [Message!]!
+}
 
-  # for furo boilerplate -------------------------------------------------------
+# for furo boilerplate ---------------------------------------------------------
+type Query {
   companySponsors: CompanySponsorsResult!
   curriculums(input: CurriculumsSearchInput!): CurriculumsResult!
   paginationArticles (input: PaginationArticlesInput!): PaginationArticlesResult!
+}
 
-  # for subscription -----------------------------------------------------------
+# for subscription -------------------------------------------------------------
+type Query {
   chatMessages (input: ChatMessagesInput!): ChatMessagesResult!
   chatRooms: ChatRoomsResult!
+}
 
-  # for scalar sample ----------------------------------------------------------
+# for scalar sample ------------------------------------------------------------
+type Query {
   customerAmounts: CustomerAmountsResult!
 }
 
@@ -30,22 +36,30 @@ type Query {
 type Mutation {
   signIn(input: SignInInput): AuthResult!
   signUp(input: SignUpInput): SignUpResult!
+}
 
-  # for furo boilerplate -------------------------------------------------------
+# for furo boilerplate ---------------------------------------------------------
+type Mutation {
   uploadImage (input: UploadImageInput!): UploadImageResult!
   uploadArrayImages (input: UploadArrayImagesInput!): [UploadImageResult!]!
   uploadDeepPropertyImages (input: UploadDeepPropertyImagesInput!): UploadDeepPropertyImagesResult!
+}
 
-  # for subscription -----------------------------------------------------------
+# for subscription -------------------------------------------------------------
+type Mutation {
   createChatRoom (input: CreateChatRoomInput!): CreateChatRoomResult!
   sendChatMessage (input: SendChatMessageInput!): SendChatMessageResult!
 
   postNotification (input: PostNotificationInput!): PostNotificationResult!
+}
 
-  # for scalar sample ----------------------------------------------------------
+# for scalar sample ------------------------------------------------------------
+type Mutation {
   postAppointment (input: PostAppointmentInput!): PostAppointmentResult!
+}
 
-  # for sign-in sample ---------------------------------------------------------
+# for sign-in sample -----------------------------------------------------------
+type Mutation {
   renewAccessToken: RenewAccessTokenResult!
 }
 
@@ -53,11 +67,15 @@ type Mutation {
 #### SUBSCRIPTION
 ################################################################################
 
+# for chat room ----------------------------------------------------------------
 type Subscription {
   onObserveChatStates (input: OnObserveChatStatesInput!): OnObserveChatStatesResult!
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
   onUpdateChatRooms: OnUpdateChatRoomsResult!
+}
 
+# for notification -------------------------------------------------------------
+type Subscription {
   onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
 
