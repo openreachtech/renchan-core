@@ -67,11 +67,15 @@ type Mutation {
 #### SUBSCRIPTION
 ################################################################################
 
+# for chat room ----------------------------------------------------------------
 type Subscription {
   onObserveChatStates (input: OnObserveChatStatesInput!): OnObserveChatStatesResult!
   onReceiveMessage (input: OnReceiveMessageInput!): OnReceiveMessageResult!
   onUpdateChatRooms: OnUpdateChatRoomsResult!
+}
 
+# for notification -------------------------------------------------------------
+type Subscription {
   onBroadcastNotifications (input: OnBroadcastNotificationsInput!): OnBroadcastNotificationsResult!
 }
 
