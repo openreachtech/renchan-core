@@ -3,6 +3,8 @@ import BaseGraphqlPostWorker from '../../../../../lib/server/graphql/post-worker
 import CustomerGraphqlServerEngine from '../../../../../app/server/graphql/CustomerGraphqlServerEngine.js'
 import AdminGraphqlServerEngine from '../../../../../app/server/graphql/AdminGraphqlServerEngine.js'
 
+import ConcreteMemberNotFoundGraphqlError from '../../../../../lib/server/graphql/errors/concretes/ConcreteMemberNotFoundGraphqlError.js'
+
 describe('BaseGraphqlPostWorker', () => {
   describe('constructor', () => {
     describe('to keep properties', () => {
@@ -149,6 +151,15 @@ describe('BaseGraphqlPostWorker', () => {
         expect(SpyClass.__spy__)
           .toHaveBeenCalledWith(tallyArgs)
       })
+    })
+  })
+})
+
+describe('BaseGraphqlPostWorker', () => {
+  describe('.get:schema', () => {
+    test('to throw ConcreteMemberNotFoundGraphqlError', () => {
+      expect(() => BaseGraphqlPostWorker.schema)
+        .toThrow(expect.any(ConcreteMemberNotFoundGraphqlError))
     })
   })
 })
