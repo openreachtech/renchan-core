@@ -59,9 +59,11 @@ export default class CustomersQueryPostWorker extends BaseGraphqlPostWorker {
  */
 
 /**
- * @typedef {Array<{
- *   id: number
- *   name: string
- *   inviteCode: string
- * }>} CustomersQueryPostWorkerOutput
+ * @typedef {{
+ *   customers: Array<{
+ *     id: number
+ *     name: string
+ *     inviteCode: string
+ *   }>
+ * }} CustomersQueryPostWorkerOutput
  */
