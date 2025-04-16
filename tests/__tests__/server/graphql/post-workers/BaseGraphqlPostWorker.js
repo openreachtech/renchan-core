@@ -200,3 +200,112 @@ describe('BaseGraphqlPostWorker', () => {
     })
   })
 })
+
+describe('BaseGraphqlPostWorker', () => {
+  describe('#onResolved()', () => {
+    describe('to throw ConcreteMemberNotFoundGraphqlError', () => {
+      const AlphaGraphqlPostWorker = class extends BaseGraphqlPostWorker {}
+      const BetaGraphqlPostWorker = class extends BaseGraphqlPostWorker {}
+
+      const postWorkerCases = [
+        {
+          params: {
+            PostWorker: AlphaGraphqlPostWorker,
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            PostWorker: BetaGraphqlPostWorker,
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      describe.each(postWorkerCases)('PostWorker: $params.PostWorker.name', ({ params }) => {
+        /**
+         * @type {Array<{
+         *   envelope: {
+         *     variables: {
+         *       input: {
+         *         userId: number
+         *       }
+         *     }
+         *     context: GraphqlType.ResolverInputContext
+         *     information: GraphqlType.ResolverInputInformation
+         *     response: {
+         *       output: GraphqlType.ResolverOutput | null
+         *       error: Error | null
+         *     }
+         *   }
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            envelope: {
+              variables: {
+                input: {
+                  userId: 10001,
+                },
+              },
+              context: {},
+              information: {},
+              response: {
+                output: {
+                  username: 'John Doe',
+                },
+                error: null,
+              },
+            },
+          },
+          {
+            envelope: {
+              variables: {
+                input: {
+                  userId: 10002,
+                },
+              },
+              context: {},
+              information: {},
+              response: {
+                output: {
+                  username: 'Jane Smith',
+                },
+                error: null,
+              },
+            },
+          },
+          {
+            envelope: {
+              variables: {
+                input: {
+                  userId: 10003,
+                },
+              },
+              context: {},
+              information: {},
+              response: {
+                output: null,
+                error: new Error('I am the first error'),
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('variables: $envelope.variables', async ({ envelope }) => {
+          const engine = await params.Engine.createAsync()
+
+          const postWorker = new params.PostWorker({
+            engine,
+          })
+
+          await expect(async () => {
+            await postWorker.onResolved(envelope)
+          })
+            .rejects
+            .toThrow(expect.any(ConcreteMemberNotFoundGraphqlError))
+        })
+      })
+    })
+  })
+})
