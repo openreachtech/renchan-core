@@ -29,6 +29,7 @@ describe('CustomerGraphqlServerEngine', () => {
         schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
+        postWorkersPath: rootPath.to('app/server/graphql/post-workers/customer/'),
         redisOptions: null,
       }
 

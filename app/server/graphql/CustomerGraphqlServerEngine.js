@@ -25,6 +25,7 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
       schemaPath: rootPath.to('app/server/graphql/schemas/customer.graphql'),
       actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
       stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
+      postWorkersPath: rootPath.to('app/server/graphql/post-workers/customer/'),
 
       /*
        * NOTE: Uncomment the following line to enable Redis PubSub

@@ -69,6 +69,7 @@ declare global {
       schemaPath: string
       actualResolversPath: string | null
       stubResolversPath: string | null
+      postWorkersPath: string | null
 
       redisOptions?: RedisOptions
     }
