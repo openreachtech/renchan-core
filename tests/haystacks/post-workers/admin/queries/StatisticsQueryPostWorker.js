@@ -12,7 +12,7 @@ import BaseGraphqlPostWorker from '../../../../../lib/server/graphql/post-worker
 export default class StatisticsQueryPostWorker extends BaseGraphqlPostWorker {
   /** @override */
   static get schema () {
-    return 'customers'
+    return 'statistics'
   }
 
   /**
