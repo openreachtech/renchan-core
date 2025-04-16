@@ -130,6 +130,7 @@ declare global {
     type Resolver = BaseResolver
     type ResolverCtor = typeof BaseResolver
 
+    // GraphQL custom scalar
     type CustomScalar = BaseScalar
     type CustomScalarCtor = typeof BaseScalar<*>
     type CustomerScalarHash = {
