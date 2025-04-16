@@ -170,3 +170,18 @@ export default class SignInMutationResolver extends BaseMutationResolver {
     }
   }
 }
+
+/**
+ * @typedef {{
+ *   input: {
+ *     email: string
+ *     password: string
+ *   }
+ * }} SignInMutationResolverVariables
+ */
+
+/**
+ * @typedef {{
+ *   accessToken: string
+ * }} SignInMutationResolverOutput
+ */
