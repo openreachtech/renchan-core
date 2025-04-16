@@ -22,6 +22,7 @@ import RenchanGraphqlError from '../lib/server/graphql/errors/RenchanGraphqlErro
 import BaseResolver from '../lib/server/graphql/resolvers/BaseResolver'
 
 import BaseGraphqlPostWorker from '../lib/server/graphql/post-workers/BaseGraphqlPostWorker'
+import GraphqlPostWorkersLoader from '../lib/server/graphql/post-workers/GraphqlPostWorkersLoader'
 
 import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
 
@@ -135,6 +136,9 @@ declare global {
     // GraphQL post worker
     type PostWorker = BaseGraphqlPostWorker
     type PostWorkerCtor = typeof BaseGraphqlPostWorker
+
+    type PostWorkersLoader = GraphqlPostWorkersLoader
+    type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
 
     // GraphQL custom scalar
     type CustomScalar = BaseScalar
