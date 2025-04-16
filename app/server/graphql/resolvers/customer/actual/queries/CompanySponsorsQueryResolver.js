@@ -84,12 +84,14 @@ export default class CompanySponsorsQueryResolver extends BaseQueryResolver {
  */
 
 /**
- * @typedef {Array<{
- *   id: number
- *   registeredAt: Date
- *   companyName: string
- *   companyDescription: string
- *   companySponsorHomepage: string
- *   companySponsorLogo: string
- * }>} CompanySponsorsQueryResolverOutput
+ * @typedef {{
+ *   companySponsors: Array<{
+ *     id: number
+ *     registeredAt: Date
+ *     companyName: string
+ *     companyDescription: string
+ *     companySponsorHomepage: string
+ *     companySponsorLogo: string
+ *   }>
+ * }} CompanySponsorsQueryResolverOutput
  */
