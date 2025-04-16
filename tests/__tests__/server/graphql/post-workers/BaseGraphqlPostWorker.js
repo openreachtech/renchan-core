@@ -163,3 +163,40 @@ describe('BaseGraphqlPostWorker', () => {
     })
   })
 })
+
+describe('BaseGraphqlPostWorker', () => {
+  describe('#get:Ctor', () => {
+    describe('to be own class', () => {
+      const AlphaGraphqlPostWorker = class extends BaseGraphqlPostWorker {}
+      const BetaGraphqlPostWorker = class extends BaseGraphqlPostWorker {}
+
+      const cases = [
+        {
+          params: {
+            PostWorker: AlphaGraphqlPostWorker,
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            PostWorker: BetaGraphqlPostWorker,
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('PostWorker: $params.PostWorker.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const postWorker = new params.PostWorker({
+          engine,
+        })
+
+        const actual = postWorker.Ctor
+
+        expect(actual)
+          .toBe(params.PostWorker)
+      })
+    })
+  })
+})
