@@ -23,6 +23,7 @@ import BaseResolver from '../lib/server/graphql/resolvers/BaseResolver'
 
 import BaseGraphqlPostWorker from '../lib/server/graphql/post-workers/BaseGraphqlPostWorker'
 import GraphqlPostWorkersLoader from '../lib/server/graphql/post-workers/GraphqlPostWorkersLoader'
+import GraphqlPostWorkerHashBuilder from '../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder'
 
 import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
 
@@ -136,6 +137,9 @@ declare global {
     // GraphQL post worker
     type PostWorker = BaseGraphqlPostWorker
     type PostWorkerCtor = typeof BaseGraphqlPostWorker
+
+    type PostWorkerHashBuilder = GraphqlPostWorkerHashBuilder
+    type PostWorkerHashBuilderCtor = typeof GraphqlPostWorkerHashBuilder
 
     type PostWorkersLoader = GraphqlPostWorkersLoader
     type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
