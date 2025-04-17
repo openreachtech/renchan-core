@@ -21,6 +21,10 @@ import GraphqlVisa from '../lib/server/graphql/contexts/GraphqlVisa'
 import RenchanGraphqlError from '../lib/server/graphql/errors/RenchanGraphqlError'
 import BaseResolver from '../lib/server/graphql/resolvers/BaseResolver'
 
+import BaseGraphqlPostWorker from '../lib/server/graphql/post-workers/BaseGraphqlPostWorker'
+import GraphqlPostWorkersLoader from '../lib/server/graphql/post-workers/GraphqlPostWorkersLoader'
+import GraphqlPostWorkerHashBuilder from '../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder'
+
 import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
 
 import SubscriptionBroker from '../lib/server/graphql/subscription/SubscriptionBroker'
@@ -69,6 +73,7 @@ declare global {
       schemaPath: string
       actualResolversPath: string | null
       stubResolversPath: string | null
+      postWorkersPath: string | null
 
       redisOptions?: RedisOptions
     }
@@ -129,6 +134,17 @@ declare global {
     type Resolver = BaseResolver
     type ResolverCtor = typeof BaseResolver
 
+    // GraphQL post worker
+    type PostWorker = BaseGraphqlPostWorker
+    type PostWorkerCtor = typeof BaseGraphqlPostWorker
+
+    type PostWorkerHashBuilder = GraphqlPostWorkerHashBuilder
+    type PostWorkerHashBuilderCtor = typeof GraphqlPostWorkerHashBuilder
+
+    type PostWorkersLoader = GraphqlPostWorkersLoader
+    type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
+
+    // GraphQL custom scalar
     type CustomScalar = BaseScalar
     type CustomScalarCtor = typeof BaseScalar<*>
     type CustomerScalarHash = {
