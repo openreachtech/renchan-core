@@ -1199,6 +1199,89 @@ describe('BaseGraphqlServerEngine', () => {
 })
 
 describe('BaseGraphqlServerEngine', () => {
+  describe('#defineOnResolved()', () => {
+    const AlphaGraphqlShare = class extends BaseGraphqlShare {}
+    const BateGraphqlShare = class extends BaseGraphqlShare {}
+
+    describe('to be empty Function', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     config: GraphqlType.Config
+       *     EngineCtor: typeof BaseGraphqlServerEngine
+       *   }
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          params: {
+            config: {
+              graphqlEndpoint: '/graphql-customer',
+              schemaPath: '/path/to/schema-customer',
+              actualResolversPath: '/path/to/resolvers/customer/actual/',
+              stubResolversPath: '/path/to/resolvers/customer/stub/',
+            },
+            EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
+              static get Share () {
+                return AlphaGraphqlShare
+              }
+
+              /** @override */
+              static get standardErrorCodeHash () {
+                return {
+                  Unknown: '100.X000.001',
+                  ConcreteMemberNotFound: '101.X000.001',
+                  Unauthenticated: '102.X000.001',
+                  Unauthorized: '102.X000.002',
+                  DeniedSchemaPermission: '102.X000.003',
+                  Database: '104.X000.001',
+                }
+              }
+            },
+          },
+        },
+        {
+          params: {
+            config: {
+              graphqlEndpoint: '/graphql-admin',
+              schemaPath: '/path/to/schema-admin',
+              actualResolversPath: '/path/to/resolvers/admin/actual/',
+              stubResolversPath: '/path/to/resolvers/admin/stub/',
+            },
+            EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
+              static get Share () {
+                return BateGraphqlShare
+              }
+
+              /** @override */
+              static get standardErrorCodeHash () {
+                return {
+                  Unknown: '100.X000.001',
+                  ConcreteMemberNotFound: '101.X000.001',
+                  Unauthenticated: '102.X000.001',
+                  Unauthorized: '102.X000.002',
+                  DeniedSchemaPermission: '102.X000.003',
+                  Database: '104.X000.001',
+                }
+              }
+            },
+          },
+        },
+      ])
+
+      test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
+        const engine = await params.EngineCtor.createAsync(params)
+
+        const actual = engine.defineOnResolved()
+
+        expect(actual)
+          .toBeInstanceOf(Function)
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('#get:visaIssuers', () => {
     const AlphaGraphqlShare = class extends BaseGraphqlShare {}
     const BateGraphqlShare = class extends BaseGraphqlShare {}

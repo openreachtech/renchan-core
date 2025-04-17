@@ -144,6 +144,17 @@ declare global {
     type PostWorkersLoader = GraphqlPostWorkersLoader
     type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
 
+    type OnResolvedEnvelope = {
+      variables: ResolverInputVariables
+      context: ResolverInputContext
+      information: ResolverInputInformation
+      parent: ResolverInputParent
+      response: {
+        output: ResolverOutput | null
+        error: Error | null
+      }
+    }
+
     // GraphQL custom scalar
     type CustomScalar = BaseScalar
     type CustomScalarCtor = typeof BaseScalar<*>
