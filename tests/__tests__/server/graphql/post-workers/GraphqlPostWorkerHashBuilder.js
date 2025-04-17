@@ -447,7 +447,7 @@ describe('GraphqlPostWorkerHashBuilder', () => {
 })
 
 describe('GraphqlPostWorkerHashBuilder', () => {
-  describe('#buildResolverHash()', () => {
+  describe('#buildPostWorkerHash()', () => {
     const AlphaServerEngine = class extends BaseGraphqlServerEngine {}
     const BetaServerEngine = class extends BaseGraphqlServerEngine {}
 
@@ -518,7 +518,7 @@ describe('GraphqlPostWorkerHashBuilder', () => {
         engine,
       })
 
-      const actual = builder.buildPostWorkersHash()
+      const actual = builder.buildPostWorkerHash()
 
       expect(actual)
         .toEqual(expected)
