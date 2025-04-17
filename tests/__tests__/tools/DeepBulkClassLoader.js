@@ -250,6 +250,12 @@ describe('DeepBulkClassLoader', () => {
             rootPath.to('app/server/graphql/contexts/AdminGraphqlShare.js'),
             rootPath.to('app/server/graphql/contexts/CustomerGraphqlContext.js'),
             rootPath.to('app/server/graphql/contexts/CustomerGraphqlShare.js'),
+
+            rootPath.to('app/server/graphql/post-workers/admin/mutations/SignInMutationPostWorker.js'),
+            rootPath.to('app/server/graphql/post-workers/admin/queries/CustomersQueryPostWorker.js'),
+            rootPath.to('app/server/graphql/post-workers/customer/mutations/SignInMutationPostWorker.js'),
+            rootPath.to('app/server/graphql/post-workers/customer/queries/CompanySponsorsQueryPostWorker.js'),
+
             rootPath.to('app/server/graphql/resolvers/admin/actual/mutations/SignUpMutationResolver.js'),
             rootPath.to('app/server/graphql/resolvers/admin/actual/queries/CustomersQueryResolver.js'),
 
