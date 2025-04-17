@@ -78,3 +78,20 @@ export default class CompanySponsorsQueryResolver extends BaseQueryResolver {
     }
   }
 }
+
+/**
+ * @typedef {{}} CompanySponsorsQueryResolverVariables
+ */
+
+/**
+ * @typedef {{
+ *   companySponsors: Array<{
+ *     id: number
+ *     registeredAt: Date
+ *     companyName: string
+ *     companyDescription: string
+ *     companySponsorHomepage: string
+ *     companySponsorLogo: string
+ *   }>
+ * }} CompanySponsorsQueryResolverOutput
+ */
