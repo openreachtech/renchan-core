@@ -785,6 +785,19 @@ describe('GraphqlHttpHandlerBuilder', () => {
 })
 
 describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.createParcelPorter()', () => {
+    describe('to be equivalent to instance of GraphqlResolvedParcelPorter', () => {
+      test('with no parameters', () => {
+        const actual = GraphqlHttpHandlerBuilder.createParcelPorter()
+
+        expect(actual)
+          .toBeInstanceOf(GraphqlResolvedParcelPorter)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
   describe('.get:SchemaBuilder', () => {
     test('to be bridge class', () => {
       const actual = GraphqlHttpHandlerBuilder.SchemaBuilder
