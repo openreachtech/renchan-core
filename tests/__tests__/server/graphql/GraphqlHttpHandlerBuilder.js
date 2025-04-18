@@ -3,6 +3,10 @@ import {
 } from 'graphql'
 
 import {
+  createHandler,
+} from 'graphql-http/lib/use/express'
+
+import {
   applyMiddleware,
 } from 'graphql-middleware'
 
@@ -990,6 +994,19 @@ describe('GraphqlHttpHandlerBuilder', () => {
 
         expect(actual)
           .toBe(applyMiddleware) // same reference
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.get:createHandler', () => {
+    describe('to be fixed value', () => {
+      test('as createHandler()', () => {
+        const actual = GraphqlHttpHandlerBuilder.createHandler
+
+        expect(actual)
+          .toBe(createHandler) // same reference
       })
     })
   })
