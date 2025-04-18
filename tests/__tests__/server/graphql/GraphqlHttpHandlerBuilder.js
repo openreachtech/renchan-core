@@ -11,6 +11,7 @@ import BaseGraphqlContext from '../../../../lib/server/graphql/contexts/BaseGrap
 import CustomerGraphqlContext from '../../../../app/server/graphql/contexts/CustomerGraphqlContext.js'
 import AdminGraphqlContext from '../../../../app/server/graphql/contexts/AdminGraphqlContext.js'
 import GraphqlResolvedParcelPorter from '../../../../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter.js'
+import GraphqlPostWorkerHashBuilder from '../../../../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder.js'
 
 describe('GraphqlHttpHandlerBuilder', () => {
   describe('constructor', () => {
@@ -413,6 +414,13 @@ describe('GraphqlHttpHandlerBuilder', () => {
     /** @type {import('graphql-http').HandlerOptions['validationRules']} */
     const validationRulesMock = /** @type {*} */ ([])
 
+    const onResolvedMock = /** @type {*} */ (async parcel => {})
+
+    /** @type {Record<string, (parcel: GraphqlType.OnResolvedParcel) => Promise<void>>} */
+    const postWorkerHashMock = /** @type {*} */ ({})
+
+    const parcelPorterMock = GraphqlResolvedParcelPorter.create()
+
     describe('to be instance of own class', () => {
       /**
        * @type {Array<{
@@ -445,6 +453,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
           rootValue: rootValueMock,
           formatError: formatErrorMock,
           validationRules: validationRulesMock,
+
+          onResolved: onResolvedMock,
+          postWorkerHash: postWorkerHashMock,
+          parcelPorter: parcelPorterMock,
         }
 
         const actual = GraphqlHttpHandlerBuilder.create(args)
@@ -488,6 +500,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
           rootValue: rootValueMock,
           formatError: formatErrorMock,
           validationRules: validationRulesMock,
+
+          onResolved: onResolvedMock,
+          postWorkerHash: postWorkerHashMock,
+          parcelPorter: parcelPorterMock,
         }
 
         SpyClass.create(args)
@@ -561,15 +577,30 @@ describe('GraphqlHttpHandlerBuilder', () => {
             params.contextFactory
           )
 
+          const onResolvedTally = /** @type {*} */ (async parcel => {})
+          const postWorkerHashTally = /** @type {*} */ ({})
+          const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+
           const buildSchemaSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
           const generateContextFactorySpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'generateContextFactory')
             .mockReturnValue(contextFactoryTally)
+          const defineOnResolvedSpy = jest.spyOn(engine, 'defineOnResolved')
+            .mockReturnValue(onResolvedTally)
+          const generateOnResolvedSchemaHashSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'generateOnResolvedSchemaHash')
+            .mockReturnValue(postWorkerHashTally)
+          const createParcelPorterSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
+            .mockReturnValue(parcelPorterTally)
+
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
           const argsExpected = {
             schema: schemaTally,
             context: contextFactoryTally,
+
+            onResolved: onResolvedTally,
+            postWorkerHash: postWorkerHashTally,
+            parcelPorter: parcelPorterTally,
           }
 
           const args = {
@@ -584,6 +615,12 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .toHaveBeenCalledWith(engineExpected)
           expect(generateContextFactorySpy)
             .toHaveBeenCalledWith(engineExpected)
+          expect(defineOnResolvedSpy)
+            .toHaveBeenCalledWith()
+          expect(generateOnResolvedSchemaHashSpy)
+            .toHaveBeenCalledWith(engineExpected)
+          expect(createParcelPorterSpy)
+            .toHaveBeenCalledWith()
         })
       })
 
@@ -641,11 +678,7 @@ describe('GraphqlHttpHandlerBuilder', () => {
         ]
 
         test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
-          const argsExpected = {
-            ...params.extraCreateHandlerParams,
-            schema: params.schema,
-            context: params.contextFactory,
-          }
+          const engine = await params.Engine.createAsync()
 
           /** @type {GraphqlType.Schema} */
           const schemaTally = /** @type {*} */ (params.schema)
@@ -662,14 +695,33 @@ describe('GraphqlHttpHandlerBuilder', () => {
             }
           }
 
+          const onResolvedTally = /** @type {*} */ (async parcel => {})
+          const postWorkerHashTally = /** @type {*} */ ({})
+          const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+
           jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
           jest.spyOn(GraphqlHttpHandlerBuilder, 'generateContextFactory')
             .mockReturnValue(contextFactoryTally)
+          jest.spyOn(engine, 'defineOnResolved')
+            .mockReturnValue(onResolvedTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'generateOnResolvedSchemaHash')
+            .mockReturnValue(postWorkerHashTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
+            .mockReturnValue(parcelPorterTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
-          const engine = await params.Engine.createAsync()
+          const argsExpected = {
+            ...params.extraCreateHandlerParams,
+            schema: params.schema,
+            context: params.contextFactory,
+
+            onResolved: onResolvedTally,
+            postWorkerHash: postWorkerHashTally,
+            parcelPorter: parcelPorterTally,
+          }
+
           const args = {
             engine,
           }
@@ -678,6 +730,119 @@ describe('GraphqlHttpHandlerBuilder', () => {
           expect(createSpy)
             .toHaveBeenCalledWith(argsExpected)
         })
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.generateOnResolvedSchemaHash()', () => {
+    describe('to be PostWorker handler hash', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+          expected: {
+            companySponsors: expect.any(Function),
+            signIn: expect.any(Function),
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+          expected: {
+            customers: expect.any(Function),
+            signIn: expect.any(Function),
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
+        const engine = await params.Engine.createAsync()
+
+        const actual = await GraphqlHttpHandlerBuilder.generateOnResolvedSchemaHash({
+          engine,
+        })
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('to call members', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const expectedArgs = {
+          engine,
+        }
+
+        const buildOnResolvedSchemaHashSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createPostWorkerHashBuilder')
+
+        await GraphqlHttpHandlerBuilder.generateOnResolvedSchemaHash({
+          engine,
+        })
+
+        expect(buildOnResolvedSchemaHashSpy)
+          .toHaveBeenCalledWith(expectedArgs)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.createPostWorkerHashBuilder()', () => {
+    describe('to be instance of GraphqlPostWorkerHashBuilder', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const actual = await GraphqlHttpHandlerBuilder.createPostWorkerHashBuilder({
+          engine,
+        })
+
+        expect(actual)
+          .toBeInstanceOf(GraphqlPostWorkerHashBuilder)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.createParcelPorter()', () => {
+    describe('to be equivalent to instance of GraphqlResolvedParcelPorter', () => {
+      test('with no parameters', () => {
+        const actual = GraphqlHttpHandlerBuilder.createParcelPorter()
+
+        expect(actual)
+          .toBeInstanceOf(GraphqlResolvedParcelPorter)
       })
     })
   })
