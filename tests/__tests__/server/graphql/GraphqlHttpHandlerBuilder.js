@@ -1132,3 +1132,329 @@ describe('GraphqlHttpHandlerBuilder', () => {
     })
   })
 })
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('#defineOnResolveMiddleware()', () => {
+    const engineCases = [
+      {
+        params: {
+          Engine: CustomerGraphqlServerEngine,
+        },
+      },
+      {
+        params: {
+          Engine: AdminGraphqlServerEngine,
+        },
+      },
+    ]
+
+    describe('to be Function', () => {
+      test.each(engineCases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const builder = await GraphqlHttpHandlerBuilder.createAsync({
+          engine,
+        })
+
+        const actual = builder.defineOnResolveMiddleware()
+
+        expect(actual)
+          .toBeInstanceOf(Function)
+      })
+    })
+
+    describe('behavior of defined function', () => {
+      /** @type {ExpressType.Request} */
+      const alphaExpressRequest = /** @type {*} */ ({
+        headers: {
+          'x-renchan-access-token': 'alpha',
+        },
+      })
+
+      /** @type {ExpressType.Request} */
+      const betaExpressRequest = /** @type {*} */ ({
+        headers: {
+          'x-renchan-access-token': 'beta',
+        },
+      })
+
+      /** @type {GraphqlType.ResolverInputInformation} */
+      const informationMock = /** @type {*} */ ({})
+
+      /**
+       * @type {Array<{
+       *   args: {
+       *     variables: GraphqlType.ResolverInputVariables
+       *     context: GraphqlType.Context
+       *   }
+       * }>}
+       */
+      const cases = /** @type {*} */ ([
+        {
+          args: {
+            variables: {
+              value: 100001,
+            },
+            context: {
+              expressRequest: {
+                raw: alphaExpressRequest,
+              },
+            },
+          },
+        },
+        {
+          args: {
+            variables: {
+              value: 100002,
+            },
+            context: {
+              expressRequest: {
+                raw: betaExpressRequest,
+              },
+            },
+          },
+        },
+      ])
+
+      describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
+        describe('as rootValue', () => {
+          describe('to return output', () => {
+            test.each(cases)('value: $args.variables.value', async ({ args }) => {
+              const engine = await params.Engine.createAsync()
+
+              const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                engine,
+              })
+
+              const outputTally = {
+                schemaName: Symbol('tally'),
+              }
+
+              const saveParcelSpy = jest.spyOn(builder.parcelPorter, 'saveParcel')
+
+              const resolveSpy = jest.fn(async () => outputTally)
+
+              const resolveMiddleware = builder.defineOnResolveMiddleware()
+
+              const expectedArgs = {
+                expressRequest: args.context.expressRequest['raw'],
+                parcel: {
+                  variables: args.variables,
+                  context: args.context,
+                  information: informationMock,
+                  response: {
+                    output: outputTally,
+                    error: null,
+                  },
+                },
+              }
+
+              const expectedResolveArgs = [
+                null, // parent
+                args.variables,
+                args.context,
+                informationMock,
+              ]
+
+              const output = await resolveMiddleware(
+                resolveSpy,
+                null, // parent
+                args.variables,
+                args.context,
+                informationMock
+              )
+
+              expect(output)
+                .toEqual(outputTally)
+
+              expect(resolveSpy)
+                .toHaveBeenCalledWith(...expectedResolveArgs)
+              expect(saveParcelSpy)
+                .toHaveBeenCalledWith(expectedArgs)
+            })
+          })
+
+          describe('to throw error', () => {
+            test.each(cases)('value: $args.variables.value', async ({ args }) => {
+              const engine = await params.Engine.createAsync()
+
+              const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                engine,
+              })
+
+              const errorTally = new Error('tally')
+
+              const saveParcelSpy = jest.spyOn(builder.parcelPorter, 'saveParcel')
+
+              const resolveSpy = jest.fn(async () => {
+                throw errorTally
+              })
+
+              const resolveMiddleware = builder.defineOnResolveMiddleware()
+
+              const expectedArgs = {
+                expressRequest: args.context.expressRequest['raw'],
+                parcel: {
+                  variables: args.variables,
+                  context: args.context,
+                  information: informationMock,
+                  response: {
+                    output: null,
+                    error: errorTally,
+                  },
+                },
+              }
+
+              const expectedResolveArgs = [
+                null, // parent
+                args.variables,
+                args.context,
+                informationMock,
+              ]
+
+              await expect(
+                async () => resolveMiddleware(
+                  resolveSpy,
+                  null, // parent
+                  args.variables,
+                  args.context,
+                  informationMock
+                )
+              )
+                .rejects
+                .toThrow(errorTally)
+
+              expect(resolveSpy)
+                .toHaveBeenCalledWith(...expectedResolveArgs)
+              expect(saveParcelSpy)
+                .toHaveBeenCalledWith(expectedArgs)
+            })
+          })
+        })
+
+        describe('as not rootValue', () => {
+          describe('to return output', () => {
+            test.each(cases)('value: $args.variables.value', async ({ args }) => {
+              const engine = await params.Engine.createAsync()
+
+              const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                engine,
+              })
+
+              const parentTally = {
+                value: Symbol('parent'),
+              }
+              const outputTally = {
+                schemaName: Symbol('tally'),
+              }
+
+              const saveParcelSpy = jest.spyOn(builder.parcelPorter, 'saveParcel')
+
+              const resolveSpy = jest.fn(async () => outputTally)
+
+              const resolveMiddleware = builder.defineOnResolveMiddleware()
+
+              const expectedArgs = {
+                expressRequest: args.context.expressRequest['raw'],
+                parcel: {
+                  variables: args.variables,
+                  context: args.context,
+                  information: informationMock,
+                  response: {
+                    output: outputTally,
+                    error: null,
+                  },
+                },
+              }
+
+              const expectedResolveArgs = [
+                parentTally,
+                args.variables,
+                args.context,
+                informationMock,
+              ]
+
+              const output = await resolveMiddleware(
+                resolveSpy,
+                parentTally,
+                args.variables,
+                args.context,
+                informationMock
+              )
+
+              expect(output)
+                .toEqual(outputTally)
+
+              expect(resolveSpy)
+                .toHaveBeenCalledWith(...expectedResolveArgs)
+              expect(saveParcelSpy)
+                .not
+                .toHaveBeenCalledWith(expectedArgs)
+            })
+          })
+
+          describe('to throw error', () => {
+            test.each(cases)('value: $args.variables.value', async ({ args }) => {
+              const engine = await params.Engine.createAsync()
+
+              const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                engine,
+              })
+
+              const parentTally = {
+                value: Symbol('parent'),
+              }
+              const errorTally = new Error('tally')
+
+              const saveParcelSpy = jest.spyOn(builder.parcelPorter, 'saveParcel')
+
+              const resolveSpy = jest.fn(async () => {
+                throw errorTally
+              })
+
+              const resolveMiddleware = builder.defineOnResolveMiddleware()
+
+              const expectedArgs = {
+                expressRequest: args.context.expressRequest['raw'],
+                parcel: {
+                  variables: args.variables,
+                  context: args.context,
+                  information: informationMock,
+                  response: {
+                    output: null,
+                    error: errorTally,
+                  },
+                },
+              }
+
+              const expectedResolveArgs = [
+                parentTally,
+                args.variables,
+                args.context,
+                informationMock,
+              ]
+
+              await expect(
+                async () => resolveMiddleware(
+                  resolveSpy,
+                  parentTally,
+                  args.variables,
+                  args.context,
+                  informationMock
+                )
+              )
+                .rejects
+                .toThrow(errorTally)
+
+              expect(resolveSpy)
+                .toHaveBeenCalledWith(...expectedResolveArgs)
+              expect(saveParcelSpy)
+                .not
+                .toHaveBeenCalledWith(expectedArgs)
+            })
+          })
+        })
+      })
+    })
+  })
+})
