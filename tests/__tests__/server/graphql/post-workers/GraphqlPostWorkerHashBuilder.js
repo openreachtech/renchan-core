@@ -447,7 +447,7 @@ describe('GraphqlPostWorkerHashBuilder', () => {
 })
 
 describe('GraphqlPostWorkerHashBuilder', () => {
-  describe('#buildPostWorkerHash()', () => {
+  describe('#buildOnResolvedSchemaHash()', () => {
     const AlphaServerEngine = class extends BaseGraphqlServerEngine {}
     const BetaServerEngine = class extends BaseGraphqlServerEngine {}
 
@@ -458,18 +458,10 @@ describe('GraphqlPostWorkerHashBuilder', () => {
           postWorkersPath: rootPath.to('tests/haystacks/post-workers/customer/'),
         },
         expected: {
-          companySponsors: new CompanySponsorsQueryPostWorker({
-            engine: expect.any(AlphaServerEngine),
-          }),
-          curriculums: new CurriculumsQueryPostWorker({
-            engine: expect.any(AlphaServerEngine),
-          }),
-          sendChatMessage: new SendChatMessageMutationPostWorker({
-            engine: expect.any(AlphaServerEngine),
-          }),
-          signIn: new CustomerSignInMutationPostWorker({
-            engine: expect.any(AlphaServerEngine),
-          }),
+          companySponsors: expect.any(Function),
+          curriculums: expect.any(Function),
+          sendChatMessage: expect.any(Function),
+          signIn: expect.any(Function),
         },
       },
       {
@@ -478,18 +470,10 @@ describe('GraphqlPostWorkerHashBuilder', () => {
           postWorkersPath: rootPath.to('tests/haystacks/post-workers/admin/'),
         },
         expected: {
-          customers: new CustomersQueryPostWorker({
-            engine: expect.any(BetaServerEngine),
-          }),
-          statistics: new StatisticsQueryPostWorker({
-            engine: expect.any(BetaServerEngine),
-          }),
-          broadcastNotification: new BroadcastNotificationMutationPostWorker({
-            engine: expect.any(BetaServerEngine),
-          }),
-          signIn: new AdminSignInMutationPostWorker({
-            engine: expect.any(BetaServerEngine),
-          }),
+          customers: expect.any(Function),
+          statistics: expect.any(Function),
+          broadcastNotification: expect.any(Function),
+          signIn: expect.any(Function),
         },
       },
     ]
@@ -518,7 +502,7 @@ describe('GraphqlPostWorkerHashBuilder', () => {
         engine,
       })
 
-      const actual = builder.buildPostWorkerHash()
+      const actual = builder.buildOnResolvedSchemaHash()
 
       expect(actual)
         .toEqual(expected)

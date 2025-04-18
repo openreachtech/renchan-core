@@ -24,6 +24,7 @@ import BaseResolver from '../lib/server/graphql/resolvers/BaseResolver'
 import BaseGraphqlPostWorker from '../lib/server/graphql/post-workers/BaseGraphqlPostWorker'
 import GraphqlPostWorkersLoader from '../lib/server/graphql/post-workers/GraphqlPostWorkersLoader'
 import GraphqlPostWorkerHashBuilder from '../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder'
+import GraphqlResolvedParcelPorter from '../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter'
 
 import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
 
@@ -138,19 +139,25 @@ declare global {
     type PostWorker = BaseGraphqlPostWorker
     type PostWorkerCtor = typeof BaseGraphqlPostWorker
 
+    type ResolvedParcelPorter = GraphqlResolvedParcelPorter
+    type ResolvedParcelPorterCtor = typeof GraphqlResolvedParcelPorter
+
     type PostWorkerHashBuilder = GraphqlPostWorkerHashBuilder
     type PostWorkerHashBuilderCtor = typeof GraphqlPostWorkerHashBuilder
 
     type PostWorkersLoader = GraphqlPostWorkersLoader
     type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
 
-    type OnResolvedEnvelope = {
-      variables: ResolverInputVariables
-      context: ResolverInputContext
+    type OnResolvedParcel<
+      V extends ResolverInputVariables = *,
+      C extends ResolverInputContext = BaseGraphqlContext,
+      O extends ResolverOutput = *,
+    >  = {
+      variables: V
+      context: C
       information: ResolverInputInformation
-      parent: ResolverInputParent
       response: {
-        output: ResolverOutput | null
+        output: O | null
         error: Error | null
       }
     }

@@ -42,7 +42,6 @@ export default class CustomersQueryPostWorker extends BaseGraphqlPostWorker {
     },
   }) {
     Timber.log('I am the post worker of CustomersQuery', {
-      companyName: variables[0].companyName,
       variables,
       output,
       error,
