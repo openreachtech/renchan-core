@@ -1887,3 +1887,52 @@ describe('GraphqlHttpHandlerBuilder', () => {
     })
   })
 })
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('#generateInterceptedSchema()', () => {
+    describe('to call members', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const builder = await GraphqlHttpHandlerBuilder.createAsync({
+          engine,
+        })
+
+        const onResolveMiddlewareTally = async () => {}
+        const applyMiddlewareTally = /** @type {*} */ ({
+          tally: Symbol('tally'),
+        })
+
+        const defineOnResolveMiddlewareSpy = jest.spyOn(builder, 'defineOnResolveMiddleware')
+          .mockReturnValue(onResolveMiddlewareTally)
+        const applyMiddlewareSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'applyMiddleware')
+          .mockReturnValue(applyMiddlewareTally)
+
+        const actual = builder.generateInterceptedSchema()
+
+        expect(actual)
+          .toBe(applyMiddlewareTally) // same reference
+        expect(defineOnResolveMiddlewareSpy)
+          .toHaveBeenCalledWith()
+        expect(applyMiddlewareSpy)
+          .toHaveBeenCalledWith(
+            builder.schema,
+            onResolveMiddlewareTally
+          )
+      })
+    })
+  })
+})
