@@ -1570,3 +1570,320 @@ describe('GraphqlHttpHandlerBuilder', () => {
     })
   })
 })
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('#defineOnFinishHandler()', () => {
+    /**
+     * @type {Array<{
+     *   params: {
+     *     Engine: GraphqlType.ServerEngineCtor
+     *   }
+     *   individualOnResolvedCases: Array<{
+     *     information: GraphqlType.ResolverInputInformation
+     *   }>
+     * }>}
+     */
+    const engineCases = /** @type {Array<*>} */ ([
+      {
+        params: {
+          Engine: CustomerGraphqlServerEngine,
+        },
+        individualOnResolvedCases: [
+          {
+            information: {
+              fieldName: 'companySponsors',
+            },
+          },
+          {
+            information: {
+              fieldName: 'signIn',
+            },
+          },
+        ],
+      },
+      {
+        params: {
+          Engine: AdminGraphqlServerEngine,
+        },
+        individualOnResolvedCases: [
+          {
+            information: {
+              fieldName: 'customers',
+            },
+          },
+          {
+            information: {
+              fieldName: 'signIn',
+            },
+          },
+        ],
+      },
+    ])
+
+    describe('to be function', () => {
+      describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'alpha-access-token',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'beta-access-token',
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('expressRequest: $expressRequest', async ({ expressRequest }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await GraphqlHttpHandlerBuilder.createAsync({
+            engine,
+          })
+
+          const args = {
+            expressRequest,
+          }
+
+          const actual = builder.defineOnFinishHandler(args)
+
+          expect(actual)
+            .toBeInstanceOf(Function)
+        })
+      })
+    })
+
+    describe('behavior of defined function', () => {
+      describe.each(engineCases)('Engine: $params.Engine.name', ({ params, individualOnResolvedCases }) => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         * }>}
+         */
+        const expressCases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'alpha-access-token',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              headers: {
+                'x-renchan-access-token': 'beta-access-token',
+              },
+            },
+          },
+        ])
+
+        describe.each(expressCases)('expressRequest: $expressRequest', ({ expressRequest }) => {
+          describe('with parcel', () => {
+            /**
+             * @type {Array<{
+             *   parcel: GraphqlType.OnResolvedParcel
+             * }>}
+             */
+            const cases = /** @type {*} */ ([
+              {
+                parcel: {
+                  variables: {
+                    value: 10001,
+                  },
+                  context: {
+                    expressRequest,
+                  },
+                  response: {
+                    output: {
+                      names: [
+                        'John Doe',
+                        'Jane Smith',
+                      ],
+                    },
+                    error: null,
+                  },
+                },
+              },
+              {
+                parcel: {
+                  variables: {
+                    value: 10002,
+                  },
+                  context: {
+                    expressRequest,
+                  },
+                  response: {
+                    output: null,
+                    error: new Error('tally'),
+                  },
+                },
+              },
+            ])
+
+            describe('to call individual onResolved()', () => {
+              describe.each(individualOnResolvedCases)('information: $information', ({ information }) => {
+                test.each(cases)('parcel: $parcel', async ({ parcel }) => {
+                  const engine = await params.Engine.createAsync()
+
+                  const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                    engine,
+                  })
+
+                  const loadParcelSpy = jest.spyOn(builder.parcelPorter, 'loadParcel')
+
+                  const onResolvedSpy = /** @type {*} */ (
+                    jest.fn()
+                      .mockImplementation(async () => {})
+                  )
+                  builder.onResolved = onResolvedSpy // Bad practice, but needed to test
+
+                  const parcelTally = {
+                    variables: parcel.variables,
+                    context: parcel.context,
+                    information,
+                    response: parcel.response,
+                  }
+
+                  builder.parcelPorter.saveParcel({
+                    expressRequest,
+                    parcel: parcelTally,
+                  })
+
+                  const args = {
+                    expressRequest,
+                  }
+                  const definedOnResolved = builder.defineOnFinishHandler(args)
+
+                  await definedOnResolved()
+
+                  expect(loadParcelSpy)
+                    .toHaveBeenCalledWith(args)
+                  expect(onResolvedSpy)
+                    .toHaveBeenCalledWith(parcelTally)
+                })
+              })
+            })
+
+            describe('not to call individual onResolved()', () => {
+              /**
+               * @type {Array<{
+               *   information: GraphqlType.ResolverInputInformation
+               * }>}
+               */
+              const noIndividualOnResolvedCases = /** @type {Array<*>} */ ([
+                {
+                  information: {
+                    fieldName: 'unknown',
+                  },
+                },
+                {
+                  information: {
+                    fieldName: 'extra',
+                  },
+                },
+              ])
+
+              describe.each(noIndividualOnResolvedCases)('information: $information', ({ information }) => {
+                test.each(cases)('parcel: $parcel', async ({ parcel }) => {
+                  const engine = await params.Engine.createAsync()
+
+                  const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                    engine,
+                  })
+
+                  const loadParcelSpy = jest.spyOn(builder.parcelPorter, 'loadParcel')
+
+                  const onResolvedSpy = /** @type {*} */ (
+                    jest.fn()
+                      .mockImplementation(async () => {})
+                  )
+                  builder.onResolved = onResolvedSpy // Bad practice, but needed to test
+
+                  const extractIndividualOnResolvedSpy = jest.spyOn(builder, 'extractIndividualOnResolved')
+
+                  const parcelTally = {
+                    variables: parcel.variables,
+                    context: parcel.context,
+                    information,
+                    response: parcel.response,
+                  }
+
+                  builder.parcelPorter.saveParcel({
+                    expressRequest,
+                    parcel: parcelTally,
+                  })
+
+                  const extractIndividualOnResolvedExpectedArgs = {
+                    information,
+                  }
+
+                  const args = {
+                    expressRequest,
+                  }
+                  const definedOnResolved = builder.defineOnFinishHandler(args)
+
+                  await definedOnResolved()
+
+                  expect(loadParcelSpy)
+                    .toHaveBeenCalledWith(args)
+                  expect(onResolvedSpy)
+                    .toHaveBeenCalledWith(parcelTally)
+                  expect(extractIndividualOnResolvedSpy)
+                    .toHaveBeenCalledWith(extractIndividualOnResolvedExpectedArgs)
+                })
+              })
+            })
+          })
+
+          describe('with no parcel', () => {
+            describe.each(individualOnResolvedCases)('information: $information', ({ information }) => {
+              test('parcel: null', async () => {
+                const engine = await params.Engine.createAsync()
+
+                const builder = await GraphqlHttpHandlerBuilder.createAsync({
+                  engine,
+                })
+
+                const loadParcelSpy = jest.spyOn(builder.parcelPorter, 'loadParcel')
+
+                const onResolvedSpy = /** @type {*} */ (
+                  jest.fn()
+                    .mockImplementation(async () => {})
+                )
+                builder.onResolved = onResolvedSpy // Bad practice, but needed to test
+
+                const extractIndividualOnResolvedSpy = jest.spyOn(builder, 'extractIndividualOnResolved')
+
+                const args = {
+                  expressRequest,
+                }
+                const definedOnResolved = builder.defineOnFinishHandler(args)
+
+                await definedOnResolved()
+
+                expect(loadParcelSpy)
+                  .toHaveBeenCalledWith(args)
+                expect(onResolvedSpy)
+                  .not
+                  .toHaveBeenCalled()
+                expect(extractIndividualOnResolvedSpy)
+                  .not
+                  .toHaveBeenCalled()
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+})
