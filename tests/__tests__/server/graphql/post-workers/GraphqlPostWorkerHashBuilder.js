@@ -447,6 +447,70 @@ describe('GraphqlPostWorkerHashBuilder', () => {
 })
 
 describe('GraphqlPostWorkerHashBuilder', () => {
+  describe('#buildOnResolvedSchemaHash()', () => {
+    const AlphaServerEngine = class extends BaseGraphqlServerEngine {}
+    const BetaServerEngine = class extends BaseGraphqlServerEngine {}
+
+    const cases = [
+      {
+        params: {
+          EngineCtor: AlphaServerEngine,
+          postWorkersPath: rootPath.to('tests/haystacks/post-workers/customer/'),
+        },
+        expected: {
+          companySponsors: expect.any(Function),
+          curriculums: expect.any(Function),
+          sendChatMessage: expect.any(Function),
+          signIn: expect.any(Function),
+        },
+      },
+      {
+        params: {
+          EngineCtor: BetaServerEngine,
+          postWorkersPath: rootPath.to('tests/haystacks/post-workers/admin/'),
+        },
+        expected: {
+          customers: expect.any(Function),
+          statistics: expect.any(Function),
+          broadcastNotification: expect.any(Function),
+          signIn: expect.any(Function),
+        },
+      },
+    ]
+
+    test.each(cases)('Engine: $params.EngineCtor.name', async ({ params, expected }) => {
+      const engineArgs = {
+        config: {
+          graphqlEndpoint: '/graphql-endpoint',
+          staticPath: null,
+          schemaPath: null,
+          actualResolversPath: null,
+          stubResolversPath: null,
+          postWorkersPath: params.postWorkersPath,
+          redisOptions: null,
+        },
+        share: /** @type {*} */ ({
+          env: {
+            NODE_ENV: 'development',
+          },
+        }),
+        errorHash: {},
+      }
+      const engine = new params.EngineCtor(engineArgs)
+
+      const builder = await GraphqlPostWorkerHashBuilder.createAsync({
+        engine,
+      })
+
+      const actual = builder.buildOnResolvedSchemaHash()
+
+      expect(actual)
+        .toEqual(expected)
+    })
+  })
+})
+
+describe('GraphqlPostWorkerHashBuilder', () => {
   describe('#buildPostWorkerHash()', () => {
     const AlphaServerEngine = class extends BaseGraphqlServerEngine {}
     const BetaServerEngine = class extends BaseGraphqlServerEngine {}
