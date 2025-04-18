@@ -41,8 +41,7 @@ export default class CompanySponsorsQueryPostWorker extends BaseGraphqlPostWorke
       error,
     },
   }) {
-    Timber.log('I am the post worker of CompanySponsorsQuery', {
-      companyName: variables[0].companyName,
+    Timber.log('I am the post worker of CompanySponsors', {
       variables,
       output,
       error,

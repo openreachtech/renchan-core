@@ -41,10 +41,7 @@ export default class SignInMutationPostWorker extends BaseGraphqlPostWorker {
       error,
     },
   }) {
-    const accessToken = output?.accessToken
-
     Timber.log('I am the post worker of SignInMutation', {
-      accessToken,
       variables,
       output,
       error,
