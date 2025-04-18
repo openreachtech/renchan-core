@@ -52,4 +52,15 @@ export default [
       'jsdoc/valid-types': 'off',
     },
   },
+
+  {
+    rules: {
+      'jest/max-nested-describe': [
+        'error',
+        {
+          max: 6, // 5
+        },
+      ],
+    },
+  },
 ]
