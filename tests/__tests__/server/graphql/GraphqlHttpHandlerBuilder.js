@@ -11,6 +11,7 @@ import BaseGraphqlContext from '../../../../lib/server/graphql/contexts/BaseGrap
 import CustomerGraphqlContext from '../../../../app/server/graphql/contexts/CustomerGraphqlContext.js'
 import AdminGraphqlContext from '../../../../app/server/graphql/contexts/AdminGraphqlContext.js'
 import GraphqlResolvedParcelPorter from '../../../../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter.js'
+import GraphqlPostWorkerHashBuilder from '../../../../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder.js'
 
 describe('GraphqlHttpHandlerBuilder', () => {
   describe('constructor', () => {
@@ -678,6 +679,36 @@ describe('GraphqlHttpHandlerBuilder', () => {
           expect(createSpy)
             .toHaveBeenCalledWith(argsExpected)
         })
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.createPostWorkerHashBuilder()', () => {
+    describe('to be instance of GraphqlPostWorkerHashBuilder', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const actual = await GraphqlHttpHandlerBuilder.createPostWorkerHashBuilder({
+          engine,
+        })
+
+        expect(actual)
+          .toBeInstanceOf(GraphqlPostWorkerHashBuilder)
       })
     })
   })
