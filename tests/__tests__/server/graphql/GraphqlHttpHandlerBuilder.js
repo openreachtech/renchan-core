@@ -1070,6 +1070,38 @@ describe('GraphqlHttpHandlerBuilder', () => {
 })
 
 describe('GraphqlHttpHandlerBuilder', () => {
+  describe('#get:Ctor', () => {
+    describe('to be fixed value', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const builder = await GraphqlHttpHandlerBuilder.createAsync({
+          engine,
+        })
+
+        const actual = builder.Ctor
+
+        expect(actual)
+          .toBe(GraphqlHttpHandlerBuilder)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
   describe('#buildHandler()', () => {
     describe('to be function', () => {
       const cases = [
