@@ -685,6 +685,76 @@ describe('GraphqlHttpHandlerBuilder', () => {
 })
 
 describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.generateOnResolvedSchemaHash()', () => {
+    describe('to be PostWorker handler hash', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+          expected: {
+            companySponsors: expect.any(Function),
+            signIn: expect.any(Function),
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+          expected: {
+            customers: expect.any(Function),
+            signIn: expect.any(Function),
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
+        const engine = await params.Engine.createAsync()
+
+        const actual = await GraphqlHttpHandlerBuilder.generateOnResolvedSchemaHash({
+          engine,
+        })
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('to call members', () => {
+      const cases = [
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const expectedArgs = {
+          engine,
+        }
+
+        const buildOnResolvedSchemaHashSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createPostWorkerHashBuilder')
+
+        await GraphqlHttpHandlerBuilder.generateOnResolvedSchemaHash({
+          engine,
+        })
+
+        expect(buildOnResolvedSchemaHashSpy)
+          .toHaveBeenCalledWith(expectedArgs)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
   describe('.createPostWorkerHashBuilder()', () => {
     describe('to be instance of GraphqlPostWorkerHashBuilder', () => {
       const cases = [
