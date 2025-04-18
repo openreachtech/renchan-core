@@ -562,15 +562,30 @@ describe('GraphqlHttpHandlerBuilder', () => {
             params.contextFactory
           )
 
+          const onResolvedTally = /** @type {*} */ (async parcel => {})
+          const postWorkerHashTally = /** @type {*} */ ({})
+          const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+
           const buildSchemaSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
           const generateContextFactorySpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'generateContextFactory')
             .mockReturnValue(contextFactoryTally)
+          const defineOnResolvedSpy = jest.spyOn(engine, 'defineOnResolved')
+            .mockReturnValue(onResolvedTally)
+          const generateOnResolvedSchemaHashSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'generateOnResolvedSchemaHash')
+            .mockReturnValue(postWorkerHashTally)
+          const createParcelPorterSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
+            .mockReturnValue(parcelPorterTally)
+
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
           const argsExpected = {
             schema: schemaTally,
             context: contextFactoryTally,
+
+            onResolved: onResolvedTally,
+            postWorkerHash: postWorkerHashTally,
+            parcelPorter: parcelPorterTally,
           }
 
           const args = {
@@ -585,6 +600,12 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .toHaveBeenCalledWith(engineExpected)
           expect(generateContextFactorySpy)
             .toHaveBeenCalledWith(engineExpected)
+          expect(defineOnResolvedSpy)
+            .toHaveBeenCalledWith()
+          expect(generateOnResolvedSchemaHashSpy)
+            .toHaveBeenCalledWith(engineExpected)
+          expect(createParcelPorterSpy)
+            .toHaveBeenCalledWith()
         })
       })
 
@@ -642,11 +663,7 @@ describe('GraphqlHttpHandlerBuilder', () => {
         ]
 
         test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
-          const argsExpected = {
-            ...params.extraCreateHandlerParams,
-            schema: params.schema,
-            context: params.contextFactory,
-          }
+          const engine = await params.Engine.createAsync()
 
           /** @type {GraphqlType.Schema} */
           const schemaTally = /** @type {*} */ (params.schema)
@@ -663,14 +680,33 @@ describe('GraphqlHttpHandlerBuilder', () => {
             }
           }
 
+          const onResolvedTally = /** @type {*} */ (async parcel => {})
+          const postWorkerHashTally = /** @type {*} */ ({})
+          const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+
           jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
           jest.spyOn(GraphqlHttpHandlerBuilder, 'generateContextFactory')
             .mockReturnValue(contextFactoryTally)
+          jest.spyOn(engine, 'defineOnResolved')
+            .mockReturnValue(onResolvedTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'generateOnResolvedSchemaHash')
+            .mockReturnValue(postWorkerHashTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
+            .mockReturnValue(parcelPorterTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
-          const engine = await params.Engine.createAsync()
+          const argsExpected = {
+            ...params.extraCreateHandlerParams,
+            schema: params.schema,
+            context: params.contextFactory,
+
+            onResolved: onResolvedTally,
+            postWorkerHash: postWorkerHashTally,
+            parcelPorter: parcelPorterTally,
+          }
+
           const args = {
             engine,
           }
