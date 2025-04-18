@@ -1458,3 +1458,115 @@ describe('GraphqlHttpHandlerBuilder', () => {
     })
   })
 })
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('#extractIndividualOnResolved()', () => {
+    describe('to be function', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     Engine: GraphqlType.ServerEngineCtor
+       *   }
+       *   functionCases: Array<{
+       *     information: GraphqlType.ResolverInputInformation
+       *   }>
+       *   nullCases: Array<{
+       *     information: GraphqlType.ResolverInputInformation
+       *   }>
+       * }>}
+       */
+      const engineCases = /** @type {*} */ ([
+        {
+          params: {
+            Engine: CustomerGraphqlServerEngine,
+          },
+          functionCases: [
+            {
+              information: {
+                fieldName: 'companySponsors',
+              },
+            },
+            {
+              information: {
+                fieldName: 'signIn',
+              },
+            },
+          ],
+          nullCases: [
+            {
+              information: {
+                fieldName: 'unknown',
+              },
+            },
+            {
+              information: {
+                fieldName: 'customers',
+              },
+            },
+          ],
+        },
+        {
+          params: {
+            Engine: AdminGraphqlServerEngine,
+          },
+          functionCases: [
+            {
+              information: {
+                fieldName: 'customers',
+              },
+            },
+            {
+              information: {
+                fieldName: 'signIn',
+              },
+            },
+          ],
+          nullCases: [
+            {
+              information: {
+                fieldName: 'unknown',
+              },
+            },
+            {
+              information: {
+                fieldName: 'companySponsors',
+              },
+            },
+          ],
+        },
+      ])
+
+      describe.each(engineCases)('Engine: $params.Engine.name', ({ params, functionCases, nullCases }) => {
+        test.each(functionCases)('fieldName: $information.fieldName', async ({ information }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await GraphqlHttpHandlerBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.extractIndividualOnResolved({
+            information,
+          })
+
+          expect(actual)
+            .toBeInstanceOf(Function)
+        })
+
+        test.each(nullCases)('fieldName: $information.fieldName', async ({ information }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await GraphqlHttpHandlerBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.extractIndividualOnResolved({
+            information,
+          })
+
+          expect(actual)
+            .toBeNull()
+        })
+      })
+    })
+  })
+})
