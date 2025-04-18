@@ -148,13 +148,16 @@ declare global {
     type PostWorkersLoader = GraphqlPostWorkersLoader
     type PostWorkersLoaderCtor = typeof GraphqlPostWorkersLoader
 
-    type OnResolvedEnvelope = {
-      variables: ResolverInputVariables
-      context: ResolverInputContext
+    type OnResolvedParcel<
+      V extends ResolverInputVariables = *,
+      C extends ResolverInputContext = BaseGraphqlContext,
+      O extends ResolverOutput = *,
+    >  = {
+      variables: V
+      context: C
       information: ResolverInputInformation
-      parent: ResolverInputParent
       response: {
-        output: ResolverOutput | null
+        output: O | null
         error: Error | null
       }
     }
