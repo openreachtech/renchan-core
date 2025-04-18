@@ -2,6 +2,10 @@ import {
   GraphQLSchema,
 } from 'graphql'
 
+import {
+  applyMiddleware,
+} from 'graphql-middleware'
+
 import GraphqlHttpHandlerBuilder from '../../../../lib/server/graphql/GraphqlHttpHandlerBuilder.js'
 import GraphqlSchemaBuilder from '../../../../lib/server/graphql/GraphqlSchemaBuilder.js'
 import AdminGraphqlServerEngine from '../../../../app/server/graphql/AdminGraphqlServerEngine.js'
@@ -973,6 +977,19 @@ describe('GraphqlHttpHandlerBuilder', () => {
           .toBeInstanceOf(BaseGraphqlContext)
         expect(buildContextSpy)
           .toHaveBeenCalledWith(expected)
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.get:applyMiddleware', () => {
+    describe('to be fixed value', () => {
+      test('as applyMiddleware()', () => {
+        const actual = GraphqlHttpHandlerBuilder.applyMiddleware
+
+        expect(actual)
+          .toBe(applyMiddleware) // same reference
       })
     })
   })
