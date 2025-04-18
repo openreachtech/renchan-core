@@ -414,6 +414,13 @@ describe('GraphqlHttpHandlerBuilder', () => {
     /** @type {import('graphql-http').HandlerOptions['validationRules']} */
     const validationRulesMock = /** @type {*} */ ([])
 
+    const onResolvedMock = /** @type {*} */ (async parcel => {})
+
+    /** @type {Record<string, (parcel: GraphqlType.OnResolvedParcel) => Promise<void>>} */
+    const postWorkerHashMock = /** @type {*} */ ({})
+
+    const parcelPorterMock = GraphqlResolvedParcelPorter.create()
+
     describe('to be instance of own class', () => {
       /**
        * @type {Array<{
@@ -446,6 +453,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
           rootValue: rootValueMock,
           formatError: formatErrorMock,
           validationRules: validationRulesMock,
+
+          onResolved: onResolvedMock,
+          postWorkerHash: postWorkerHashMock,
+          parcelPorter: parcelPorterMock,
         }
 
         const actual = GraphqlHttpHandlerBuilder.create(args)
@@ -489,6 +500,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
           rootValue: rootValueMock,
           formatError: formatErrorMock,
           validationRules: validationRulesMock,
+
+          onResolved: onResolvedMock,
+          postWorkerHash: postWorkerHashMock,
+          parcelPorter: parcelPorterMock,
         }
 
         SpyClass.create(args)
