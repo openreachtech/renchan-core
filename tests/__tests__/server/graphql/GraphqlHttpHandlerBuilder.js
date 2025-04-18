@@ -1120,20 +1120,20 @@ describe('GraphqlHttpHandlerBuilder', () => {
 
 describe('GraphqlHttpHandlerBuilder', () => {
   describe('#buildHandler()', () => {
-    describe('to be function', () => {
-      const cases = [
-        {
-          params: {
-            Engine: CustomerGraphqlServerEngine,
-          },
+    const cases = [
+      {
+        params: {
+          Engine: CustomerGraphqlServerEngine,
         },
-        {
-          params: {
-            Engine: AdminGraphqlServerEngine,
-          },
+      },
+      {
+        params: {
+          Engine: AdminGraphqlServerEngine,
         },
-      ]
+      },
+    ]
 
+    describe('to be function', () => {
       test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
         const engine = await params.Engine.createAsync()
 
@@ -1145,6 +1145,73 @@ describe('GraphqlHttpHandlerBuilder', () => {
 
         expect(actual)
           .toBeInstanceOf(Function)
+      })
+    })
+
+    describe('to call members', () => {
+      test.each(cases)('Engine: $params.Engine.name', async ({ params }) => {
+        const engine = await params.Engine.createAsync()
+
+        const builder = await GraphqlHttpHandlerBuilder.createAsync({
+          engine,
+        })
+
+        const expressRequestTally = /** @type {*} */ ({})
+        const expressResponseTally = /** @type {*} */ ({
+          on: () => {},
+        })
+        const nextTally = /** @type {*} */ (() => {})
+
+        const schemaTally = /** @type {*} */ ({})
+        const onListenerTally = /** @type {*} */ (async () => {})
+
+        const graphqlHandlerSpy = /** @type {*} */ (
+          jest.fn()
+        )
+        const generateInterceptedSchemaSpy = jest.spyOn(builder, 'generateInterceptedSchema')
+          .mockReturnValue(schemaTally)
+        const createHandlerSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createHandler')
+          .mockReturnValue(graphqlHandlerSpy)
+        const defineOnFinishHandlerSpy = jest.spyOn(builder, 'defineOnFinishHandler')
+          .mockReturnValue(onListenerTally)
+        const onSpy = jest.spyOn(expressResponseTally, 'on')
+
+        const createHandlerExpectedArgs = {
+          schema: schemaTally,
+          context: builder.context,
+          rootValue: builder.rootValue,
+          formatError: builder.formatError,
+          validationRules: builder.validationRules,
+        }
+        const defineOnFinishHandlerExpectedArgs = {
+          expressRequest: expressRequestTally,
+        }
+
+        const actualGraphqlHandler = builder.buildHandler()
+
+        actualGraphqlHandler(
+          expressRequestTally,
+          expressResponseTally,
+          nextTally
+        )
+
+        expect(generateInterceptedSchemaSpy)
+          .toHaveBeenCalledWith()
+        expect(createHandlerSpy)
+          .toHaveBeenCalledWith(createHandlerExpectedArgs)
+        expect(defineOnFinishHandlerSpy)
+          .toHaveBeenCalledWith(defineOnFinishHandlerExpectedArgs)
+        expect(onSpy)
+          .toHaveBeenCalledWith(
+            'finish',
+            onListenerTally
+          )
+        expect(graphqlHandlerSpy)
+          .toHaveBeenCalledWith(
+            expressRequestTally,
+            expressResponseTally,
+            nextTally
+          )
       })
     })
   })
