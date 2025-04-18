@@ -10,6 +10,7 @@ import BaseGraphqlContext from '../../../../lib/server/graphql/contexts/BaseGrap
 
 import CustomerGraphqlContext from '../../../../app/server/graphql/contexts/CustomerGraphqlContext.js'
 import AdminGraphqlContext from '../../../../app/server/graphql/contexts/AdminGraphqlContext.js'
+import GraphqlResolvedParcelPorter from '../../../../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter.js'
 
 describe('GraphqlHttpHandlerBuilder', () => {
   describe('constructor', () => {
@@ -28,6 +29,13 @@ describe('GraphqlHttpHandlerBuilder', () => {
 
       /** @type {import('graphql-http').HandlerOptions['validationRules']} */
       const validationRulesMock = /** @type {*} */ ([])
+
+      const onResolvedMock = /** @type {*} */ (async parcel => {})
+
+      /** @type {Record<string, (parcel: GraphqlType.OnResolvedParcel) => Promise<void>>} */
+      const postWorkerHashMock = /** @type {*} */ ({})
+
+      const parcelPorterMock = GraphqlResolvedParcelPorter.create()
 
       describe('#schema', () => {
         /**
@@ -61,6 +69,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
             rootValue: rootValueMock,
             formatError: formatErrorMock,
             validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
           }
 
           const actual = new GraphqlHttpHandlerBuilder(args)
@@ -106,6 +118,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
             rootValue: rootValueMock,
             formatError: formatErrorMock,
             validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
           }
 
           const actual = new GraphqlHttpHandlerBuilder(args)
@@ -147,6 +163,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
             rootValue: params.rootValue,
             formatError: formatErrorMock,
             validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
           }
 
           const actual = new GraphqlHttpHandlerBuilder(args)
@@ -188,6 +208,10 @@ describe('GraphqlHttpHandlerBuilder', () => {
             rootValue: rootValueMock,
             formatError: params.formatError,
             validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
           }
 
           const actual = new GraphqlHttpHandlerBuilder(args)
@@ -227,12 +251,148 @@ describe('GraphqlHttpHandlerBuilder', () => {
             rootValue: rootValueMock,
             formatError: formatErrorMock,
             validationRules: params.validationRules,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
           }
 
           const actual = new GraphqlHttpHandlerBuilder(args)
 
           expect(actual)
             .toHaveProperty('validationRules', params.validationRules)
+        })
+      })
+
+      describe('#onResolved', () => {
+        /**
+         * @type {Array<{
+         *   label: string
+         *   params: {
+         *     onResolved: (parcel: GraphqlType.OnResolvedParcel) => Promise<void>
+         *   }
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            label: 'first case',
+            params: {
+              onResolved: async () => {},
+            },
+          },
+          {
+            label: 'second case',
+            params: {
+              onResolved: async () => {},
+            },
+          },
+        ])
+
+        test.each(cases)('$label', ({ params }) => {
+          const args = {
+            schema: schemaMock,
+            context: contextFactoryMock,
+            rootValue: rootValueMock,
+            formatError: formatErrorMock,
+            validationRules: validationRulesMock,
+
+            onResolved: params.onResolved,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: parcelPorterMock,
+          }
+
+          const actual = new GraphqlHttpHandlerBuilder(args)
+
+          expect(actual)
+            .toHaveProperty('onResolved', params.onResolved)
+        })
+      })
+
+      describe('#postWorkerHash', () => {
+        /**
+         * @type {Array<{
+         *   params: {
+         *     postWorkerHash: Record<string, (parcel: GraphqlType.OnResolvedParcel) => Promise<void>>
+         *   }
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              postWorkerHash: {
+                alpha: async parcel => {},
+              },
+            },
+          },
+          {
+            params: {
+              postWorkerHash: {
+                beta: async parcel => {},
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('postWorkerHash: $param.postWorkerHash', ({ params }) => {
+          const args = {
+            schema: schemaMock,
+            context: contextFactoryMock,
+            rootValue: rootValueMock,
+            formatError: formatErrorMock,
+            validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: params.postWorkerHash,
+            parcelPorter: parcelPorterMock,
+          }
+
+          const actual = new GraphqlHttpHandlerBuilder(args)
+
+          expect(actual)
+            .toHaveProperty('postWorkerHash', params.postWorkerHash)
+        })
+      })
+
+      describe('#parcelPorter', () => {
+        /**
+         * @type {Array<{
+         *   params: {
+         *     parcelPorter: GraphqlResolvedParcelPorter
+         *   }
+         * }>}
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              parcelPorter: GraphqlResolvedParcelPorter.create({
+                parcelMap: new WeakMap(),
+              }),
+            },
+          },
+          {
+            params: {
+              parcelPorter: GraphqlResolvedParcelPorter.create(),
+            },
+          },
+        ])
+
+        test.each(cases)('parcelPorter: $params.parcelPorter', ({ params }) => {
+          const args = {
+            schema: schemaMock,
+            context: contextFactoryMock,
+            rootValue: rootValueMock,
+            formatError: formatErrorMock,
+            validationRules: validationRulesMock,
+
+            onResolved: onResolvedMock,
+            postWorkerHash: postWorkerHashMock,
+            parcelPorter: params.parcelPorter,
+          }
+
+          const actual = new GraphqlHttpHandlerBuilder(args)
+
+          expect(actual)
+            .toHaveProperty('parcelPorter', params.parcelPorter)
         })
       })
     })
