@@ -44,6 +44,7 @@ export default [
       'sort-imports': 'off',
 
       'jest/max-expects': 'off',
+      'jest/max-nested-describe': 'off',
 
       'jsdoc/check-indentation': 'off',
       'jsdoc/check-tag-names': 'off',
