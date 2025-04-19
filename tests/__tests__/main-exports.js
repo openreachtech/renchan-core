@@ -22,6 +22,11 @@ import { default as GraphqlResolversBuilderActual } from '../../lib/server/graph
 import { default as GraphqlResolversLoaderActual } from '../../lib/server/graphql/resolvers/GraphqlResolversLoader.js'
 import { default as ResolverSchemaHashBuilderActual } from '../../lib/server/graphql/resolvers/ResolverSchemaHashBuilder.js'
 
+import { default as BaseGraphqlPostWorkerActual } from '../../lib/server/graphql/post-workers/BaseGraphqlPostWorker.js'
+import { default as GraphqlPostWorkerHashBuilderActual } from '../../lib/server/graphql/post-workers/GraphqlPostWorkerHashBuilder.js'
+import { default as GraphqlPostWorkersLoaderActual } from '../../lib/server/graphql/post-workers/GraphqlPostWorkersLoader.js'
+import { default as GraphqlResolvedParcelPorterActual } from '../../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter.js'
+
 import { default as ExceptionCatchingProxyBuilderActual } from '../../lib/server/graphql/resolvers/ExceptionCatchingProxyBuilder.js'
 
 import { default as SchemaFilesLoaderActual } from '../../lib/server/graphql/schemas/SchemaFilesLoader.js'
@@ -93,6 +98,11 @@ import {
   BaseQueryResolver,
   BaseMutationResolver,
   BaseSubscriptionResolver,
+
+  BaseGraphqlPostWorker,
+  GraphqlPostWorkerHashBuilder,
+  GraphqlPostWorkersLoader,
+  GraphqlResolvedParcelPorter,
 
   FilterSchemaHashBuilder,
   GraphqlResolversBuilder,
@@ -166,6 +176,11 @@ describe('main exports', () => {
     { ExportedClass: BaseQueryResolver, ActualClass: BaseQueryResolverActual },
     { ExportedClass: BaseMutationResolver, ActualClass: BaseMutationResolverActual },
     { ExportedClass: BaseSubscriptionResolver, ActualClass: BaseSubscriptionResolverActual },
+
+    { ExportedClass: BaseGraphqlPostWorker, ActualClass: BaseGraphqlPostWorkerActual },
+    { ExportedClass: GraphqlPostWorkerHashBuilder, ActualClass: GraphqlPostWorkerHashBuilderActual },
+    { ExportedClass: GraphqlPostWorkersLoader, ActualClass: GraphqlPostWorkersLoaderActual },
+    { ExportedClass: GraphqlResolvedParcelPorter, ActualClass: GraphqlResolvedParcelPorterActual },
 
     { ExportedClass: FilterSchemaHashBuilder, ActualClass: FilterSchemaHashBuilderActual },
     { ExportedClass: GraphqlResolversBuilder, ActualClass: GraphqlResolversBuilderActual },
