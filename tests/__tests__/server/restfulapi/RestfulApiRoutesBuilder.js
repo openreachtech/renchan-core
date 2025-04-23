@@ -607,7 +607,7 @@ describe('RestfulApiRoutesBuilder', () => {
         },
       })
 
-      /** @type {import('express').NextFunction} */
+      /** @type {ExpressType.NextFunction} */
       const expressNextMock = /** @type {*} */ (
         () => {}
       )
