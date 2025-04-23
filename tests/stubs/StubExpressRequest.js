@@ -61,10 +61,6 @@ export default class StubExpressRequest {
 }
 
 /**
- * @typedef {import('express').Request} ExpressRequest
- */
-
-/**
  * @typedef {{
  *   headers?: Record<*, *>
  *   query?: Record<*, *>
