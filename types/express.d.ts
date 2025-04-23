@@ -3,6 +3,7 @@ import type {
   Handler,
   Request as ExpressRequest,
   Response as ExpressResponse,
+  NextFunction as ExpressNextFunction,
 } from 'express'
 
 import BaseExpressRoute from '../lib/server/express/routes/BaseExpressRoute'
@@ -15,6 +16,7 @@ declare global {
     type Application = ExpressApplication
     type Request = ExpressRequest
     type Response = ExpressResponse
+    type NextFunction = ExpressNextFunction
     type Middleware = Handler
 
     type Route = BaseExpressRoute
