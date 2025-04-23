@@ -881,7 +881,7 @@ describe('RestfulApiRoutesBuilder', () => {
     })
 
     describe('generated handler', () => {
-      /** @type {import('express').Request} */
+      /** @type {ExpressType.Request} */
       const expressRequestTally = /** @type {*} */ ({
         tally: Symbol('express request tally'),
       })
