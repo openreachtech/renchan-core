@@ -61,7 +61,7 @@ declare global {
 
     type RenderResponse = RestfulApiResponse<
       Record<string, *>,
-      Record<string, *>
+      RenchanRestfulApiError
     >
 
     type ErrorResponse = RestfulApiResponse
