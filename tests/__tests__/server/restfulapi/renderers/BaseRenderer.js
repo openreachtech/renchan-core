@@ -817,3 +817,131 @@ describe('BaseRenderer', () => {
     })
   })
 })
+
+describe('BaseRenderer', () => {
+  describe('#flushResponse()', () => {
+    const propertyCases = [
+      {
+        params: {
+          errorResponseHash: {
+            BadRequest: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 400,
+                errorMessage: 'Bad Request error occurred',
+              },
+            }),
+            Unauthorized: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 401,
+                errorMessage: 'Unauthorized error occurred',
+              },
+            }),
+            PaymentRequired: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 402,
+                errorMessage: 'Payment Required error occurred',
+              },
+            }),
+          },
+        },
+      },
+      {
+        params: {
+          errorResponseHash: {
+            Forbidden: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 403,
+                errorMessage: 'Forbidden error occurred',
+              },
+            }),
+            NotFound: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 404,
+                errorMessage: 'Not Found error occurred',
+              },
+            }),
+            MethodNotAllowed: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 405,
+                errorMessage: 'Method Not Allowed error occurred',
+              },
+            }),
+          },
+        },
+      },
+    ]
+
+    /** @type {ExpressType.Response} */
+    const expressResponseMock = /** @type {*} */ ({
+      status (args) {
+        return this
+      },
+      set (args) {
+        return this
+      },
+      json (args) {
+        return this
+      },
+    })
+
+    /**
+     * @type {Array<{
+     *   args: {
+     *     expressResponse: ExpressType.Response
+     *     renderResponse: RestfulApiType.RenderResponse
+     *   }
+     * }>}
+     */
+    const cases = /** @type {Array<*>} */ ([
+      {
+        args: {
+          expressResponse: expressResponseMock,
+          renderResponse: new RestfulApiResponse({
+            statusCode: 200,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: {
+              alpha: 'alpha',
+            },
+            error: null,
+          }),
+        },
+      },
+      {
+        args: {
+          expressResponse: expressResponseMock,
+          renderResponse: new RestfulApiResponse({
+            statusCode: 500,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: null,
+            error: RenchanRestfulApiError.create({
+              code: '500',
+            }),
+          }),
+        },
+      },
+    ])
+
+    describe.each(propertyCases)('errorResponseHash: $params.errorResponseHash', ({ params }) => {
+      const renderer = new BaseRenderer(params)
+
+      test.each(cases)('renderResponse: $args.renderResponse', async ({ args }) => {
+        const flusherMock = JsonRestfulApiResponseFlusher.create(args)
+
+        const createResponseFlusherSpy = jest.spyOn(BaseRenderer, 'createResponseFlusher')
+          .mockReturnValue(flusherMock)
+        const flushResponseSpy = jest.spyOn(flusherMock, 'flushResponse')
+
+        renderer.flushResponse(args)
+
+        expect(createResponseFlusherSpy)
+          .toHaveBeenCalledWith(args)
+        expect(flushResponseSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+  })
+})
