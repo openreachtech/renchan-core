@@ -2,6 +2,7 @@ import BaseRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRen
 
 import RestfulApiResponse from '../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 import BaseRestfulApiContext from '../../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
+import JsonRestfulApiResponseFlusher from '../../../../../lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
 
 describe('BaseRenderer', () => {
   describe('constructor', () => {
@@ -317,6 +318,19 @@ describe('BaseRenderer', () => {
 
         expect(() => BaseRenderer.routePath)
           .toThrow(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('.get:FlusherCtor', () => {
+    describe('to be fixed value', () => {
+      test('as default value', () => {
+        const actual = BaseRenderer.FlusherCtor
+
+        expect(actual)
+          .toBe(JsonRestfulApiResponseFlusher)
       })
     })
   })
