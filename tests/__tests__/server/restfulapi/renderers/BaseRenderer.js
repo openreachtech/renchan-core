@@ -2,6 +2,8 @@ import BaseRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRen
 
 import RestfulApiResponse from '../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 import BaseRestfulApiContext from '../../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
+import JsonRestfulApiResponseFlusher from '../../../../../lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
+import RenchanRestfulApiError from '../../../../../lib/server/restfulapi/errors/RenchanRestfulApiError.js'
 
 describe('BaseRenderer', () => {
   describe('constructor', () => {
@@ -317,6 +319,88 @@ describe('BaseRenderer', () => {
 
         expect(() => BaseRenderer.routePath)
           .toThrow(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('.get:FlusherCtor', () => {
+    describe('to be fixed value', () => {
+      test('as default value', () => {
+        const actual = BaseRenderer.FlusherCtor
+
+        expect(actual)
+          .toBe(JsonRestfulApiResponseFlusher)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('.createResponseFlusher()', () => {
+    /**
+     * @type {Array<{
+     *   params: {
+     *     expressResponse: ExpressType.Response
+     *     renderResponse: RestfulApiType.RenderResponse
+     *   }
+     * }>}
+     */
+    const cases = /** @type {Array<*>} */ ([
+      {
+        params: {
+          expressResponse: /** @type {*} */ ({
+            tally: Symbol('alpha tally'),
+          }),
+          renderResponse: new RestfulApiResponse({
+            statusCode: 200,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: {
+              alpha: 'alpha',
+            },
+            error: null,
+          }),
+        },
+      },
+      {
+        params: {
+          expressResponse: /** @type {*} */ ({
+            tally: Symbol('beta tally'),
+          }),
+          renderResponse: new RestfulApiResponse({
+            statusCode: 500,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: null,
+            error: RenchanRestfulApiError.create({
+              code: '500',
+            }),
+          }),
+        },
+      },
+    ])
+
+    describe('to be instance of JsonRestfulApiResponseFlusher', () => {
+      test.each(cases)('expressResponse: $params.expressResponse', async ({ params }) => {
+        const actual = BaseRenderer.createResponseFlusher(params)
+
+        expect(actual)
+          .toBeInstanceOf(JsonRestfulApiResponseFlusher)
+      })
+    })
+
+    describe('to call JsonRestfulApiResponseFlusher.create()', () => {
+      test.each(cases)('expressResponse: $params.expressResponse', async ({ params }) => {
+        const createSpy = jest.spyOn(JsonRestfulApiResponseFlusher, 'create')
+
+        BaseRenderer.createResponseFlusher(params)
+
+        expect(createSpy)
+          .toHaveBeenCalledWith(params)
       })
     })
   })
@@ -729,6 +813,134 @@ describe('BaseRenderer', () => {
         await expect(renderer.render(renderArgs))
           .rejects
           .toThrow(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('#flushResponse()', () => {
+    const propertyCases = [
+      {
+        params: {
+          errorResponseHash: {
+            BadRequest: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 400,
+                errorMessage: 'Bad Request error occurred',
+              },
+            }),
+            Unauthorized: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 401,
+                errorMessage: 'Unauthorized error occurred',
+              },
+            }),
+            PaymentRequired: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 402,
+                errorMessage: 'Payment Required error occurred',
+              },
+            }),
+          },
+        },
+      },
+      {
+        params: {
+          errorResponseHash: {
+            Forbidden: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 403,
+                errorMessage: 'Forbidden error occurred',
+              },
+            }),
+            NotFound: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 404,
+                errorMessage: 'Not Found error occurred',
+              },
+            }),
+            MethodNotAllowed: RestfulApiResponse.declareErrorRestfulApiResponse({
+              errorEnvelope: {
+                statusCode: 405,
+                errorMessage: 'Method Not Allowed error occurred',
+              },
+            }),
+          },
+        },
+      },
+    ]
+
+    /** @type {ExpressType.Response} */
+    const expressResponseMock = /** @type {*} */ ({
+      status (args) {
+        return this
+      },
+      set (args) {
+        return this
+      },
+      json (args) {
+        return this
+      },
+    })
+
+    /**
+     * @type {Array<{
+     *   args: {
+     *     expressResponse: ExpressType.Response
+     *     renderResponse: RestfulApiType.RenderResponse
+     *   }
+     * }>}
+     */
+    const cases = /** @type {Array<*>} */ ([
+      {
+        args: {
+          expressResponse: expressResponseMock,
+          renderResponse: new RestfulApiResponse({
+            statusCode: 200,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: {
+              alpha: 'alpha',
+            },
+            error: null,
+          }),
+        },
+      },
+      {
+        args: {
+          expressResponse: expressResponseMock,
+          renderResponse: new RestfulApiResponse({
+            statusCode: 500,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: null,
+            error: RenchanRestfulApiError.create({
+              code: '500',
+            }),
+          }),
+        },
+      },
+    ])
+
+    describe.each(propertyCases)('errorResponseHash: $params.errorResponseHash', ({ params }) => {
+      const renderer = new BaseRenderer(params)
+
+      test.each(cases)('renderResponse: $args.renderResponse', async ({ args }) => {
+        const flusherMock = JsonRestfulApiResponseFlusher.create(args)
+
+        const createResponseFlusherSpy = jest.spyOn(BaseRenderer, 'createResponseFlusher')
+          .mockReturnValue(flusherMock)
+        const flushResponseSpy = jest.spyOn(flusherMock, 'flushResponse')
+
+        renderer.flushResponse(args)
+
+        expect(createResponseFlusherSpy)
+          .toHaveBeenCalledWith(args)
+        expect(flushResponseSpy)
+          .toHaveBeenCalledWith()
       })
     })
   })
