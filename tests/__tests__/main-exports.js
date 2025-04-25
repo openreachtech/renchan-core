@@ -63,6 +63,11 @@ import { default as BaseRendererActual } from '../../lib/server/restfulapi/rende
 import { default as BaseGetRendererActual } from '../../lib/server/restfulapi/renderers/BaseGetRenderer.js'
 import { default as BasePostRendererActual } from '../../lib/server/restfulapi/renderers/BasePostRenderer.js'
 
+import { default as BaseRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/BaseRestfulApiResponseFlusher.js'
+import { default as JsonRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
+import { default as HtmlRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/concretes/HtmlRestfulApiResponseFlusher.js'
+import { default as CsvRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/concretes/CsvRestfulApiResponseFlusher.js'
+
 import { default as RestfulApiRequestActual } from '../../lib/server/restfulapi/interfaces/RestfulApiRequest.js'
 import { default as RestfulApiResponseActual } from '../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 
@@ -142,6 +147,11 @@ import {
   BaseGetRenderer,
   BasePostRenderer,
 
+  BaseRestfulApiResponseFlusher,
+  JsonRestfulApiResponseFlusher,
+  HtmlRestfulApiResponseFlusher,
+  CsvRestfulApiResponseFlusher,
+
   RestfulApiRequest,
   RestfulApiResponse,
 
@@ -217,6 +227,11 @@ describe('main exports', () => {
     { ExportedClass: BaseRenderer, ActualClass: BaseRendererActual },
     { ExportedClass: BaseGetRenderer, ActualClass: BaseGetRendererActual },
     { ExportedClass: BasePostRenderer, ActualClass: BasePostRendererActual },
+
+    { ExportedClass: BaseRestfulApiResponseFlusher, ActualClass: BaseRestfulApiResponseFlusherActual },
+    { ExportedClass: JsonRestfulApiResponseFlusher, ActualClass: JsonRestfulApiResponseFlusherActual },
+    { ExportedClass: HtmlRestfulApiResponseFlusher, ActualClass: HtmlRestfulApiResponseFlusherActual },
+    { ExportedClass: CsvRestfulApiResponseFlusher, ActualClass: CsvRestfulApiResponseFlusherActual },
 
     { ExportedClass: RestfulApiRequest, ActualClass: RestfulApiRequestActual },
     { ExportedClass: RestfulApiResponse, ActualClass: RestfulApiResponseActual },
