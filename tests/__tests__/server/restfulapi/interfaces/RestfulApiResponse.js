@@ -156,6 +156,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 200,
+              headers: {},
               content: {
                 message: 'first message',
                 course: 'first course',
@@ -166,6 +167,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 300,
+              headers: {},
               content: {
                 message: 'second message',
                 course: 'second course',
@@ -176,6 +178,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 400,
+              headers: {},
               // content: {
               //   message: 'third message',
               //   course: 'third course',
@@ -186,6 +189,51 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 500,
+              headers: {},
+              // content: {
+              //   message: 'fourth message',
+              //   course: 'fourth course',
+              // },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 201,
+              // headers: {},
+              content: {
+                message: 'first message',
+                course: 'first course',
+              },
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 301,
+              // headers: {},
+              content: {
+                message: 'second message',
+                course: 'second course',
+              },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 401,
+              // headers: {},
+              // content: {
+              //   message: 'third message',
+              //   course: 'third course',
+              // },
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 501,
+              // headers: {},
               // content: {
               //   message: 'fourth message',
               //   course: 'fourth course',
@@ -208,6 +256,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 200,
+              headers: {},
               content: {
                 message: 'first message',
                 course: 'first course',
@@ -218,6 +267,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 300,
+              headers: {},
               content: {
                 message: 'second message',
                 course: 'second course',
@@ -228,6 +278,7 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 400,
+              headers: {},
               // content: {
               //   message: 'third message',
               //   course: 'third course',
@@ -238,6 +289,51 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 500,
+              headers: {},
+              // content: {
+              //   message: 'fourth message',
+              //   course: 'fourth course',
+              // },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 201,
+              // headers: {},
+              content: {
+                message: 'first message',
+                course: 'first course',
+              },
+              error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 301,
+              // headers: {},
+              content: {
+                message: 'second message',
+                course: 'second course',
+              },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 401,
+              // headers: {},
+              // content: {
+              //   message: 'third message',
+              //   course: 'third course',
+              // },
+              error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 501,
+              // headers: {},
               // content: {
               //   message: 'fourth message',
               //   course: 'fourth course',
@@ -260,6 +356,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 200,
+              headers: {
+                tally: 'type/alpha',
+              },
               content: {
                 message: 'first message',
                 course: 'first course',
@@ -268,6 +367,9 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 200,
+              headers: {
+                tally: 'type/alpha',
+              },
               content: {
                 message: 'first message',
                 course: 'first course',
@@ -278,6 +380,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 300,
+              headers: {
+                tally: 'type/beta',
+              },
               content: {
                 message: 'second message',
                 course: 'second course',
@@ -286,6 +391,9 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 300,
+              headers: {
+                tally: 'type/beta',
+              },
               content: {
                 message: 'second message',
                 course: 'second course',
@@ -296,6 +404,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 400,
+              headers: {
+                tally: 'type/gamma',
+              },
               // content: {
               //   message: 'third message',
               //   course: 'third course',
@@ -304,6 +415,9 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 400,
+              headers: {
+                tally: 'type/gamma',
+              },
               content: null,
               error: null,
             },
@@ -311,6 +425,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               statusCode: 500,
+              headers: {
+                tally: 'type/delta',
+              },
               // content: {
               //   message: 'fourth message',
               //   course: 'fourth course',
@@ -319,6 +436,83 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 500,
+              headers: {
+                tally: 'type/delta',
+              },
+              content: null,
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 201,
+              // headers: {},
+              content: {
+                message: 'first message',
+                course: 'first course',
+              },
+              error: null,
+            },
+            expected: {
+              statusCode: 201,
+              headers: {},
+              content: {
+                message: 'first message',
+                course: 'first course',
+              },
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 301,
+              // headers: {},
+              content: {
+                message: 'second message',
+                course: 'second course',
+              },
+              // error: null,
+            },
+            expected: {
+              statusCode: 301,
+              headers: {},
+              content: {
+                message: 'second message',
+                course: 'second course',
+              },
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 401,
+              // headers: {},
+              // content: {
+              //   message: 'third message',
+              //   course: 'third course',
+              // },
+              error: null,
+            },
+            expected: {
+              statusCode: 401,
+              headers: {},
+              content: null,
+              error: null,
+            },
+          },
+          {
+            params: {
+              statusCode: 501,
+              // headers: {},
+              // content: {
+              //   message: 'fourth message',
+              //   course: 'fourth course',
+              // },
+              // error: null,
+            },
+            expected: {
+              statusCode: 501,
+              headers: {},
               content: null,
               error: null,
             },
@@ -340,6 +534,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 200,
+              headers: {
+                tally: 'type/alpha',
+              },
               content: {
                 message: 'first message',
                 course: 'first course',
@@ -350,6 +547,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 300,
+              headers: {
+                tally: 'type/beta',
+              },
               content: {
                 message: 'second message',
                 course: 'second course',
@@ -360,6 +560,9 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 400,
+              headers: {
+                tally: 'type/gamma',
+              },
               // content: {
               //   message: 'third message',
               //   course: 'third course',
@@ -370,6 +573,53 @@ describe('RestfulApiResponse', () => {
           {
             params: {
               // statusCode: 500,
+              headers: {
+                tally: 'type/delta',
+              },
+              // content: {
+              //   message: 'fourth message',
+              //   course: 'fourth course',
+              // },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 201,
+              // headers: {},
+              content: {
+                message: 'first message',
+                course: 'first course',
+              },
+              error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 301,
+              // headers: {},
+              content: {
+                message: 'second message',
+                course: 'second course',
+              },
+              // error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 401,
+              // headers: {},
+              // content: {
+              //   message: 'third message',
+              //   course: 'third course',
+              // },
+              error: null,
+            },
+          },
+          {
+            params: {
+              // statusCode: 501,
+              // headers: {},
               // content: {
               //   message: 'fourth message',
               //   course: 'fourth course',
