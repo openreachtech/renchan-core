@@ -605,6 +605,9 @@ describe('RestfulApiRoutesBuilder', () => {
         json () {
           return this
         },
+        set () {
+          return this
+        },
       })
 
       /** @type {ExpressType.NextFunction} */
@@ -658,7 +661,7 @@ describe('RestfulApiRoutesBuilder', () => {
         })
       })
 
-      describe('to call #flushResponse()', () => {
+      describe('to call Renderer#flushResponse()', () => {
         describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
           test.each(cases)('renderer: $renderer.constructor.name', async ({ renderer, filterHandler }) => {
             const engine = await params.Engine.createAsync()
@@ -677,7 +680,8 @@ describe('RestfulApiRoutesBuilder', () => {
 
             jest.spyOn(builder, 'generateExceptionProxyRender')
               .mockReturnValue(exceptionProxyRenderTally)
-            const flushResponseSpy = jest.spyOn(builder, 'flushResponse')
+
+            const flushResponseSpy = jest.spyOn(renderer, 'flushResponse')
 
             const handler = builder.generateRendererHandler({
               renderer,
@@ -692,7 +696,7 @@ describe('RestfulApiRoutesBuilder', () => {
 
             const expected = {
               expressResponse: expressResponseMock,
-              response: responseTally,
+              renderResponse: responseTally,
             }
 
             expect(flushResponseSpy)
