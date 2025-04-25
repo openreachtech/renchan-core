@@ -605,6 +605,9 @@ describe('RestfulApiRoutesBuilder', () => {
         json () {
           return this
         },
+        set () {
+          return this
+        },
       })
 
       /** @type {ExpressType.NextFunction} */
@@ -658,7 +661,7 @@ describe('RestfulApiRoutesBuilder', () => {
         })
       })
 
-      describe('to call #flushResponse()', () => {
+      describe('to call Renderer#flushResponse()', () => {
         describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
           test.each(cases)('renderer: $renderer.constructor.name', async ({ renderer, filterHandler }) => {
             const engine = await params.Engine.createAsync()
@@ -677,7 +680,8 @@ describe('RestfulApiRoutesBuilder', () => {
 
             jest.spyOn(builder, 'generateExceptionProxyRender')
               .mockReturnValue(exceptionProxyRenderTally)
-            const flushResponseSpy = jest.spyOn(builder, 'flushResponse')
+
+            const flushResponseSpy = jest.spyOn(renderer, 'flushResponse')
 
             const handler = builder.generateRendererHandler({
               renderer,
@@ -692,7 +696,7 @@ describe('RestfulApiRoutesBuilder', () => {
 
             const expected = {
               expressResponse: expressResponseMock,
-              response: responseTally,
+              renderResponse: responseTally,
             }
 
             expect(flushResponseSpy)
@@ -1335,118 +1339,6 @@ describe('RestfulApiRoutesBuilder', () => {
 
         expect(actual)
           .toBeInstanceOf(RestfulApiRequest)
-      })
-    })
-  })
-})
-
-describe('RestfulApiRoutesBuilder', () => {
-  describe('#flushResponse()', () => {
-    describe('to flush response via Express response', () => {
-      const engineCases = [
-        {
-          params: {
-            Engine: AlphaRestfulApiServerEngine,
-          },
-          cases: [
-            {
-              response: RestfulApiResponse.create({
-                statusCode: 200,
-                content: {
-                  id: 10001,
-                },
-              }),
-              expected: {
-                content: {
-                  id: 10001,
-                },
-                error: null,
-              },
-            },
-            {
-              response: RestfulApiResponse.create({
-                statusCode: 201,
-                content: {
-                  id: 10002,
-                },
-              }),
-              expected: {
-                content: {
-                  id: 10002,
-                },
-                error: null,
-              },
-            },
-          ],
-        },
-        {
-          params: {
-            Engine: BetaRestfulApiServerEngine,
-          },
-          cases: [
-            {
-              response: RestfulApiResponse.create({
-                statusCode: 401,
-                error: {
-                  course: 'Unauthorized error occurred',
-                },
-              }),
-              expected: {
-                content: null,
-                error: {
-                  course: 'Unauthorized error occurred',
-                },
-              },
-            },
-            {
-              response: RestfulApiResponse.create({
-                statusCode: 404,
-                error: {
-                  course: 'Not found error occurred',
-                },
-              }),
-              expected: {
-                content: null,
-                error: {
-                  course: 'Not found error occurred',
-                },
-              },
-            },
-          ],
-        },
-      ]
-
-      describe.each(engineCases)('Engine: $params.Engine.name', ({ params, cases }) => {
-        test.each(cases)('response: $response', async ({ response, expected }) => {
-          const engine = await params.Engine.createAsync()
-
-          const builder = await RestfulApiRoutesBuilder.createAsync({
-            engine,
-          })
-
-          /** @type {ExpressType.Response} */
-          const expressResponseMock = /** @type {*} */ ({
-            status (statusCode) {
-              return this
-            },
-            json (value) {
-              return this
-            },
-          })
-
-          const statusSpy = jest.spyOn(expressResponseMock, 'status')
-          const jsonSpy = jest.spyOn(expressResponseMock, 'json')
-
-          await builder.flushResponse({
-            response,
-            expressResponse: expressResponseMock,
-          })
-
-          expect(statusSpy)
-            .toHaveBeenCalledWith(response.status)
-          expect(jsonSpy)
-            .toHaveBeenCalledWith(expected)
-        })
       })
     })
   })

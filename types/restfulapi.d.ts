@@ -13,6 +13,8 @@ import RestfulApiRequest from '../lib/server/restfulapi/interfaces/RestfulApiReq
 import RestfulApiResponse from '../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 import RenchanRestfulApiError from '../lib/server/restfulapi/errors/RenchanRestfulApiError.js'
 
+import BaseRestfulApiResponseFlusher from '../lib/server/restfulapi/responseFlusher/BaseRestfulApiResponseFlusher.js'
+
 /**
  * Declare types
  */
@@ -60,8 +62,8 @@ declare global {
     type Request = RestfulApiRequest
 
     type RenderResponse = RestfulApiResponse<
-      Record<string, *>,
-      Record<string, *>
+      *,
+      RenchanRestfulApiError
     >
 
     type ErrorResponse = RestfulApiResponse
@@ -84,5 +86,8 @@ declare global {
 
     type Error = RenchanRestfulApiError
     type ErrorCtor = typeof RenchanRestfulApiError
+
+    type ResponseFlusher = BaseRestfulApiResponseFlusher
+    type ResponseFlusherCtor = typeof BaseRestfulApiResponseFlusher
   }
 }
