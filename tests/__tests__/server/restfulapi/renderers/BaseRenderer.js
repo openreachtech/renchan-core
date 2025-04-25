@@ -3,6 +3,7 @@ import BaseRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRen
 import RestfulApiResponse from '../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 import BaseRestfulApiContext from '../../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
 import JsonRestfulApiResponseFlusher from '../../../../../lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
+import RenchanRestfulApiError from '../../../../../lib/server/restfulapi/errors/RenchanRestfulApiError.js'
 
 describe('BaseRenderer', () => {
   describe('constructor', () => {
@@ -331,6 +332,75 @@ describe('BaseRenderer', () => {
 
         expect(actual)
           .toBe(JsonRestfulApiResponseFlusher)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('.createResponseFlusher()', () => {
+    /**
+     * @type {Array<{
+     *   params: {
+     *     expressResponse: ExpressType.Response
+     *     renderResponse: RestfulApiType.RenderResponse
+     *   }
+     * }>}
+     */
+    const cases = /** @type {Array<*>} */ ([
+      {
+        params: {
+          expressResponse: /** @type {*} */ ({
+            tally: Symbol('alpha tally'),
+          }),
+          renderResponse: new RestfulApiResponse({
+            statusCode: 200,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: {
+              alpha: 'alpha',
+            },
+            error: null,
+          }),
+        },
+      },
+      {
+        params: {
+          expressResponse: /** @type {*} */ ({
+            tally: Symbol('beta tally'),
+          }),
+          renderResponse: new RestfulApiResponse({
+            statusCode: 500,
+            headers: {
+              'X-Alpha': 'alpha',
+            },
+            content: null,
+            error: RenchanRestfulApiError.create({
+              code: '500',
+            }),
+          }),
+        },
+      },
+    ])
+
+    describe('to be instance of JsonRestfulApiResponseFlusher', () => {
+      test.each(cases)('expressResponse: $params.expressResponse', async ({ params }) => {
+        const actual = BaseRenderer.createResponseFlusher(params)
+
+        expect(actual)
+          .toBeInstanceOf(JsonRestfulApiResponseFlusher)
+      })
+    })
+
+    describe('to call JsonRestfulApiResponseFlusher.create()', () => {
+      test.each(cases)('expressResponse: $params.expressResponse', async ({ params }) => {
+        const createSpy = jest.spyOn(JsonRestfulApiResponseFlusher, 'create')
+
+        BaseRenderer.createResponseFlusher(params)
+
+        expect(createSpy)
+          .toHaveBeenCalledWith(params)
       })
     })
   })
