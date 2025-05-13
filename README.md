@@ -168,7 +168,7 @@ builder.buildHttpServer()
 
 This project is released under the MIT License.
 
-See [here](./LICENSE) for details.
+See [LICENSE](./LICENSE) for details.
 
 ## Contributing
 
