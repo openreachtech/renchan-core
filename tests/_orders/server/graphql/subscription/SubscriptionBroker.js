@@ -137,26 +137,26 @@ describe('SubscriptionBroker', () => {
 
 describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
+
+    beforeAll(() => {
+      jest.spyOn(RedisPubSub, 'create')
+        .mockReturnValue(
+          /** @type {never} */ (redisPubSub)
+        )
+    })
+
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
     describe('to be PubSub instance', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
-
-      beforeAll(() => {
-        jest.spyOn(RedisPubSub, 'create')
-          .mockReturnValue(
-            /** @type {never} */ (redisPubSub)
-          )
-      })
-
-      afterAll(() => {
-        redisPubSub.publishingRedisClient.disconnect()
-        redisPubSub.subscribingRedisClient.disconnect()
-      })
-
       /**
        * @type {Array<{
        *   params: {
