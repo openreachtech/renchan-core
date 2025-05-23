@@ -3,7 +3,7 @@
 ############################################################## declare functions
 
 function jestCommand () {
-  npx jest --forceExit --passWithNoTests "$@";
+  npx jest --passWithNoTests "$@";
 }
 
 function testWithEmpty () {
