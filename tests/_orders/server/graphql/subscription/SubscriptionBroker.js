@@ -542,6 +542,13 @@ describe('SubscriptionBroker', () => {
           [Symbol.asyncIterator]: expect.any(Function),
         }
 
+        jest.spyOn(RedisPubSub, 'create')
+          .mockReturnValue(
+            /** @type {never} */ (
+              LocalPubSub.create()
+            )
+          )
+
         const broker = SubscriptionBroker.create(params)
 
         test.each(cases)('input: $input', ({ input }) => {
@@ -616,9 +623,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const expected = {
             channel: input.channel,
             broker,
