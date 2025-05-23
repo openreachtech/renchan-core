@@ -6,35 +6,35 @@ import MockRedis from '../../../../../mocks/MockRedis.js'
 
 describe('RedisPubSub', () => {
   describe('constructor', () => {
+    const clientHash = {}
+
+    beforeAll(() => {
+      clientHash.alpha = new Redis({
+        host: 'localhost',
+        port: 6379,
+      })
+      clientHash.beta = new Redis({
+        host: 'localhost',
+        port: 6379,
+      })
+      clientHash.gamma = new Redis({
+        host: 'localhost',
+        port: 8888,
+      })
+      clientHash.delta = new Redis({
+        host: 'localhost',
+        port: 8888,
+      })
+    })
+
+    afterAll(() => {
+      clientHash.alpha.disconnect()
+      clientHash.beta.disconnect()
+      clientHash.gamma.disconnect()
+      clientHash.delta.disconnect()
+    })
+
     describe('to keep private properties', () => {
-      const clientHash = {}
-
-      beforeAll(() => {
-        clientHash.alpha = new Redis({
-          host: 'localhost',
-          port: 6379,
-        })
-        clientHash.beta = new Redis({
-          host: 'localhost',
-          port: 6379,
-        })
-        clientHash.gamma = new Redis({
-          host: 'localhost',
-          port: 8888,
-        })
-        clientHash.delta = new Redis({
-          host: 'localhost',
-          port: 8888,
-        })
-      })
-
-      afterAll(() => {
-        clientHash.alpha.disconnect()
-        clientHash.beta.disconnect()
-        clientHash.gamma.disconnect()
-        clientHash.delta.disconnect()
-      })
-
       describe('#publishingRedisClient', () => {
         const cases = [
           {
