@@ -354,9 +354,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const subscribeSpy = jest.spyOn(broker.pubSub, 'subscribe')
             .mockImplementation(async () => {})
 
