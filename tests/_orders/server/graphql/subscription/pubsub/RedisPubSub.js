@@ -262,14 +262,19 @@ describe('RedisPubSub', () => {
 
 describe('RedisPubSub', () => {
   describe('#publish()', () => {
-    describe('to call publishingRedisClient.publish()', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
 
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
+    describe('to call publishingRedisClient.publish()', () => {
       const cases = [
         {
           params: {
