@@ -375,14 +375,19 @@ describe('RedisPubSub', () => {
 
 describe('RedisPubSub', () => {
   describe('#teardownBroadcasterOnUnsubscribe()', () => {
-    describe('to call member of Redis client', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
 
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
+    describe('to call member of Redis client', () => {
       const cases = [
         {
           params: {
