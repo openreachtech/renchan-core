@@ -1,3 +1,5 @@
+import RenchanRestfulApiError from '../../../../../lib/server/restfulapi/errors/RenchanRestfulApiError.js'
+
 import RestfulApiResponse from '../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 
 describe('RestfulApiResponse', () => {
@@ -109,18 +111,22 @@ describe('RestfulApiResponse', () => {
         const cases = [
           {
             params: {
-              error: {
-                message: 'fist error',
-                course: new Error('first course'),
-              },
+              error: RenchanRestfulApiError.create({
+                code: '190.X000.001',
+                options: {
+                  cause: new Error('first cause'),
+                },
+              }),
             },
           },
           {
             params: {
-              error: {
-                message: 'second error',
-                course: new Error('second course'),
-              },
+              error: RenchanRestfulApiError.create({
+                code: '190.X000.002',
+                options: {
+                  cause: new Error('second cause'),
+                },
+              }),
             },
           },
           {
