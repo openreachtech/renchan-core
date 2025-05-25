@@ -47,6 +47,7 @@ describe('AdminGraphqlContext', () => {
         {
           params: {
             expressRequest: /** @type {*} */ ({}),
+            requestParams: /** @type {*} */ ({}),
             engine: /** @type {*} */ ({}),
             userEntity: /** @type {*} */ ({
               label: 'alphaUser',
@@ -60,6 +61,7 @@ describe('AdminGraphqlContext', () => {
         {
           params: {
             expressRequest: /** @type {*} */ ({}),
+            requestParams: /** @type {*} */ ({}),
             engine: /** @type {*} */ ({}),
             userEntity: /** @type {*} */ ({
               label: 'betaUser',
@@ -91,6 +93,7 @@ describe('AdminGraphqlContext', () => {
         {
           params: {
             expressRequest: /** @type {*} */ ({}),
+            requestParams: /** @type {*} */ ({}),
             engine: /** @type {*} */ ({}),
             userEntity: /** @type {*} */ ({
               id: 10001,
@@ -104,6 +107,7 @@ describe('AdminGraphqlContext', () => {
         {
           params: {
             expressRequest: /** @type {*} */ ({}),
+            requestParams: /** @type {*} */ ({}),
             engine: /** @type {*} */ ({}),
             userEntity: /** @type {*} */ ({
               id: 10002,

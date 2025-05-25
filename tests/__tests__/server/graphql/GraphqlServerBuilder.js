@@ -21,6 +21,7 @@ import AdminGraphqlServerEngine from '../../../../app/server/graphql/AdminGraphq
 import MiddlewareExpressRoute from '../../../../lib/server/express/routes/MiddlewareExpressRoute.js'
 import GetMethodExpressRoute from '../../../../lib/server/express/routes/GetMethodExpressRoute.js'
 import BaseExpressRoute from '../../../../lib/server/express/routes/BaseExpressRoute.js'
+import GraphqlResolvedParcelPorter from '../../../../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter.js'
 
 describe('GraphqlServerBuilder', () => {
   describe('constructor', () => {
@@ -74,6 +75,12 @@ describe('GraphqlServerBuilder', () => {
                 rootValue: {},
                 formatError: /** @type {*} */ ({}),
                 validationRules: [],
+
+                onResolved: async parcel => {},
+                postWorkerHash: {},
+                parcelPorter: new GraphqlResolvedParcelPorter({
+                  parcelMap: new WeakMap(),
+                }),
               }),
             },
           },
@@ -87,6 +94,12 @@ describe('GraphqlServerBuilder', () => {
                 rootValue: {},
                 formatError: /** @type {*} */ ({}),
                 validationRules: [],
+
+                onResolved: async parcel => {},
+                postWorkerHash: {},
+                parcelPorter: new GraphqlResolvedParcelPorter({
+                  parcelMap: new WeakMap(),
+                }),
               }),
             },
           },

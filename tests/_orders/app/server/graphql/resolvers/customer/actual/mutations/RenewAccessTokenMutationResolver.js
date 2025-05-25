@@ -69,7 +69,7 @@ describe('RenewAccessTokenMutationResolver', () => {
     const resolver = RenewAccessTokenMutationResolver.create()
 
     describe('to be access token null', () => {
-      /** @type {import('../../../../../../../../server/graphql/contexts/CustomerGraphqlContext').default} */
+      /** @type {import('../../../../../../../../../app/server/graphql/contexts/CustomerGraphqlContext.js').default} */
       const context = /** @type {*} */ ({
         accessToken: null,
       })
@@ -93,7 +93,7 @@ describe('RenewAccessTokenMutationResolver', () => {
       /**
        * @type {Array<{
        *   params: {
-       *     context: import('../../../../../../../../server/graphql/contexts/CustomerGraphqlContext').default
+       *     context: import('../../../../../../../../../app/server/graphql/contexts/CustomerGraphqlContext.js').default
        *   }
        *   expected: {
        *     accessToken: string
@@ -142,7 +142,7 @@ describe('RenewAccessTokenMutationResolver', () => {
       /**
        * @type {Array<{
        *   params: {
-       *     context: import('../../../../../../../../server/graphql/contexts/CustomerGraphqlContext').default
+       *     context: import('../../../../../../../../../app/server/graphql/contexts/CustomerGraphqlContext.js').default
        *   }
        *   tally: string
        *   expected: {
