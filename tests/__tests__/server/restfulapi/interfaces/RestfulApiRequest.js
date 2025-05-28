@@ -164,56 +164,6 @@ describe('RestfulApiRequest', () => {
 })
 
 describe('RestfulApiRequest', () => {
-  describe('.get:headers', () => {
-    /**
-     * @type {Array<{
-     *   params: {
-     *     expressRequest: ExpressType.Request
-     *   }
-     *   expected: Headers
-     * }>}
-     */
-    const cases = /** @type {*} */ ([
-      {
-        params: {
-          expressRequest: {
-            headers: {
-              alpha: Symbol.for('alpha-value'),
-            },
-            params: {},
-          },
-        },
-        expected: {
-          alpha: Symbol.for('alpha-value'),
-        },
-      },
-      {
-        params: {
-          expressRequest: {
-            headers: {
-              beta: Symbol.for('beta-value'),
-            },
-            params: {},
-          },
-        },
-        expected: {
-          beta: Symbol.for('beta-value'),
-        },
-      },
-    ])
-
-    test.each(cases)('expressRequest: $params.expressRequest', ({ params, expected }) => {
-      const request = RestfulApiRequest.create(params)
-
-      const actual = request.headers
-
-      expect(actual)
-        .toEqual(expected)
-    })
-  })
-})
-
-describe('RestfulApiRequest', () => {
   describe('.createPashParameterHashProxy()', () => {
     describe('with existing parameter', () => {
       /**
@@ -335,6 +285,56 @@ describe('RestfulApiRequest', () => {
             .toBeNull()
         })
       })
+    })
+  })
+})
+
+describe('RestfulApiRequest', () => {
+  describe('#get:headers', () => {
+    /**
+     * @type {Array<{
+     *   params: {
+     *     expressRequest: ExpressType.Request
+     *   }
+     *   expected: Headers
+     * }>}
+     */
+    const cases = /** @type {*} */ ([
+      {
+        params: {
+          expressRequest: {
+            headers: {
+              alpha: Symbol.for('alpha-value'),
+            },
+            params: {},
+          },
+        },
+        expected: {
+          alpha: Symbol.for('alpha-value'),
+        },
+      },
+      {
+        params: {
+          expressRequest: {
+            headers: {
+              beta: Symbol.for('beta-value'),
+            },
+            params: {},
+          },
+        },
+        expected: {
+          beta: Symbol.for('beta-value'),
+        },
+      },
+    ])
+
+    test.each(cases)('expressRequest: $params.expressRequest', ({ params, expected }) => {
+      const request = RestfulApiRequest.create(params)
+
+      const actual = request.headers
+
+      expect(actual)
+        .toEqual(expected)
     })
   })
 })
