@@ -101,6 +101,132 @@ describe('RestfulApiRequest', () => {
 })
 
 describe('RestfulApiRequest', () => {
+  describe('.createPashParameterHashProxy()', () => {
+    describe('with existing parameter', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     expressRequest: ExpressType.Request
+       *   }
+       *   cases: Array<{
+       *     key: string
+       *     expected: * // any type
+       *   }>
+       * }>}
+       */
+      const requestCases = /** @type {*} */ ([
+        {
+          params: {
+            expressRequest: {
+              params: {
+                alpha: Symbol.for('alpha-value'),
+                beta: Symbol.for('beta-value'),
+              },
+            },
+          },
+          cases: [
+            {
+              key: 'alpha',
+              expected: Symbol.for('alpha-value'),
+            },
+            {
+              key: 'beta',
+              expected: Symbol.for('beta-value'),
+            },
+          ],
+        },
+        {
+          params: {
+            expressRequest: {
+              params: {
+                gamma: Symbol.for('alpha-value'),
+                delta: Symbol.for('beta-value'),
+              },
+            },
+          },
+          cases: [
+            {
+              key: 'gamma',
+              expected: Symbol.for('alpha-value'),
+            },
+            {
+              key: 'delta',
+              expected: Symbol.for('beta-value'),
+            },
+          ],
+        },
+      ])
+
+      describe.each(requestCases)('expressRequest: $params.expressRequest', ({ params, cases }) => {
+        const parameterHash = RestfulApiRequest.createPashParameterHashProxy(params)
+
+        test.each(cases)('key: $key', ({ key, expected }) => {
+          const actual = parameterHash[key]
+
+          expect(actual)
+            .toEqual(expected)
+        })
+      })
+    })
+
+    describe('with not-existing parameter', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     expressRequest: ExpressType.Request
+       *   }
+       *   cases: Array<{
+       *     key: string
+       *     expected: * // any type
+       *   }>
+       * }>}
+       */
+      const requestCases = /** @type {*} */ ([
+        {
+          params: {
+            expressRequest: {
+              params: {
+                alpha: Symbol.for('alpha-value'),
+                beta: Symbol.for('beta-value'),
+              },
+            },
+          },
+          cases: [
+            { key: 'gamma' },
+            { key: 'delta' },
+          ],
+        },
+        {
+          params: {
+            expressRequest: {
+              params: {
+                gamma: Symbol.for('alpha-value'),
+                delta: Symbol.for('beta-value'),
+              },
+            },
+          },
+          cases: [
+            { key: 'alpha' },
+            { key: 'beta' },
+          ],
+        },
+      ])
+
+      describe.each(requestCases)('expressRequest: $params.expressRequest', ({ params, cases }) => {
+        const parameterHash = RestfulApiRequest.createPashParameterHashProxy(params)
+
+        test.each(cases)('key: $key', ({ key }) => {
+          const actual = parameterHash[key]
+
+          expect(actual)
+            .toBeNull()
+        })
+      })
+    })
+  })
+})
+
+describe('RestfulApiRequest', () => {
   describe('#get:pathParameterHash', () => {
     describe('with existing parameter', () => {
       /**
