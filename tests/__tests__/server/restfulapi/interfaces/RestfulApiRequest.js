@@ -193,6 +193,7 @@ describe('RestfulApiRequest', () => {
             headers: {
               beta: Symbol.for('beta-value'),
             },
+            params: {},
           },
         },
         expected: {
