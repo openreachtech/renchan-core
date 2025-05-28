@@ -55,7 +55,7 @@ describe('RestfulApiRequest', () => {
          *   params: {
          *     pathParameterHashProxy: ExpressType.Request['params']
          *   }
-         * }
+         * }>}
          */
         const cases = /** @type {*} */ ([
           {
