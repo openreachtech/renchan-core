@@ -1,6 +1,99 @@
 import RestfulApiRequest from '../../../../../lib/server/restfulapi/interfaces/RestfulApiRequest.js'
 
 describe('RestfulApiRequest', () => {
+  describe('constructor', () => {
+    describe('to keep properties', () => {
+      describe('#expressRequest', () => {
+        const pathParameterHashProxyMock = new Proxy({}, {})
+
+        /**
+         * @type {Array<{
+         *   params: {
+         *     expressRequest: ExpressType.Request
+         *   }
+         * }
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              expressRequest: {
+                query: {
+                  alpha: 1,
+                },
+              },
+            },
+          },
+          {
+            params: {
+              expressRequest: {
+                query: {
+                  beta: 2,
+                },
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('expressRequest: $params.expressRequest', ({ params }) => {
+          const args = {
+            expressRequest: params.expressRequest,
+            pathParameterHashProxy: pathParameterHashProxyMock,
+          }
+          const request = new RestfulApiRequest(args)
+
+          expect(request)
+            .toHaveProperty('expressRequest', params.expressRequest)
+        })
+      })
+
+      describe('#pathParameterHashProxy', () => {
+        /** @type {ExpressType.Request} */
+        const expressRequestMock = /** @type {*} */ ({})
+
+        /**
+         * @type {Array<{
+         *   params: {
+         *     pathParameterHashProxy: ExpressType.Request['params']
+         *   }
+         * }
+         */
+        const cases = /** @type {*} */ ([
+          {
+            params: {
+              pathParameterHashProxy: new Proxy({
+                alpha: 1,
+              }, {
+                get: (target, key) => Reflect.get(target, key),
+              }),
+            },
+          },
+          {
+            params: {
+              pathParameterHashProxy: {
+                query: {
+                  beta: 2,
+                },
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('expressRequest: $params.expressRequest', ({ params }) => {
+          const args = {
+            expressRequest: expressRequestMock,
+            pathParameterHashProxy: params.pathParameterHashProxy,
+          }
+          const request = new RestfulApiRequest(args)
+
+          expect(request)
+            .toHaveProperty('pathParameterHashProxy', params.pathParameterHashProxy)
+        })
+      })
+    })
+  })
+})
+
+describe('RestfulApiRequest', () => {
   describe('.create()', () => {
     /**
      * @type {Array<{
