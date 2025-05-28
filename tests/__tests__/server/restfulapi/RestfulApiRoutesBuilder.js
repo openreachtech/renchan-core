@@ -887,6 +887,7 @@ describe('RestfulApiRoutesBuilder', () => {
     describe('generated handler', () => {
       /** @type {ExpressType.Request} */
       const expressRequestTally = /** @type {*} */ ({
+        params: {},
         tally: Symbol('express request tally'),
       })
 
@@ -976,6 +977,7 @@ describe('RestfulApiRoutesBuilder', () => {
               expressRequest: /** @type {*} */ ({
                 body: Symbol('get tally'),
                 query: Symbol('post tally'),
+                params: {},
               }),
             })
 
@@ -1024,6 +1026,7 @@ describe('RestfulApiRoutesBuilder', () => {
               expressRequest: /** @type {*} */ ({
                 body: Symbol('get tally'),
                 query: Symbol('post tally'),
+                params: {},
               }),
             })
 
@@ -1281,6 +1284,7 @@ describe('RestfulApiRoutesBuilder', () => {
         query: {
           tally: Symbol('post tally'),
         },
+        params: {},
       })
 
       const builder = await RestfulApiRoutesBuilder.createAsync({
@@ -1334,7 +1338,9 @@ describe('RestfulApiRoutesBuilder', () => {
         })
 
         const actual = builder.createRestfulApiRequest({
-          expressRequest: /** @type {*} */ ({}),
+          expressRequest: /** @type {*} */ ({
+            params: {},
+          }),
         })
 
         expect(actual)
