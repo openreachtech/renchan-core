@@ -109,6 +109,7 @@ describe('RestfulApiRequest', () => {
             query: {
               alpha: 1,
             },
+            params: {},
           },
         },
       },
@@ -118,6 +119,7 @@ describe('RestfulApiRequest', () => {
             query: {
               beta: 2,
             },
+            params: {},
           },
         },
       },
@@ -125,70 +127,38 @@ describe('RestfulApiRequest', () => {
 
     describe('to be instance of own class', () => {
       test.each(cases)('expressRequest: $params.expressRequest', ({ params }) => {
-        const error = RestfulApiRequest.create(params)
+        const request = RestfulApiRequest.create(params)
 
-        expect(error)
+        expect(request)
           .toBeInstanceOf(RestfulApiRequest)
       })
     })
 
     describe('to call constructor', () => {
       test.each(cases)('expressRequest: $params.expressRequest', ({ params }) => {
+        /** @type {ExpressType.Request['params']} */
+        const pathParameterHashProxyTally = new Proxy({}, {})
+
+        const expectedConstructorArgs = {
+          expressRequest: params.expressRequest,
+          pathParameterHashProxy: pathParameterHashProxyTally,
+        }
+        const expectedFactoryArgs = {
+          expressRequest: params.expressRequest,
+        }
+
+        const createPashParameterHashProxySpy = jest.spyOn(RestfulApiRequest, 'createPashParameterHashProxy')
+          .mockReturnValue(pathParameterHashProxyTally)
+
         const SpyClass = globalThis.constructorSpy.spyOn(RestfulApiRequest)
 
         SpyClass.create(params)
 
         expect(SpyClass.__spy__)
-          .toHaveBeenCalledWith(params)
+          .toHaveBeenCalledWith(expectedConstructorArgs)
+        expect(createPashParameterHashProxySpy)
+          .toHaveBeenCalledWith(expectedFactoryArgs)
       })
-    })
-  })
-})
-
-describe('RestfulApiRequest', () => {
-  describe('.get:headers', () => {
-    /**
-     * @type {Array<{
-     *   params: {
-     *     expressRequest: ExpressType.Request
-     *   }
-     *   expected: Headers
-     * }>}
-     */
-    const cases = /** @type {*} */ ([
-      {
-        params: {
-          expressRequest: {
-            headers: {
-              alpha: Symbol.for('alpha-value'),
-            },
-          },
-        },
-        expected: {
-          alpha: Symbol.for('alpha-value'),
-        },
-      },
-      {
-        params: {
-          expressRequest: {
-            headers: {
-              beta: Symbol.for('beta-value'),
-            },
-          },
-        },
-        expected: {
-          beta: Symbol.for('beta-value'),
-        },
-      },
-    ])
-
-    test.each(cases)('expressRequest: $params.expressRequest', ({ params, expected }) => {
-      const request = RestfulApiRequest.create(params)
-
-      const actual = request.headers
-
-      expect(actual)
-        .toEqual(expected)
     })
   })
 })
@@ -315,6 +285,56 @@ describe('RestfulApiRequest', () => {
             .toBeNull()
         })
       })
+    })
+  })
+})
+
+describe('RestfulApiRequest', () => {
+  describe('#get:headers', () => {
+    /**
+     * @type {Array<{
+     *   params: {
+     *     expressRequest: ExpressType.Request
+     *   }
+     *   expected: Headers
+     * }>}
+     */
+    const cases = /** @type {*} */ ([
+      {
+        params: {
+          expressRequest: {
+            headers: {
+              alpha: Symbol.for('alpha-value'),
+            },
+            params: {},
+          },
+        },
+        expected: {
+          alpha: Symbol.for('alpha-value'),
+        },
+      },
+      {
+        params: {
+          expressRequest: {
+            headers: {
+              beta: Symbol.for('beta-value'),
+            },
+            params: {},
+          },
+        },
+        expected: {
+          beta: Symbol.for('beta-value'),
+        },
+      },
+    ])
+
+    test.each(cases)('expressRequest: $params.expressRequest', ({ params, expected }) => {
+      const request = RestfulApiRequest.create(params)
+
+      const actual = request.headers
+
+      expect(actual)
+        .toEqual(expected)
     })
   })
 })
