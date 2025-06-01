@@ -9,7 +9,7 @@ describe('BaseGraphqlServerEngine', () => {
   describe('constructor', () => {
     /** @type {GraphqlType.Config} */
     const mockConfig = /** @type {*} */ ({
-      RedisOptions: null,
+      redisOptions: null,
     })
     const mockBroker = SubscriptionBroker.create({
       config: mockConfig,
@@ -195,7 +195,7 @@ describe('BaseGraphqlServerEngine', () => {
   describe('.create()', () => {
     /** @type {GraphqlType.Config} */
     const mockConfig = /** @type {*} */ ({
-      RedisOptions: null,
+      redisOptions: null,
     })
     const mockBroker = SubscriptionBroker.create({
       config: mockConfig,
