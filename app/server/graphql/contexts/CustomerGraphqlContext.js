@@ -124,4 +124,14 @@ export default class CustomerGraphqlContext extends BaseGraphqlContext {
   get customerId () {
     return this.userId
   }
+
+  /**
+   * get: Customer access token.
+   *
+   * @returns {import('../../../client/redis/AiResponseRedisClerk.js').default} AI response Redis clerk.
+   */
+  get aiResponseRedisClerk () {
+    return /** @type {import('./CustomerGraphqlShare.js').default} */ (this.share)
+      .aiResponseRedisClerk
+  }
 }

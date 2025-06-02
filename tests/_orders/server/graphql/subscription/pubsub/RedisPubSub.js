@@ -6,35 +6,35 @@ import MockRedis from '../../../../../mocks/MockRedis.js'
 
 describe('RedisPubSub', () => {
   describe('constructor', () => {
+    const clientHash = {}
+
+    beforeAll(() => {
+      clientHash.alpha = new Redis({
+        host: 'localhost',
+        port: 6379,
+      })
+      clientHash.beta = new Redis({
+        host: 'localhost',
+        port: 6379,
+      })
+      clientHash.gamma = new Redis({
+        host: 'localhost',
+        port: 8888,
+      })
+      clientHash.delta = new Redis({
+        host: 'localhost',
+        port: 8888,
+      })
+    })
+
+    afterAll(() => {
+      clientHash.alpha.disconnect()
+      clientHash.beta.disconnect()
+      clientHash.gamma.disconnect()
+      clientHash.delta.disconnect()
+    })
+
     describe('to keep private properties', () => {
-      const clientHash = {}
-
-      beforeAll(() => {
-        clientHash.alpha = new Redis({
-          host: 'localhost',
-          port: 6379,
-        })
-        clientHash.beta = new Redis({
-          host: 'localhost',
-          port: 6379,
-        })
-        clientHash.gamma = new Redis({
-          host: 'localhost',
-          port: 8888,
-        })
-        clientHash.delta = new Redis({
-          host: 'localhost',
-          port: 8888,
-        })
-      })
-
-      afterAll(() => {
-        clientHash.alpha.disconnect()
-        clientHash.beta.disconnect()
-        clientHash.gamma.disconnect()
-        clientHash.delta.disconnect()
-      })
-
       describe('#publishingRedisClient', () => {
         const cases = [
           {
@@ -262,14 +262,19 @@ describe('RedisPubSub', () => {
 
 describe('RedisPubSub', () => {
   describe('#publish()', () => {
-    describe('to call publishingRedisClient.publish()', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
 
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
+    describe('to call publishingRedisClient.publish()', () => {
       const cases = [
         {
           params: {
@@ -312,14 +317,19 @@ describe('RedisPubSub', () => {
 
 describe('RedisPubSub', () => {
   describe('#setupBroadcasterOnSubscribe()', () => {
-    describe('to call member of Redis client', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
 
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
+    describe('to call member of Redis client', () => {
       const cases = [
         {
           params: {
@@ -365,14 +375,19 @@ describe('RedisPubSub', () => {
 
 describe('RedisPubSub', () => {
   describe('#teardownBroadcasterOnUnsubscribe()', () => {
-    describe('to call member of Redis client', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
 
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
+    describe('to call member of Redis client', () => {
       const cases = [
         {
           params: {

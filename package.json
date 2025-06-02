@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/renchan",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
@@ -27,8 +27,8 @@
   "keywords": [
     "Renchan"
   ],
-  "author": "Open Reach Tech inc.",
-  "license": "UNLICENSED",
+  "author": "Open Reach Tech Inc.",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/openreachtech/renchan-core/issues"
   },
@@ -36,7 +36,7 @@
   "dependencies": {
     "@graphql-tools/schema": "^10.0.6",
     "@graphql-tools/utils": "^10.5.5",
-    "@openreachtech/renchan-env": "^1.0.0",
+    "@openreachtech/renchan-env": "^1.0.2",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "graphql": "^16.9.0",

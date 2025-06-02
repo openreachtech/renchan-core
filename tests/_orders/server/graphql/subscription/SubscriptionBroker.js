@@ -137,26 +137,26 @@ describe('SubscriptionBroker', () => {
 
 describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
+    const redisPubSub = RedisPubSub.create({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+    })
+
+    beforeAll(() => {
+      jest.spyOn(RedisPubSub, 'create')
+        .mockReturnValue(
+          /** @type {never} */ (redisPubSub)
+        )
+    })
+
+    afterAll(() => {
+      redisPubSub.publishingRedisClient.disconnect()
+      redisPubSub.subscribingRedisClient.disconnect()
+    })
+
     describe('to be PubSub instance', () => {
-      const redisPubSub = RedisPubSub.create({
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      })
-
-      beforeAll(() => {
-        jest.spyOn(RedisPubSub, 'create')
-          .mockReturnValue(
-            /** @type {never} */ (redisPubSub)
-          )
-      })
-
-      afterAll(() => {
-        redisPubSub.publishingRedisClient.disconnect()
-        redisPubSub.subscribingRedisClient.disconnect()
-      })
-
       /**
        * @type {Array<{
        *   params: {
@@ -270,9 +270,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const publishSpy = jest.spyOn(broker.pubSub, 'publish')
             .mockImplementation(async () => {})
 
@@ -347,9 +354,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const subscribeSpy = jest.spyOn(broker.pubSub, 'subscribe')
             .mockImplementation(async () => {})
 
@@ -432,9 +446,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const unsubscribeSpy = jest.spyOn(broker.pubSub, 'unsubscribe')
             .mockImplementation(async () => {})
 
@@ -521,6 +542,13 @@ describe('SubscriptionBroker', () => {
           [Symbol.asyncIterator]: expect.any(Function),
         }
 
+        jest.spyOn(RedisPubSub, 'create')
+          .mockReturnValue(
+            /** @type {never} */ (
+              LocalPubSub.create()
+            )
+          )
+
         const broker = SubscriptionBroker.create(params)
 
         test.each(cases)('input: $input', ({ input }) => {
@@ -595,9 +623,16 @@ describe('SubscriptionBroker', () => {
       ])
 
       describe.each(pubSubCases)('config: $params.config', ({ params, cases }) => {
-        const broker = SubscriptionBroker.create(params)
-
         test.each(cases)('input: $input', ({ input }) => {
+          jest.spyOn(RedisPubSub, 'create')
+            .mockReturnValue(
+              /** @type {never} */ (
+                LocalPubSub.create()
+              )
+            )
+
+          const broker = SubscriptionBroker.create(params)
+
           const expected = {
             channel: input.channel,
             broker,

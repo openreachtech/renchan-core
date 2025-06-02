@@ -93,7 +93,7 @@ describe('SignInMutationResolver', () => {
       /**
        * @type {Array<{
        *   params: {
-       *     accessTokenEntity: import('../../../../../../../../sequelize/models/CustomerAccessToken.js').CustomerAccessTokenEntity
+       *     accessTokenEntity: import('../../../../../../../../../app/sequelize/models/CustomerAccessToken.js').CustomerAccessTokenEntity
        *   }
        *   expected: {
        *     accessToken: string

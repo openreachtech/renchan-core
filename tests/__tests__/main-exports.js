@@ -75,6 +75,12 @@ import { default as RenchanRestfulApiErrorActual } from '../../lib/server/restfu
 import { default as ConcreteMemberNotFoundRestfulApiErrorActual } from '../../lib/server/restfulapi/errors/concretes/ConcreteMemberNotFoundRestfulApiError.js'
 
 /**
+ * For Redis server.
+ */
+import { default as BaseRedisClerkActual } from '../../lib/client/redis/BaseRedisClerk.js'
+import { default as LocalRedisActual } from '../../lib/client/redis/LocalRedis.js'
+
+/**
  * For modules.
  */
 import { default as DeepBulkClassLoaderActual } from '../../lib/tools/DeepBulkClassLoader.js'
@@ -158,6 +164,9 @@ import {
   RenchanRestfulApiError,
   ConcreteMemberNotFoundRestfulApiError,
 
+  BaseRedisClerk,
+  LocalRedis,
+
   DeepBulkClassLoader,
   RootPath,
   ValueTemplateHydrator,
@@ -238,6 +247,9 @@ describe('main exports', () => {
 
     { ExportedClass: RenchanRestfulApiError, ActualClass: RenchanRestfulApiErrorActual },
     { ExportedClass: ConcreteMemberNotFoundRestfulApiError, ActualClass: ConcreteMemberNotFoundRestfulApiErrorActual },
+
+    { ExportedClass: BaseRedisClerk, ActualClass: BaseRedisClerkActual },
+    { ExportedClass: LocalRedis, ActualClass: LocalRedisActual },
 
     { ExportedClass: DeepBulkClassLoader, ActualClass: DeepBulkClassLoaderActual },
     { ExportedClass: RootPath, ActualClass: RootPathActual },
