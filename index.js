@@ -84,6 +84,12 @@ export { default as RestfulApiResponse } from './lib/server/restfulapi/interface
 export { default as RenchanRestfulApiError } from './lib/server/restfulapi/errors/RenchanRestfulApiError.js'
 export { default as ConcreteMemberNotFoundRestfulApiError } from './lib/server/restfulapi/errors/concretes/ConcreteMemberNotFoundRestfulApiError.js'
 
+/**
+ * For Redis server.
+ */
+export { default as BaseRedisClerk } from './lib/server/redis/BaseRedisClerk.js'
+export { default as LocalRedis } from './lib/server/redis/LocalRedis.js'
+
 /*
  * Modules
  */
