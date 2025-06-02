@@ -113,7 +113,7 @@ export default class CustomerGraphqlShare extends BaseGraphqlShare {
   }
 
   /**
-   * Get the type of this GraphQL share.
+   * get: AI response Redis clerk.
    *
    * @returns {AiResponseRedisClerk} AI response Redis clerk.
    */
