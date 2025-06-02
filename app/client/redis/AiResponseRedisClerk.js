@@ -1,4 +1,4 @@
-import BaseRedisClerk from '../../../lib/server/redis/BaseRedisClerk.js'
+import BaseRedisClerk from '../../../lib/client/redis/BaseRedisClerk.js'
 
 /**
  * Redis clerk for AI responses.

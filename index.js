@@ -87,8 +87,8 @@ export { default as ConcreteMemberNotFoundRestfulApiError } from './lib/server/r
 /**
  * For Redis server.
  */
-export { default as BaseRedisClerk } from './lib/server/redis/BaseRedisClerk.js'
-export { default as LocalRedis } from './lib/server/redis/LocalRedis.js'
+export { default as BaseRedisClerk } from './lib/client/redis/BaseRedisClerk.js'
+export { default as LocalRedis } from './lib/client/redis/LocalRedis.js'
 
 /*
  * Modules

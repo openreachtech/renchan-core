@@ -1,5 +1,5 @@
 import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
-import AiResponseRedisClerk from '../../redis/AiResponseRedisClerk.js'
+import AiResponseRedisClerk from '../../../client/redis/AiResponseRedisClerk.js'
 
 /**
  * Extra client.

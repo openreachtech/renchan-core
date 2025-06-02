@@ -1,8 +1,8 @@
 import Redis from 'ioredis'
 
-import BaseRedisClerk from '../../../../lib/server/redis/BaseRedisClerk.js'
+import BaseRedisClerk from '../../../../lib/client/redis/BaseRedisClerk.js'
 
-import LocalRedis from '../../../../lib/server/redis/LocalRedis.js'
+import LocalRedis from '../../../../lib/client/redis/LocalRedis.js'
 
 describe('BaseRedisClerk', () => {
   describe('constructor', () => {
