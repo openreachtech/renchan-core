@@ -34,10 +34,7 @@ export default class MockRedis {
 }
 
 /**
- * @typedef {{
- *   port: number
- *   host: string
- * }} MockRedisParams
+ * @typedef {import('ioredis').RedisOptions} MockRedisParams
  */
 
 /**
