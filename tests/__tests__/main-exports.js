@@ -78,7 +78,7 @@ import { default as ConcreteMemberNotFoundRestfulApiErrorActual } from '../../li
  * For Redis server.
  */
 import { default as BaseRedisClerkActual } from '../../lib/client/redis/BaseRedisClerk.js'
-import { default as LocalRedisActual } from '../../lib/server/redis/LocalRedis.js'
+import { default as LocalRedisActual } from '../../lib/client/redis/LocalRedis.js'
 
 /**
  * For modules.

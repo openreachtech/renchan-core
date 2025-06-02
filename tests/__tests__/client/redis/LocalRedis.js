@@ -1,4 +1,4 @@
-import LocalRedis from '../../../../lib/server/redis/LocalRedis.js'
+import LocalRedis from '../../../../lib/client/redis/LocalRedis.js'
 
 describe('LocalRedis', () => {
   describe('constructor', () => {
