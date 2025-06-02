@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 
-import BaseRedisClerk from '../../../../lib/server/redis/BaseRedisClerk.js'
+import BaseRedisClerk from '../../../../lib/client/redis/BaseRedisClerk.js'
 
 import LocalRedis from '../../../../lib/server/redis/LocalRedis.js'
 
