@@ -25,3 +25,7 @@ globalThis.sequelizeActivator = sequelizeActivator
 afterEach(() => { // eslint-disable-line jest/require-top-level-describe
   jest.restoreAllMocks()
 })
+
+afterAll(async () => { // eslint-disable-line jest/require-top-level-describe
+  await sequelizeActivator.sequelizeClient.close()
+})
