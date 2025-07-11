@@ -29,6 +29,35 @@ describe('BasePostRenderer', () => {
 })
 
 describe('BasePostRenderer', () => {
+  describe('.get:preExpressHandlers', () => {
+    test('should be an instance of Multer', () => {
+      const multerUploaderTally = multer()
+      const handlerTally = () => {}
+
+      const expected = [
+        handlerTally,
+      ]
+
+      const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
+        .mockReturnValue(multerUploaderTally)
+
+      const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+        .mockReturnValue(handlerTally)
+
+      const actual = BasePostRenderer.preExpressHandlers
+
+      expect(actual)
+        .toEqual(expected)
+
+      expect(createMulterUploaderSpy)
+        .toHaveBeenCalledWith()
+      expect(noneSpy)
+        .toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
   describe('.createMulterUploader()', () => {
     test('should be an instance of Multer', () => {
       const multerUploaderTally = multer()
