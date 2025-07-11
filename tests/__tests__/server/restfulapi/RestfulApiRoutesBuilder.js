@@ -9,6 +9,7 @@ import AlphaGetRenderer from '../../../haystacks/renderers/v1/get/AlphaGetRender
 import BetaGetRenderer from '../../../haystacks/renderers/v1/get/BetaGetRenderer.js'
 import CatPostRenderer from '../../../haystacks/renderers/v1/post/CatPostRenderer.js'
 import DogPostRenderer from '../../../haystacks/renderers/v1/post/DogPostRenderer.js'
+
 import DeepBulkClassLoader from '../../../../lib/tools/DeepBulkClassLoader.js'
 import HttpMethodExpressRoute from '../../../../lib/server/express/routes/HttpMethodExpressRoute.js'
 import BaseRestfulApiContext from '../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
@@ -388,40 +389,42 @@ describe('RestfulApiRoutesBuilder', () => {
 
 describe('RestfulApiRoutesBuilder', () => {
   describe('#buildRoutes()', () => {
-    const cases = [
-      {
-        params: {
-          Engine: AlphaRestfulApiServerEngine,
+    describe('should be array of HttpMethodExpressRoute', () => {
+      const cases = [
+        {
+          params: {
+            Engine: AlphaRestfulApiServerEngine,
+          },
+          expected: [
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+          ],
         },
-        expected: [
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-        ],
-      },
-      {
-        params: {
-          Engine: BetaRestfulApiServerEngine,
+        {
+          params: {
+            Engine: BetaRestfulApiServerEngine,
+          },
+          expected: [
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+          ],
         },
-        expected: [
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-        ],
-      },
-    ]
+      ]
 
-    test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
-      const engine = await params.Engine.createAsync()
+      test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
+        const engine = await params.Engine.createAsync()
 
-      const builder = await RestfulApiRoutesBuilder.createAsync({
-        engine,
+        const builder = await RestfulApiRoutesBuilder.createAsync({
+          engine,
+        })
+
+        const actual = builder.buildRoutes()
+
+        expect(actual)
+          .toEqual(expected)
       })
-
-      const actual = builder.buildRoutes()
-
-      expect(actual)
-        .toEqual(expected)
     })
   })
 })
