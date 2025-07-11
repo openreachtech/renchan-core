@@ -426,6 +426,168 @@ describe('RestfulApiRoutesBuilder', () => {
           .toEqual(expected)
       })
     })
+
+    describe('should call members', () => {
+      test('with AlphaRestfulApiServerEngine', async () => {
+        // renderers: [
+        //   new AlphaGetRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new BetaGetRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new CatPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new DogPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        // ],
+
+        const engine = await AlphaRestfulApiServerEngine.createAsync()
+
+        const filterHandlerTally = () => null
+        const renderHandlerTally = async () => null
+
+        const args = {
+          engine,
+        }
+        const builder = await RestfulApiRoutesBuilder.createAsync(args)
+
+        const generateFilterHandlerSpy = jest.spyOn(builder, 'generateFilterHandler')
+          .mockReturnValue(filterHandlerTally)
+        const generateRendererHandlerSpy = jest.spyOn(builder, 'generateRendererHandler')
+          .mockReturnValue(renderHandlerTally)
+        const resolveRoutePathSpy = jest.spyOn(builder, 'resolveRoutePath')
+        const createSpy = jest.spyOn(HttpMethodExpressRoute, 'create')
+
+        builder.buildRoutes()
+
+        expect(generateFilterHandlerSpy)
+          .toHaveBeenCalledWith()
+
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(1, {
+            renderer: expect.any(AlphaGetRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(2, {
+            renderer: expect.any(BetaGetRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(3, {
+            renderer: expect.any(CatPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(4, {
+            renderer: expect.any(DogPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(1, { path: '/haystacks/get/alpha' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(2, { path: '/haystacks/get/beta' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(3, { path: '/haystacks/post/cat' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(4, { path: '/haystacks/post/dog' })
+
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(1, {
+            method: 'get',
+            path: '/v1/haystacks/get/alpha',
+            handlers: [
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(2, {
+            method: 'get',
+            path: '/v1/haystacks/get/beta',
+            handlers: [
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(3, {
+            method: 'post',
+            path: '/v1/haystacks/post/cat',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(4, {
+            method: 'post',
+            path: '/v1/haystacks/post/dog',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+      })
+
+      test('with BetaRestfulApiServerEngine', async () => {
+        // renderers: [
+        //   new CatPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new DogPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        // ],
+
+        const engine = await BetaRestfulApiServerEngine.createAsync()
+
+        const filterHandlerTally = () => null
+        const renderHandlerTally = async () => null
+
+        const args = {
+          engine,
+        }
+        const builder = await RestfulApiRoutesBuilder.createAsync(args)
+
+        const generateFilterHandlerSpy = jest.spyOn(builder, 'generateFilterHandler')
+          .mockReturnValue(filterHandlerTally)
+        const generateRendererHandlerSpy = jest.spyOn(builder, 'generateRendererHandler')
+          .mockReturnValue(renderHandlerTally)
+        const resolveRoutePathSpy = jest.spyOn(builder, 'resolveRoutePath')
+        const createSpy = jest.spyOn(HttpMethodExpressRoute, 'create')
+
+        builder.buildRoutes()
+
+        expect(generateFilterHandlerSpy)
+          .toHaveBeenCalledWith()
+
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(1, {
+            renderer: expect.any(CatPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(2, {
+            renderer: expect.any(DogPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(1, { path: '/haystacks/post/cat' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(2, { path: '/haystacks/post/dog' })
+
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(1, {
+            method: 'post',
+            path: '/v2/haystacks/post/cat',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(2, {
+            method: 'post',
+            path: '/v2/haystacks/post/dog',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+      })
+    })
   })
 })
 
