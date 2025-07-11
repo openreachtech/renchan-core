@@ -29,6 +29,31 @@ describe('BasePostRenderer', () => {
 })
 
 describe('BasePostRenderer', () => {
+  describe('.createMulterUploader()', () => {
+    test('should be an instance of Multer', () => {
+      const multerUploaderTally = multer()
+
+      /** @type {typeof multer} */
+      const multerSpy = /** @type {*} */ (
+        jest.fn()
+          .mockReturnValue(multerUploaderTally)
+      )
+
+      jest.spyOn(BasePostRenderer, 'multer', 'get')
+        .mockReturnValue(multerSpy)
+
+      const actual = BasePostRenderer.createMulterUploader()
+
+      expect(actual)
+        .toBe(multerUploaderTally) // same reference
+
+      expect(multerSpy)
+        .toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
   describe('.get:multer', () => {
     test('to be fixed value', () => {
       const expected = multer
