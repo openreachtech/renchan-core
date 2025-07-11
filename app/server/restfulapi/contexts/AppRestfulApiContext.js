@@ -12,6 +12,7 @@ export default class AppRestfulApiContext extends BaseRestfulApiContext {
    * @param {{
    *   expressRequest: ExpressType.Request
    *   accessToken: string | null
+   *   requestedAt: Date
    * }} params
    * @returns {Promise<renchan.UserEntity | null>} - User entity.
    * @example
@@ -37,6 +38,7 @@ export default class AppRestfulApiContext extends BaseRestfulApiContext {
   static async findUser ({
     expressRequest,
     accessToken,
+    requestedAt,
   }) {
     return super.findUser({
       expressRequest,
