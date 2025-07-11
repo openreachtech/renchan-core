@@ -6,8 +6,7 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * BetaExternalCallback success renderer.
  *
  * @extends {BasePostRenderer<
- *   BetaExternalCallbackSuccessRendererInputBody,
- *   BetaExternalCallbackSuccessRendererInputQuery
+ *   BetaExternalCallbackSuccessRendererInputBody
  * >}
  */
 export default class BetaExternalCallbackSuccessRenderer extends BasePostRenderer {
@@ -18,12 +17,7 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
 
   /** @override */
   static get errorStructureHash () {
-    return {
-      AlphaRequired: {
-        statusCode: 400,
-        errorMessage: 'first is required',
-      },
-    }
+    return {}
   }
 
   /**
@@ -40,14 +34,12 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
    * Render BetaExternalCallback success.
    *
    * @override
-   * @param {RestfulApiType.RenderInput<*, *>} input - Input data.
+   * @param {RestfulApiType.RenderInput<BetaExternalCallbackSuccessRendererInputBody, *>} input - Input data.
    * @returns {Promise<RestfulApiType.RenderResponse>} - Success response.
    */
   async render ({
-    query: {
-      first,
-      second,
-    },
+    query,
+    body,
     context, // has now, share.env
     request, // has req, res, next
   }) {
@@ -55,12 +47,13 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
       status: 'success',
       message: 'I am version 1.0.0 of BetaExternalCallback (^_^)',
       receivedValues: [
-        first,
-        second,
+        body.first,
+        body.second,
       ],
     }
 
     return RestfulApiResponse.create({
+      statusCode: 200,
       content,
     })
   }
@@ -68,16 +61,9 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
 
 /**
  * @typedef {{
- *   one: string
- *   two: string
+ *   first: string
+ *   second: string
  * }} BetaExternalCallbackSuccessRendererInputBody
- */
-
-/**
- * @typedef {{
- *   alpha: string
- *   beta: string
- * }} BetaExternalCallbackSuccessRendererInputQuery
  */
 
 /**
