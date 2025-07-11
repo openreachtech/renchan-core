@@ -325,6 +325,21 @@ describe('BaseRenderer', () => {
 })
 
 describe('BaseRenderer', () => {
+  describe('.get:preExpressHandlers', () => {
+    describe('to be fixed value', () => {
+      test('as default value', () => {
+        const expected = []
+
+        const actual = BaseRenderer.preExpressHandlers
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
   describe('.get:FlusherCtor', () => {
     describe('to be fixed value', () => {
       test('as default value', () => {
