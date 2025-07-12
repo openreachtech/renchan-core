@@ -325,12 +325,12 @@ describe('BaseRenderer', () => {
 })
 
 describe('BaseRenderer', () => {
-  describe('.get:preExpressHandlers', () => {
+  describe('.buildPreExpressHandlers()', () => {
     describe('to be fixed value', () => {
       test('as default value', () => {
         const expected = []
 
-        const actual = BaseRenderer.preExpressHandlers
+        const actual = BaseRenderer.buildPreExpressHandlers()
 
         expect(actual)
           .toEqual(expected)
