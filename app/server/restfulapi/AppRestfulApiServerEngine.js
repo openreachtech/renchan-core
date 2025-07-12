@@ -113,6 +113,16 @@ export default class AppRestfulApiServerEngine extends BaseRestfulApiServerEngin
 
   /** @override */
   collectMiddleware () {
+    /*
+     * Keep raw body.
+     * for:
+     *   express.json()
+     *   express.raw()
+     *   express.text()
+     *   express.urlencoded()
+     */
+    const keepRawBody = this.defineKeepRawBodyCallback()
+
     return [
       cors({
         origin: '*',
