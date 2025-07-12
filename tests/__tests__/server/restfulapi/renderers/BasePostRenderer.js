@@ -31,30 +31,24 @@ describe('BasePostRenderer', () => {
 describe('BasePostRenderer', () => {
   describe('.buildPreExpressHandlers()', () => {
     test('should be an instance of Multer', () => {
-      const multerUploaderTally = multer()
-      const handlerTally = () => {}
+      const middlewareTally = () => {}
 
       const expected = [
-        handlerTally,
+        middlewareTally,
       ]
 
-      const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
-        .mockReturnValue(multerUploaderTally)
+      const defineMulterUploaderMiddlewareSpy = jest.spyOn(BasePostRenderer, 'defineMulterUploaderMiddleware')
+        .mockReturnValue(middlewareTally)
       const buildPreExpressHandlersSpy = jest.spyOn(BaseRenderer, 'buildPreExpressHandlers')
-
-      const noneSpy = jest.spyOn(multerUploaderTally, 'none')
-        .mockReturnValue(handlerTally)
 
       const actual = BasePostRenderer.buildPreExpressHandlers()
 
       expect(actual)
         .toEqual(expected)
 
-      expect(createMulterUploaderSpy)
+      expect(defineMulterUploaderMiddlewareSpy)
         .toHaveBeenCalledWith()
       expect(buildPreExpressHandlersSpy)
-        .toHaveBeenCalledWith()
-      expect(noneSpy)
         .toHaveBeenCalledWith()
     })
   })
