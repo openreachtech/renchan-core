@@ -40,6 +40,7 @@ describe('BasePostRenderer', () => {
 
       const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
         .mockReturnValue(multerUploaderTally)
+      const buildPreExpressHandlersSpy = jest.spyOn(BaseRenderer, 'buildPreExpressHandlers')
 
       const noneSpy = jest.spyOn(multerUploaderTally, 'none')
         .mockReturnValue(handlerTally)
@@ -50,6 +51,8 @@ describe('BasePostRenderer', () => {
         .toEqual(expected)
 
       expect(createMulterUploaderSpy)
+        .toHaveBeenCalledWith()
+      expect(buildPreExpressHandlersSpy)
         .toHaveBeenCalledWith()
       expect(noneSpy)
         .toHaveBeenCalledWith()
