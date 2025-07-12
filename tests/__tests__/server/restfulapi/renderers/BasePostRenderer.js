@@ -61,6 +61,99 @@ describe('BasePostRenderer', () => {
 })
 
 describe('BasePostRenderer', () => {
+  describe('.defineMulterUploaderMiddleware()', () => {
+    describe('should be return value of Multer#fields()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: {
+            fieldsArgs: [
+              { name: 'alpha', maxCount: 1 },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BasePostRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(fieldsHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .not
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .toHaveBeenCalledWith(expected.fieldsArgs)
+      })
+    })
+
+    describe('should be return value of Multer#none()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {},
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BasePostRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(noneHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .not
+          .toHaveBeenCalled()
+      })
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
   describe('.createMulterUploader()', () => {
     test('should be an instance of Multer', () => {
       const multerUploaderTally = multer()
