@@ -139,4 +139,21 @@ export default class AppRestfulApiServerEngine extends BaseRestfulApiServerEngin
       }),
     ]
   }
+
+  /**
+   * Define callback for keeping raw body.
+   *
+   * @returns {(
+   *   req: *,
+   *   res: *,
+   *   buf: Buffer,
+   *   encoding: string
+   * ) => void} - Express request handler.
+   */
+  defineKeepRawBodyCallback () {
+    return (request, response, buffer, encoding) => {
+      // eslint-disable-next-line no-param-reassign
+      request['rawBody'] = buffer.toString()
+    }
+  }
 }
