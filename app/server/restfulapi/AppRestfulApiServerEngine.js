@@ -132,10 +132,6 @@ export default class AppRestfulApiServerEngine extends BaseRestfulApiServerEngin
         this.config.staticPath
       ),
 
-      express.raw({
-        type: 'application/json',
-      }),
-
       express.json({
         limit: '10mb',
       }),
