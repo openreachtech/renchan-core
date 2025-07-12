@@ -97,3 +97,16 @@ describe('BasePostRenderer', () => {
     })
   })
 })
+
+describe('BasePostRenderer', () => {
+  describe('.get:fileFieldsConfigHash', () => {
+    test('to be fixed value', () => {
+      const expected = {}
+
+      const actual = BasePostRenderer.fileFieldsConfigHash
+
+      expect(actual)
+        .toEqual(expected)
+    })
+  })
+})
