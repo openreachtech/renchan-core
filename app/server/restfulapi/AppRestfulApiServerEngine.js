@@ -137,12 +137,9 @@ export default class AppRestfulApiServerEngine extends BaseRestfulApiServerEngin
         verify: keepRawBody,
       }),
 
-      express.urlencoded({
+      express.urlencoded({ // on Content-Type: application/x-www-form-urlencoded
         extended: true,
-        verify: (req, res, body) => {
-          // eslint-disable-next-line no-param-reassign
-          req['rawBody'] = body.toString()
-        },
+        verify: keepRawBody,
       }),
     ]
   }
