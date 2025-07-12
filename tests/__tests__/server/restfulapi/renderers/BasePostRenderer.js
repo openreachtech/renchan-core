@@ -29,7 +29,7 @@ describe('BasePostRenderer', () => {
 })
 
 describe('BasePostRenderer', () => {
-  describe('.get:preExpressHandlers', () => {
+  describe('.buildPreExpressHandlers()', () => {
     test('should be an instance of Multer', () => {
       const multerUploaderTally = multer()
       const handlerTally = () => {}
@@ -44,7 +44,7 @@ describe('BasePostRenderer', () => {
       const noneSpy = jest.spyOn(multerUploaderTally, 'none')
         .mockReturnValue(handlerTally)
 
-      const actual = BasePostRenderer.preExpressHandlers
+      const actual = BasePostRenderer.buildPreExpressHandlers()
 
       expect(actual)
         .toEqual(expected)

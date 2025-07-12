@@ -325,12 +325,12 @@ describe('BaseRenderer', () => {
 })
 
 describe('BaseRenderer', () => {
-  describe('.get:preExpressHandlers', () => {
+  describe('.buildPreExpressHandlers()', () => {
     describe('to be fixed value', () => {
       test('as default value', () => {
         const expected = []
 
-        const actual = BaseRenderer.preExpressHandlers
+        const actual = BaseRenderer.buildPreExpressHandlers()
 
         expect(actual)
           .toEqual(expected)
@@ -594,7 +594,7 @@ describe('BaseRenderer', () => {
 })
 
 describe('BaseRenderer', () => {
-  describe('#get:preExpressHandlers', () => {
+  describe('#buildPreExpressHandlers()', () => {
     describe('to fixed value', () => {
       const cases = [
         {
@@ -637,14 +637,14 @@ describe('BaseRenderer', () => {
 
       test.each(cases)('errorStructureHash: $params.errorStructureHash', ({ params }) => {
         const expected = []
-        const tally = BaseRenderer.preExpressHandlers
+        const tally = BaseRenderer.buildPreExpressHandlers()
 
         const args = {
           errorStructureHash: params.errorStructureHash,
         }
         const renderer = BaseRenderer.create(args)
 
-        const actual = renderer.preExpressHandlers
+        const actual = renderer.buildPreExpressHandlers()
 
         expect(actual)
           .toEqual(expected)
