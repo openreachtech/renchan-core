@@ -73,6 +73,15 @@ export { default as BaseRenderer } from './lib/server/restfulapi/renderers/BaseR
 export { default as BaseGetRenderer } from './lib/server/restfulapi/renderers/BaseGetRenderer.js'
 export { default as BasePostRenderer } from './lib/server/restfulapi/renderers/BasePostRenderer.js'
 
+export { default as BaseRequestBodyRenderer } from './lib/server/restfulapi/renderers/BaseRequestBodyRenderer.js'
+export { default as BaseConnectRenderer } from './lib/server/restfulapi/renderers/BaseConnectRenderer.js'
+export { default as BaseDeleteRenderer } from './lib/server/restfulapi/renderers/BaseDeleteRenderer.js'
+export { default as BaseHeadRenderer } from './lib/server/restfulapi/renderers/BaseHeadRenderer.js'
+export { default as BaseOptionsRenderer } from './lib/server/restfulapi/renderers/BaseOptionsRenderer.js'
+export { default as BasePatchRenderer } from './lib/server/restfulapi/renderers/BasePatchRenderer.js'
+export { default as BasePutRenderer } from './lib/server/restfulapi/renderers/BasePutRenderer.js'
+export { default as BaseTraceRenderer } from './lib/server/restfulapi/renderers/BaseTraceRenderer.js'
+
 export { default as BaseRestfulApiResponseFlusher } from './lib/server/restfulapi/flushers/BaseRestfulApiResponseFlusher.js'
 export { default as JsonRestfulApiResponseFlusher } from './lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
 export { default as HtmlRestfulApiResponseFlusher } from './lib/server/restfulapi/flushers/concretes/HtmlRestfulApiResponseFlusher.js'

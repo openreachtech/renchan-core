@@ -325,6 +325,21 @@ describe('BaseRenderer', () => {
 })
 
 describe('BaseRenderer', () => {
+  describe('.buildPreExpressHandlers()', () => {
+    describe('to be fixed value', () => {
+      test('as default value', () => {
+        const expected = []
+
+        const actual = BaseRenderer.buildPreExpressHandlers()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
   describe('.get:FlusherCtor', () => {
     describe('to be fixed value', () => {
       test('as default value', () => {
@@ -573,6 +588,69 @@ describe('BaseRenderer', () => {
 
         expect(() => renderer.routePath)
           .toThrow(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRenderer', () => {
+  describe('#buildPreExpressHandlers()', () => {
+    describe('to fixed value', () => {
+      const cases = [
+        {
+          params: {
+            errorStructureHash: {
+              BadRequest: {
+                statusCode: 400,
+                errorMessage: 'Bad Request',
+              },
+              Unauthorized: {
+                statusCode: 401,
+                errorMessage: 'Unauthorized',
+              },
+              PaymentRequired: {
+                statusCode: 402,
+                errorMessage: 'Payment Required',
+              },
+            },
+          },
+        },
+        {
+          params: {
+            errorStructureHash: {
+              Forbidden: {
+                statusCode: 403,
+                errorMessage: 'Forbidden',
+              },
+              NotFound: {
+                statusCode: 404,
+                errorMessage: 'Not Found',
+              },
+              MethodNotAllowed: {
+                statusCode: 405,
+                errorMessage: 'Method Not Allowed',
+              },
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('errorStructureHash: $params.errorStructureHash', ({ params }) => {
+        const expected = []
+        const tally = BaseRenderer.buildPreExpressHandlers()
+
+        const args = {
+          errorStructureHash: params.errorStructureHash,
+        }
+        const renderer = BaseRenderer.create(args)
+
+        const actual = renderer.buildPreExpressHandlers()
+
+        expect(actual)
+          .toEqual(expected)
+
+        expect(actual)
+          .toStrictEqual(tally)
       })
     })
   })

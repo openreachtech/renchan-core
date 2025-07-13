@@ -9,6 +9,7 @@ import AlphaGetRenderer from '../../../haystacks/renderers/v1/get/AlphaGetRender
 import BetaGetRenderer from '../../../haystacks/renderers/v1/get/BetaGetRenderer.js'
 import CatPostRenderer from '../../../haystacks/renderers/v1/post/CatPostRenderer.js'
 import DogPostRenderer from '../../../haystacks/renderers/v1/post/DogPostRenderer.js'
+
 import DeepBulkClassLoader from '../../../../lib/tools/DeepBulkClassLoader.js'
 import HttpMethodExpressRoute from '../../../../lib/server/express/routes/HttpMethodExpressRoute.js'
 import BaseRestfulApiContext from '../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
@@ -388,40 +389,204 @@ describe('RestfulApiRoutesBuilder', () => {
 
 describe('RestfulApiRoutesBuilder', () => {
   describe('#buildRoutes()', () => {
-    const cases = [
-      {
-        params: {
-          Engine: AlphaRestfulApiServerEngine,
+    describe('should be array of HttpMethodExpressRoute', () => {
+      const cases = [
+        {
+          params: {
+            Engine: AlphaRestfulApiServerEngine,
+          },
+          expected: [
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+          ],
         },
-        expected: [
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-        ],
-      },
-      {
-        params: {
-          Engine: BetaRestfulApiServerEngine,
+        {
+          params: {
+            Engine: BetaRestfulApiServerEngine,
+          },
+          expected: [
+            expect.any(HttpMethodExpressRoute),
+            expect.any(HttpMethodExpressRoute),
+          ],
         },
-        expected: [
-          expect.any(HttpMethodExpressRoute),
-          expect.any(HttpMethodExpressRoute),
-        ],
-      },
-    ]
+      ]
 
-    test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
-      const engine = await params.Engine.createAsync()
+      test.each(cases)('Engine: $params.Engine.name', async ({ params, expected }) => {
+        const engine = await params.Engine.createAsync()
 
-      const builder = await RestfulApiRoutesBuilder.createAsync({
-        engine,
+        const builder = await RestfulApiRoutesBuilder.createAsync({
+          engine,
+        })
+
+        const actual = builder.buildRoutes()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should call members', () => {
+      test('with AlphaRestfulApiServerEngine', async () => {
+        // renderers: [
+        //   new AlphaGetRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new BetaGetRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new CatPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new DogPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        // ],
+
+        const engine = await AlphaRestfulApiServerEngine.createAsync()
+
+        const filterHandlerTally = () => null
+        const renderHandlerTally = async () => null
+
+        const args = {
+          engine,
+        }
+        const builder = await RestfulApiRoutesBuilder.createAsync(args)
+
+        const generateFilterHandlerSpy = jest.spyOn(builder, 'generateFilterHandler')
+          .mockReturnValue(filterHandlerTally)
+        const generateRendererHandlerSpy = jest.spyOn(builder, 'generateRendererHandler')
+          .mockReturnValue(renderHandlerTally)
+        const resolveRoutePathSpy = jest.spyOn(builder, 'resolveRoutePath')
+        const createSpy = jest.spyOn(HttpMethodExpressRoute, 'create')
+
+        builder.buildRoutes()
+
+        expect(generateFilterHandlerSpy)
+          .toHaveBeenCalledWith()
+
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(1, {
+            renderer: expect.any(AlphaGetRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(2, {
+            renderer: expect.any(BetaGetRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(3, {
+            renderer: expect.any(CatPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(4, {
+            renderer: expect.any(DogPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(1, { path: '/haystacks/get/alpha' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(2, { path: '/haystacks/get/beta' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(3, { path: '/haystacks/post/cat' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(4, { path: '/haystacks/post/dog' })
+
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(1, {
+            method: 'get',
+            path: '/v1/haystacks/get/alpha',
+            handlers: [
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(2, {
+            method: 'get',
+            path: '/v1/haystacks/get/beta',
+            handlers: [
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(3, {
+            method: 'post',
+            path: '/v1/haystacks/post/cat',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(4, {
+            method: 'post',
+            path: '/v1/haystacks/post/dog',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
       })
 
-      const actual = builder.buildRoutes()
+      test('with BetaRestfulApiServerEngine', async () => {
+        // renderers: [
+        //   new CatPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        //   new DogPostRenderer({ errorResponseHash: mockErrorResponseHash }),
+        // ],
 
-      expect(actual)
-        .toEqual(expected)
+        const engine = await BetaRestfulApiServerEngine.createAsync()
+
+        const filterHandlerTally = () => null
+        const renderHandlerTally = async () => null
+
+        const args = {
+          engine,
+        }
+        const builder = await RestfulApiRoutesBuilder.createAsync(args)
+
+        const generateFilterHandlerSpy = jest.spyOn(builder, 'generateFilterHandler')
+          .mockReturnValue(filterHandlerTally)
+        const generateRendererHandlerSpy = jest.spyOn(builder, 'generateRendererHandler')
+          .mockReturnValue(renderHandlerTally)
+        const resolveRoutePathSpy = jest.spyOn(builder, 'resolveRoutePath')
+        const createSpy = jest.spyOn(HttpMethodExpressRoute, 'create')
+
+        builder.buildRoutes()
+
+        expect(generateFilterHandlerSpy)
+          .toHaveBeenCalledWith()
+
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(1, {
+            renderer: expect.any(CatPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+        expect(generateRendererHandlerSpy)
+          .toHaveBeenNthCalledWith(2, {
+            renderer: expect.any(DogPostRenderer),
+            filterHandler: filterHandlerTally,
+          })
+
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(1, { path: '/haystacks/post/cat' })
+        expect(resolveRoutePathSpy)
+          .toHaveBeenNthCalledWith(2, { path: '/haystacks/post/dog' })
+
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(1, {
+            method: 'post',
+            path: '/v2/haystacks/post/cat',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+        expect(createSpy)
+          .toHaveBeenNthCalledWith(2, {
+            method: 'post',
+            path: '/v2/haystacks/post/dog',
+            handlers: [
+              expect.any(Function), // multer handler
+              renderHandlerTally,
+            ],
+          })
+      })
     })
   })
 })
@@ -1273,43 +1438,424 @@ describe('RestfulApiRoutesBuilder', () => {
       },
     ]
 
-    test.each(engineCases)('Engine: $params.Engine.name', async ({ params }) => {
-      const engine = await params.Engine.createAsync()
+    describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
+      /** @type {Express.Multer.File} */
+      const alphaFile = /** @type {*} */ ({
+        tally: Symbol('alpha file'),
+      })
 
-      /** @type {ExpressType.Request} */
-      const expressMock = /** @type {*} */ ({
-        body: {
-          tally: Symbol('get tally'),
+      /** @type {Express.Multer.File} */
+      const betaFile = /** @type {*} */ ({
+        tally: Symbol('beta file'),
+      })
+
+      /** @type {Express.Multer.File} */
+      const gammaFile = /** @type {*} */ ({
+        tally: Symbol('gamma file'),
+      })
+
+      /** @type {Express.Multer.File} */
+      const deltaFile = /** @type {*} */ ({
+        tally: Symbol('delta file'),
+      })
+
+      describe('with Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+              query: {
+                tally: Symbol.for('first query tally'),
+              },
+              params: {},
+              files: {
+                alpha: [
+                  alphaFile,
+                ],
+              },
+            },
+            expected: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+                alpha: [
+                  alphaFile,
+                ],
+              },
+              query: {
+                tally: Symbol.for('first query tally'),
+              },
+              context: expect.any(params.Context),
+              request: expect.any(RestfulApiRequest),
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+              query: {
+                tally: Symbol.for('second query tally'),
+              },
+              params: {},
+              files: {
+                beta: [
+                  betaFile,
+                  gammaFile,
+                ],
+              },
+            },
+            expected: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+                beta: [
+                  betaFile,
+                  gammaFile,
+                ],
+              },
+              query: {
+                tally: Symbol.for('second query tally'),
+              },
+              context: expect.any(params.Context),
+              request: expect.any(RestfulApiRequest),
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+              },
+              query: {
+                tally: Symbol.for('third query tally'),
+              },
+              params: {},
+              files: {
+                alpha: [
+                  betaFile,
+                ],
+                beta: [
+                  gammaFile,
+                  deltaFile,
+                ],
+              },
+            },
+            expected: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+                alpha: [
+                  betaFile,
+                ],
+                beta: [
+                  gammaFile,
+                  deltaFile,
+                ],
+              },
+              query: {
+                tally: Symbol.for('third query tally'),
+              },
+              context: expect.any(params.Context),
+              request: expect.any(RestfulApiRequest),
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest, expected }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const contextFactory = async () => params.Context.createAsync({
+            expressRequest,
+            engine,
+          })
+
+          const actual = await builder.generateRenderInput({
+            expressRequest,
+            contextFactory,
+          })
+
+          expect(actual)
+            .toEqual(expected)
+        })
+      })
+
+      describe('without Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+              query: {
+                tally: Symbol.for('first query tally'),
+              },
+              params: {},
+            },
+            expected: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+              query: {
+                tally: Symbol.for('first query tally'),
+              },
+              context: expect.any(params.Context),
+              request: expect.any(RestfulApiRequest),
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+              query: {
+                tally: Symbol.for('second query tally'),
+              },
+              params: {},
+            },
+            expected: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+              query: {
+                tally: Symbol.for('second query tally'),
+              },
+              context: expect.any(params.Context),
+              request: expect.any(RestfulApiRequest),
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest, expected }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const contextFactory = async () => params.Context.createAsync({
+            expressRequest,
+            engine,
+          })
+
+          const actual = await builder.generateRenderInput({
+            expressRequest,
+            contextFactory,
+          })
+
+          expect(actual)
+            .toEqual(expected)
+        })
+      })
+    })
+  })
+})
+
+describe('RestfulApiRoutesBuilder', () => {
+  describe('#buildFulfilledRequestBody()', () => {
+    const engineCases = [
+      {
+        params: {
+          Engine: AlphaRestfulApiServerEngine,
         },
-        query: {
-          tally: Symbol('post tally'),
+      },
+      {
+        params: {
+          Engine: BetaRestfulApiServerEngine,
         },
-        params: {},
+      },
+    ]
+
+    describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
+      /** @type {Express.Multer.File} */
+      const alphaFile = /** @type {*} */ ({
+        tally: Symbol('alpha file'),
       })
 
-      const builder = await RestfulApiRoutesBuilder.createAsync({
-        engine,
+      /** @type {Express.Multer.File} */
+      const betaFile = /** @type {*} */ ({
+        tally: Symbol('beta file'),
       })
 
-      const contextFactoryMock = async () => params.Context.createAsync({
-        expressRequest: expressMock,
-        engine,
+      /** @type {Express.Multer.File} */
+      const gammaFile = /** @type {*} */ ({
+        tally: Symbol('gamma file'),
       })
 
-      const expected = {
-        body: expressMock.body,
-        query: expressMock.query,
-        context: expect.any(params.Context),
-        request: expect.any(RestfulApiRequest),
-      }
-
-      const actual = await builder.generateRenderInput({
-        expressRequest: expressMock,
-        contextFactory: contextFactoryMock,
+      /** @type {Express.Multer.File} */
+      const deltaFile = /** @type {*} */ ({
+        tally: Symbol('delta file'),
       })
 
-      expect(actual)
-        .toEqual(expected)
+      describe('with Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+              files: {
+                alpha: [
+                  alphaFile,
+                ],
+              },
+            },
+            expected: {
+              first: 'first value',
+              second: 'second value',
+              alpha: [
+                alphaFile,
+              ],
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+              files: {
+                beta: [
+                  betaFile,
+                  gammaFile,
+                ],
+              },
+            },
+            expected: {
+              third: 'third value',
+              fourth: 'fourth value',
+              beta: [
+                betaFile,
+                gammaFile,
+              ],
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+              },
+              files: {
+                alpha: [
+                  betaFile,
+                ],
+                beta: [
+                  gammaFile,
+                  deltaFile,
+                ],
+              },
+            },
+            expected: {
+              fifth: 'fifth value',
+              sixth: 'sixth value',
+              alpha: [
+                betaFile,
+              ],
+              beta: [
+                gammaFile,
+                deltaFile,
+              ],
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest, expected }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.buildFulfilledRequestBody({
+            expressRequest,
+          })
+
+          expect(actual)
+            .toEqual(expected)
+        })
+      })
+
+      describe('without Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.buildFulfilledRequestBody({
+            expressRequest,
+          })
+
+          expect(actual)
+            .toBe(expressRequest.body) // same reference
+        })
+      })
     })
   })
 })

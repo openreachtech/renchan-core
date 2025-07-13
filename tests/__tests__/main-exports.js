@@ -63,6 +63,15 @@ import { default as BaseRendererActual } from '../../lib/server/restfulapi/rende
 import { default as BaseGetRendererActual } from '../../lib/server/restfulapi/renderers/BaseGetRenderer.js'
 import { default as BasePostRendererActual } from '../../lib/server/restfulapi/renderers/BasePostRenderer.js'
 
+import { default as BaseRequestBodyRendererActual } from '../../lib/server/restfulapi/renderers/BaseRequestBodyRenderer.js'
+import { default as BaseConnectRendererActual } from '../../lib/server/restfulapi/renderers/BaseConnectRenderer.js'
+import { default as BaseDeleteRendererActual } from '../../lib/server/restfulapi/renderers/BaseDeleteRenderer.js'
+import { default as BaseHeadRendererActual } from '../../lib/server/restfulapi/renderers/BaseHeadRenderer.js'
+import { default as BaseOptionsRendererActual } from '../../lib/server/restfulapi/renderers/BaseOptionsRenderer.js'
+import { default as BasePatchRendererActual } from '../../lib/server/restfulapi/renderers/BasePatchRenderer.js'
+import { default as BasePutRendererActual } from '../../lib/server/restfulapi/renderers/BasePutRenderer.js'
+import { default as BaseTraceRendererActual } from '../../lib/server/restfulapi/renderers/BaseTraceRenderer.js'
+
 import { default as BaseRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/BaseRestfulApiResponseFlusher.js'
 import { default as JsonRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/concretes/JsonRestfulApiResponseFlusher.js'
 import { default as HtmlRestfulApiResponseFlusherActual } from '../../lib/server/restfulapi/flushers/concretes/HtmlRestfulApiResponseFlusher.js'
@@ -153,6 +162,15 @@ import {
   BaseGetRenderer,
   BasePostRenderer,
 
+  BaseRequestBodyRenderer,
+  BaseConnectRenderer,
+  BaseDeleteRenderer,
+  BaseHeadRenderer,
+  BaseOptionsRenderer,
+  BasePatchRenderer,
+  BasePutRenderer,
+  BaseTraceRenderer,
+
   BaseRestfulApiResponseFlusher,
   JsonRestfulApiResponseFlusher,
   HtmlRestfulApiResponseFlusher,
@@ -236,6 +254,15 @@ describe('main exports', () => {
     { ExportedClass: BaseRenderer, ActualClass: BaseRendererActual },
     { ExportedClass: BaseGetRenderer, ActualClass: BaseGetRendererActual },
     { ExportedClass: BasePostRenderer, ActualClass: BasePostRendererActual },
+
+    { ExportedClass: BaseRequestBodyRenderer, ActualClass: BaseRequestBodyRendererActual },
+    { ExportedClass: BaseConnectRenderer, ActualClass: BaseConnectRendererActual },
+    { ExportedClass: BaseDeleteRenderer, ActualClass: BaseDeleteRendererActual },
+    { ExportedClass: BaseHeadRenderer, ActualClass: BaseHeadRendererActual },
+    { ExportedClass: BaseOptionsRenderer, ActualClass: BaseOptionsRendererActual },
+    { ExportedClass: BasePatchRenderer, ActualClass: BasePatchRendererActual },
+    { ExportedClass: BasePutRenderer, ActualClass: BasePutRendererActual },
+    { ExportedClass: BaseTraceRenderer, ActualClass: BaseTraceRendererActual },
 
     { ExportedClass: BaseRestfulApiResponseFlusher, ActualClass: BaseRestfulApiResponseFlusherActual },
     { ExportedClass: JsonRestfulApiResponseFlusher, ActualClass: JsonRestfulApiResponseFlusherActual },

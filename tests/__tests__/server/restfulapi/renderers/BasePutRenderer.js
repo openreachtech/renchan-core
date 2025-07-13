@@ -1,11 +1,11 @@
-import BasePostRenderer from '../../../../../lib/server/restfulapi/renderers/BasePostRenderer.js'
+import BasePutRenderer from '../../../../../lib/server/restfulapi/renderers/BasePutRenderer.js'
 
 import BaseRequestBodyRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRequestBodyRenderer.js'
 
-describe('BasePostRenderer', () => {
+describe('BasePutRenderer', () => {
   describe('inheritance', () => {
     test('to be BaseRequestBodyRenderer', () => {
-      const actual = BasePostRenderer.prototype
+      const actual = BasePutRenderer.prototype
 
       expect(actual)
         .toBeInstanceOf(BaseRequestBodyRenderer)
@@ -13,12 +13,12 @@ describe('BasePostRenderer', () => {
   })
 })
 
-describe('BasePostRenderer', () => {
+describe('BasePutRenderer', () => {
   describe('.get:method', () => {
     test('to be fixed value', () => {
-      const expected = 'post'
+      const expected = 'put'
 
-      const actual = BasePostRenderer.method
+      const actual = BasePutRenderer.method
 
       expect(actual)
         .toBe(expected)

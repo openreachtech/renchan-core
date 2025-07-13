@@ -1,3 +1,7 @@
+import {
+  setTimeout as sleep,
+} from 'timers/promises'
+
 import BaseGetRenderer from '../../../../../../lib/server/restfulapi/renderers/BaseGetRenderer.js'
 
 import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
@@ -6,11 +10,11 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   PathParameterHashRendererInputQuery,
- *   PathParameterHashRendererResponse
+ *   PathParameterHashGetRendererInputQuery,
+ *   PathParameterHashGetRendererResponse
  * >}
  */
-export default class PathParameterHashRenderer extends BaseGetRenderer {
+export default class PathParameterHashGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
     return '/path-parameter-hash/:id/:name'
@@ -44,6 +48,8 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
     context, // has now, share.env
     request, // has req, res, next
   }) {
+    await sleep(500) // Simulate a delay of 500ms
+
     const id = this.resolveId({
       pathParameterHash: request.pathParameterHash,
     })
@@ -82,7 +88,7 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
 }
 
 /**
- * @typedef {{}} PathParameterHashRendererInputQuery
+ * @typedef {{}} PathParameterHashGetRendererInputQuery
  */
 
 /**
@@ -92,5 +98,5 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
  *     id: number | null
  *     name: string | null
  *   }
- * }} PathParameterHashRendererResponse
+ * }} PathParameterHashGetRendererResponse
  */

@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/renchan",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
@@ -46,6 +46,7 @@
     "graphql-upload": "^17.0.0",
     "graphql-ws": "^5.16.0",
     "ioredis": "^5.4.1",
+    "multer": "^2.0.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {

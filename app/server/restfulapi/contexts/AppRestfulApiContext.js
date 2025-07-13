@@ -1,5 +1,9 @@
 import BaseRestfulApiContext from '../../../../lib/server/restfulapi/contexts/BaseRestfulApiContext.js'
 
+import Customer from '../../../sequelize/models/Customer.js'
+import CustomerBasic from '../../../sequelize/models/CustomerBasic.js'
+import CustomerAccessToken from '../../../sequelize/models/CustomerAccessToken.js'
+
 /**
  * App RESTful API context.
  *
@@ -12,6 +16,7 @@ export default class AppRestfulApiContext extends BaseRestfulApiContext {
    * @param {{
    *   expressRequest: ExpressType.Request
    *   accessToken: string | null
+   *   requestedAt: Date
    * }} params
    * @returns {Promise<renchan.UserEntity | null>} - User entity.
    * @example
@@ -37,11 +42,56 @@ export default class AppRestfulApiContext extends BaseRestfulApiContext {
   static async findUser ({
     expressRequest,
     accessToken,
+    requestedAt,
   }) {
-    return super.findUser({
-      expressRequest,
+    const customerAccessTokenEntity = await this.findCustomerAccessToken({
       accessToken,
     })
+
+    if (!customerAccessTokenEntity) {
+      return null
+    }
+
+    if (customerAccessTokenEntity.isExpired({
+      pointsAt: requestedAt,
+    })) {
+      return null
+    }
+
+    return customerAccessTokenEntity.Customer
+      ?? null
+  }
+
+  /**
+   * Find customer access token.
+   *
+   * @param {{
+   *   accessToken: string
+   * }} params - Parameters.
+   * @returns {Promise<import('../../../sequelize/models/CustomerAccessToken').CustomerAccessTokenAssociatedEntity | null>} - Customer access token.
+   */
+  static async findCustomerAccessToken ({
+    accessToken,
+  }) {
+    /** @type {import('../../../sequelize/models/CustomerAccessToken').CustomerAccessTokenAssociatedEntity | null} */
+    const customerAccessTokenEntity = /** @type {*} */ (
+      await CustomerAccessToken.findOne({
+        where: {
+          accessToken,
+        },
+        include: [
+          {
+            model: Customer,
+            include: [
+              CustomerBasic,
+            ],
+          },
+        ],
+      })
+    )
+
+    return customerAccessTokenEntity
+      ?? null
   }
 
   /**

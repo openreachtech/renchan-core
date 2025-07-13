@@ -113,30 +113,51 @@ export default class AppRestfulApiServerEngine extends BaseRestfulApiServerEngin
 
   /** @override */
   collectMiddleware () {
+    /*
+     * Keep raw body.
+     * for:
+     *   express.json()
+     *   express.raw()
+     *   express.text()
+     *   express.urlencoded()
+     */
+    const keepRawBody = this.defineKeepRawBodyCallback()
+
     return [
       cors({
         origin: '*',
-      }),
-
-      express.raw({
-        type: 'application/json',
-      }),
-
-      express.json({
-        limit: '10mb',
       }),
 
       express.static(
         this.config.staticPath
       ),
 
-      express.urlencoded({
+      express.json({ // on Content-Type: application/json
+        limit: '10mb',
+        verify: keepRawBody,
+      }),
+
+      express.urlencoded({ // on Content-Type: application/x-www-form-urlencoded
         extended: true,
-        verify: (req, res, body) => {
-          // eslint-disable-next-line no-param-reassign
-          req['rawBody'] = body.toString()
-        },
+        verify: keepRawBody,
       }),
     ]
+  }
+
+  /**
+   * Define callback for keeping raw body.
+   *
+   * @returns {(
+   *   req: *,
+   *   res: *,
+   *   buf: Buffer,
+   *   encoding: string
+   * ) => void} - Express request handler.
+   */
+  defineKeepRawBodyCallback () {
+    return (request, response, buffer, encoding) => {
+      // eslint-disable-next-line no-param-reassign
+      request['rawBody'] = buffer.toString()
+    }
   }
 }

@@ -1,3 +1,7 @@
+import {
+  setTimeout as sleep,
+} from 'timers/promises'
+
 import BaseGetRenderer from '../../../../../../lib/server/restfulapi/renderers/BaseGetRenderer.js'
 
 import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
@@ -6,11 +10,11 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   AlphaExternalCallbackSuccessRendererInputQuery,
- *   AlphaExternalCallbackSuccessRendererResponse
+ *   AlphaExternalCallbackSuccessGetRendererInputQuery,
+ *   AlphaExternalCallbackSuccessGetRendererResponse
  * >}
  */
-export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRenderer {
+export default class AlphaExternalCallbackSuccessGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
     return '/alpha-external-callback/success'
@@ -51,6 +55,8 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
     context, // has now, share.env
     request, // has req, res, next
   }) {
+    await sleep(500) // Simulate a delay of 500ms
+
     if (!alpha) {
       return this.Error.AlphaRequired.createAsError()
     }
@@ -78,7 +84,7 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
  * @typedef {{
  *   alpha: string
  *   beta: string
- * }} AlphaExternalCallbackSuccessRendererInputQuery
+ * }} AlphaExternalCallbackSuccessGetRendererInputQuery
  */
 
 /**
@@ -86,5 +92,5 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
  *   status: string
  *   message: string
  *   receivedValues: Array<*>
- * }} AlphaExternalCallbackSuccessRendererResponse
+ * }} AlphaExternalCallbackSuccessGetRendererResponse
  */

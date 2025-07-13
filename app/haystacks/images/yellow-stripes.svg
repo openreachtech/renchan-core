@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+  <defs>
+    <pattern id="verticalStripes" patternUnits="userSpaceOnUse" width="4" height="16">
+      <rect x="0" y="0" width="2" height="16" fill="black"/>
+      <rect x="2" y="0" width="2" height="16" fill="yellow"/>
+    </pattern>
+  </defs>
+  <rect width="16" height="16" fill="url(#verticalStripes)"/>
+</svg>
