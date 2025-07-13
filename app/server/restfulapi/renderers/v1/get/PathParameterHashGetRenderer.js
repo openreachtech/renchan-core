@@ -10,24 +10,19 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   AlphaExternalCallbackSuccessRendererInputQuery,
- *   AlphaExternalCallbackSuccessRendererResponse
+ *   PathParameterHashGetRendererInputQuery,
+ *   PathParameterHashGetRendererResponse
  * >}
  */
-export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRenderer {
+export default class PathParameterHashGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
-    return '/alpha-external-callback/success'
+    return '/path-parameter-hash/:id/:name'
   }
 
   /** @override */
   static get errorStructureHash () {
-    return {
-      AlphaRequired: {
-        statusCode: 400,
-        errorMessage: 'alpha is required',
-      },
-    }
+    return {}
   }
 
   /**
@@ -48,29 +43,23 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
    * @returns {Promise<RestfulApiResponse>} - Success response.
    */
   async render ({
-    query: {
-      alpha,
-      beta,
-    },
+    query,
+    body,
     context, // has now, share.env
     request, // has req, res, next
   }) {
     await sleep(500) // Simulate a delay of 500ms
 
-    if (!alpha) {
-      return this.Error.AlphaRequired.createAsError()
-    }
+    const id = this.resolveId({
+      pathParameterHash: request.pathParameterHash,
+    })
 
     const content = {
       status: 'success',
-      message: 'I am version 1.0.0 of AlphaExternalCallback (^_^)',
-      receivedValues: [
-        {
-          alpha,
-          beta,
-        },
-        context.now.toISOString(),
-      ],
+      pathParams: {
+        id,
+        name: request.pathParameterHash.name,
+      },
     }
 
     return RestfulApiResponse.create({
@@ -78,19 +67,36 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
       content,
     })
   }
+
+  /**
+   * Resolve ID from request.
+   *
+   * @param {{
+   *   pathParameterHash: ExpressType.Request['params']
+   * }} params - Parameters for resolving ID.
+   * @returns {number | null} - Resolved ID or null if not found.
+   */
+  resolveId ({
+    pathParameterHash,
+  }) {
+    try {
+      return Number.parseInt(pathParameterHash.id)
+    } catch (error) {
+      return null
+    }
+  }
 }
 
 /**
- * @typedef {{
- *   alpha: string
- *   beta: string
- * }} AlphaExternalCallbackSuccessRendererInputQuery
+ * @typedef {{}} PathParameterHashGetRendererInputQuery
  */
 
 /**
  * @typedef {{
  *   status: string
- *   message: string
- *   receivedValues: Array<*>
- * }} AlphaExternalCallbackSuccessRendererResponse
+ *   pathParams: {
+ *     id: number | null
+ *     name: string | null
+ *   }
+ * }} PathParameterHashGetRendererResponse
  */

@@ -10,19 +10,24 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   PathParameterHashRendererInputQuery,
- *   PathParameterHashRendererResponse
+ *   AlphaExternalCallbackSuccessGetRendererInputQuery,
+ *   AlphaExternalCallbackSuccessGetRendererResponse
  * >}
  */
-export default class PathParameterHashRenderer extends BaseGetRenderer {
+export default class AlphaExternalCallbackSuccessGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
-    return '/path-parameter-hash/:id/:name'
+    return '/alpha-external-callback/success'
   }
 
   /** @override */
   static get errorStructureHash () {
-    return {}
+    return {
+      AlphaRequired: {
+        statusCode: 400,
+        errorMessage: 'alpha is required',
+      },
+    }
   }
 
   /**
@@ -43,23 +48,29 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
    * @returns {Promise<RestfulApiResponse>} - Success response.
    */
   async render ({
-    query,
-    body,
+    query: {
+      alpha,
+      beta,
+    },
     context, // has now, share.env
     request, // has req, res, next
   }) {
     await sleep(500) // Simulate a delay of 500ms
 
-    const id = this.resolveId({
-      pathParameterHash: request.pathParameterHash,
-    })
+    if (!alpha) {
+      return this.Error.AlphaRequired.createAsError()
+    }
 
     const content = {
       status: 'success',
-      pathParams: {
-        id,
-        name: request.pathParameterHash.name,
-      },
+      message: 'I am version 1.0.0 of AlphaExternalCallback (^_^)',
+      receivedValues: [
+        {
+          alpha,
+          beta,
+        },
+        context.now.toISOString(),
+      ],
     }
 
     return RestfulApiResponse.create({
@@ -67,36 +78,19 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
       content,
     })
   }
-
-  /**
-   * Resolve ID from request.
-   *
-   * @param {{
-   *   pathParameterHash: ExpressType.Request['params']
-   * }} params - Parameters for resolving ID.
-   * @returns {number | null} - Resolved ID or null if not found.
-   */
-  resolveId ({
-    pathParameterHash,
-  }) {
-    try {
-      return Number.parseInt(pathParameterHash.id)
-    } catch (error) {
-      return null
-    }
-  }
 }
 
 /**
- * @typedef {{}} PathParameterHashRendererInputQuery
+ * @typedef {{
+ *   alpha: string
+ *   beta: string
+ * }} AlphaExternalCallbackSuccessGetRendererInputQuery
  */
 
 /**
  * @typedef {{
  *   status: string
- *   pathParams: {
- *     id: number | null
- *     name: string | null
- *   }
- * }} PathParameterHashRendererResponse
+ *   message: string
+ *   receivedValues: Array<*>
+ * }} AlphaExternalCallbackSuccessGetRendererResponse
  */

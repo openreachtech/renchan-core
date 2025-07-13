@@ -6,10 +6,10 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * BetaExternalCallback success renderer.
  *
  * @extends {BasePostRenderer<
- *   BetaExternalCallbackSuccessRendererInputBody
+ *   BetaExternalCallbackSuccessPostRendererInputBody
  * >}
  */
-export default class BetaExternalCallbackSuccessRenderer extends BasePostRenderer {
+export default class BetaExternalCallbackSuccessPostRenderer extends BasePostRenderer {
   /** @override */
   get routePath () {
     return '/beta-external-callback/success'
@@ -34,7 +34,7 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
    * Render BetaExternalCallback success.
    *
    * @override
-   * @param {RestfulApiType.RenderInput<BetaExternalCallbackSuccessRendererInputBody, *>} input - Input data.
+   * @param {RestfulApiType.RenderInput<BetaExternalCallbackSuccessPostRendererInputBody, *>} input - Input data.
    * @returns {Promise<RestfulApiType.RenderResponse>} - Success response.
    */
   async render ({
@@ -63,7 +63,7 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
  * @typedef {{
  *   first: string
  *   second: string
- * }} BetaExternalCallbackSuccessRendererInputBody
+ * }} BetaExternalCallbackSuccessPostRendererInputBody
  */
 
 /**
@@ -71,5 +71,5 @@ export default class BetaExternalCallbackSuccessRenderer extends BasePostRendere
  *   status: string
  *   message: string
  *   receivedValues: Array<*>
- * }} BetaExternalCallbackSuccessRendererResponse
+ * }} BetaExternalCallbackSuccessPostRendererResponse
  */
