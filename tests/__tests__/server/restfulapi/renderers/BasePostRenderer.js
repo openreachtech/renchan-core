@@ -31,31 +31,118 @@ describe('BasePostRenderer', () => {
 describe('BasePostRenderer', () => {
   describe('.buildPreExpressHandlers()', () => {
     test('should be an instance of Multer', () => {
-      const multerUploaderTally = multer()
-      const handlerTally = () => {}
+      const middlewareTally = () => {}
 
       const expected = [
-        handlerTally,
+        middlewareTally,
       ]
 
-      const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
-        .mockReturnValue(multerUploaderTally)
+      const defineMulterUploaderMiddlewareSpy = jest.spyOn(BasePostRenderer, 'defineMulterUploaderMiddleware')
+        .mockReturnValue(middlewareTally)
       const buildPreExpressHandlersSpy = jest.spyOn(BaseRenderer, 'buildPreExpressHandlers')
-
-      const noneSpy = jest.spyOn(multerUploaderTally, 'none')
-        .mockReturnValue(handlerTally)
 
       const actual = BasePostRenderer.buildPreExpressHandlers()
 
       expect(actual)
         .toEqual(expected)
 
-      expect(createMulterUploaderSpy)
+      expect(defineMulterUploaderMiddlewareSpy)
         .toHaveBeenCalledWith()
       expect(buildPreExpressHandlersSpy)
         .toHaveBeenCalledWith()
-      expect(noneSpy)
-        .toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
+  describe('.defineMulterUploaderMiddleware()', () => {
+    describe('should be return value of Multer#fields()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: {
+            fieldsArgs: [
+              { name: 'alpha', maxCount: 1 },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BasePostRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(fieldsHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .not
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .toHaveBeenCalledWith(expected.fieldsArgs)
+      })
+    })
+
+    describe('should be return value of Multer#none()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {},
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BasePostRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BasePostRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(noneHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .not
+          .toHaveBeenCalled()
+      })
     })
   })
 })
@@ -94,6 +181,71 @@ describe('BasePostRenderer', () => {
 
       expect(actual)
         .toBe(expected) // same reference
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
+  describe('.buildMulterUploaderFieldsInput()', () => {
+    describe('should return array of config', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: [
+            { name: 'alpha', maxCount: 1 },
+          ],
+        },
+        {
+          input: {
+            fileFieldsConfigHash: {
+              avatar: 1,
+              gallery: 8,
+            },
+          },
+          expected: [
+            { name: 'avatar', maxCount: 1 },
+            { name: 'gallery', maxCount: 8 },
+          ],
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const actual = BasePostRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should return empty array', () => {
+      test('with default definition of .get:fileFieldsConfigHash', () => {
+        const expected = []
+
+        const actual = BasePostRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
+  describe('.get:fileFieldsConfigHash', () => {
+    test('to be fixed value', () => {
+      const expected = {}
+
+      const actual = BasePostRenderer.fileFieldsConfigHash
+
+      expect(actual)
+        .toEqual(expected)
     })
   })
 })
