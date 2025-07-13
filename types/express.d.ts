@@ -22,6 +22,7 @@ declare global {
     type Route = BaseExpressRoute
 
     type HttpMethod = 'all'
+      | 'connect'
       | 'delete'
       | 'get'
       | 'head'
@@ -29,5 +30,6 @@ declare global {
       | 'patch'
       | 'post'
       | 'put'
+      | 'trace'
   }
 }
