@@ -10,11 +10,11 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   AlphaExternalCallbackSuccessRendererInputQuery,
- *   AlphaExternalCallbackSuccessRendererResponse
+ *   AlphaExternalCallbackSuccessGetRendererInputQuery,
+ *   AlphaExternalCallbackSuccessGetRendererResponse
  * >}
  */
-export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRenderer {
+export default class AlphaExternalCallbackSuccessGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
     return '/alpha-external-callback/success'
@@ -84,7 +84,7 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
  * @typedef {{
  *   alpha: string
  *   beta: string
- * }} AlphaExternalCallbackSuccessRendererInputQuery
+ * }} AlphaExternalCallbackSuccessGetRendererInputQuery
  */
 
 /**
@@ -92,5 +92,5 @@ export default class AlphaExternalCallbackSuccessRenderer extends BaseGetRendere
  *   status: string
  *   message: string
  *   receivedValues: Array<*>
- * }} AlphaExternalCallbackSuccessRendererResponse
+ * }} AlphaExternalCallbackSuccessGetRendererResponse
  */
