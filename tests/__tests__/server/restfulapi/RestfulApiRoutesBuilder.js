@@ -1480,6 +1480,191 @@ describe('RestfulApiRoutesBuilder', () => {
 })
 
 describe('RestfulApiRoutesBuilder', () => {
+  describe('#buildFulfilledRequestBody()', () => {
+    const engineCases = [
+      {
+        params: {
+          Engine: AlphaRestfulApiServerEngine,
+        },
+      },
+      {
+        params: {
+          Engine: BetaRestfulApiServerEngine,
+        },
+      },
+    ]
+
+    describe.each(engineCases)('Engine: $params.Engine.name', ({ params }) => {
+      /** @type {Express.Multer.File} */
+      const alphaFile = /** @type {*} */ ({
+        tally: Symbol('alpha file'),
+      })
+
+      /** @type {Express.Multer.File} */
+      const betaFile = /** @type {*} */ ({
+        tally: Symbol('beta file'),
+      })
+
+      /** @type {Express.Multer.File} */
+      const gammaFile = /** @type {*} */ ({
+        tally: Symbol('gamma file'),
+      })
+
+      /** @type {Express.Multer.File} */
+      const deltaFile = /** @type {*} */ ({
+        tally: Symbol('delta file'),
+      })
+
+      describe('with Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+              files: {
+                alpha: [
+                  alphaFile,
+                ],
+              },
+            },
+            expected: {
+              first: 'first value',
+              second: 'second value',
+              alpha: [
+                alphaFile,
+              ],
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+              files: {
+                beta: [
+                  betaFile,
+                  gammaFile,
+                ],
+              },
+            },
+            expected: {
+              third: 'third value',
+              fourth: 'fourth value',
+              beta: [
+                betaFile,
+                gammaFile,
+              ],
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+              },
+              files: {
+                alpha: [
+                  betaFile,
+                ],
+                beta: [
+                  gammaFile,
+                  deltaFile,
+                ],
+              },
+            },
+            expected: {
+              fifth: 'fifth value',
+              sixth: 'sixth value',
+              alpha: [
+                betaFile,
+              ],
+              beta: [
+                gammaFile,
+                deltaFile,
+              ],
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest, expected }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.buildFulfilledRequestBody({
+            expressRequest,
+          })
+
+          expect(actual)
+            .toEqual(expected)
+        })
+      })
+
+      describe('without Express request files', () => {
+        /**
+         * @type {Array<{
+         *   expressRequest: ExpressType.Request
+         *   expected: Record<string, any>
+         * }>}
+         */
+        const cases = /** @type {Array<*>} */ ([
+          {
+            expressRequest: {
+              body: {
+                first: 'first value',
+                second: 'second value',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                third: 'third value',
+                fourth: 'fourth value',
+              },
+            },
+          },
+          {
+            expressRequest: {
+              body: {
+                fifth: 'fifth value',
+                sixth: 'sixth value',
+              },
+            },
+          },
+        ])
+
+        test.each(cases)('body: $expressRequest.body', async ({ expressRequest }) => {
+          const engine = await params.Engine.createAsync()
+
+          const builder = await RestfulApiRoutesBuilder.createAsync({
+            engine,
+          })
+
+          const actual = builder.buildFulfilledRequestBody({
+            expressRequest,
+          })
+
+          expect(actual)
+            .toBe(expressRequest.body) // same reference
+        })
+      })
+    })
+  })
+})
+
+describe('RestfulApiRoutesBuilder', () => {
   describe('#createRestfulApiRequest()', () => {
     describe('to be instance of RestfulApiRequest', () => {
       const cases = [
