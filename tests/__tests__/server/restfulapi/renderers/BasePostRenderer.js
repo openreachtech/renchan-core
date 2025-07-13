@@ -99,6 +99,58 @@ describe('BasePostRenderer', () => {
 })
 
 describe('BasePostRenderer', () => {
+  describe('.buildMulterUploaderFieldsInput()', () => {
+    describe('should return array of config', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: [
+            { name: 'alpha', maxCount: 1 },
+          ],
+        },
+        {
+          input: {
+            fileFieldsConfigHash: {
+              avatar: 1,
+              gallery: 8,
+            },
+          },
+          expected: [
+            { name: 'avatar', maxCount: 1 },
+            { name: 'gallery', maxCount: 8 },
+          ],
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        jest.spyOn(BasePostRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const actual = BasePostRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should return empty array', () => {
+      test('with default definition of .get:fileFieldsConfigHash', () => {
+        const expected = []
+
+        const actual = BasePostRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BasePostRenderer', () => {
   describe('.get:fileFieldsConfigHash', () => {
     test('to be fixed value', () => {
       const expected = {}
