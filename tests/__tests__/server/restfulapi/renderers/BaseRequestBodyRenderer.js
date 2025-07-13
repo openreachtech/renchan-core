@@ -1,0 +1,238 @@
+import multer from 'multer'
+
+import BaseRequestBodyRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRequestBodyRenderer.js'
+
+import BaseRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRenderer.js'
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('super class', () => {
+    test('to be BaseRenderer', () => {
+      const actual = BaseRequestBodyRenderer.prototype
+
+      expect(actual)
+        .toBeInstanceOf(BaseRenderer)
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.buildPreExpressHandlers()', () => {
+    test('should be an instance of Multer', () => {
+      const middlewareTally = () => {}
+
+      const expected = [
+        middlewareTally,
+      ]
+
+      const defineMulterUploaderMiddlewareSpy = jest.spyOn(BaseRequestBodyRenderer, 'defineMulterUploaderMiddleware')
+        .mockReturnValue(middlewareTally)
+      const buildPreExpressHandlersSpy = jest.spyOn(BaseRenderer, 'buildPreExpressHandlers')
+
+      const actual = BaseRequestBodyRenderer.buildPreExpressHandlers()
+
+      expect(actual)
+        .toEqual(expected)
+
+      expect(defineMulterUploaderMiddlewareSpy)
+        .toHaveBeenCalledWith()
+      expect(buildPreExpressHandlersSpy)
+        .toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.defineMulterUploaderMiddleware()', () => {
+    describe('should be return value of Multer#fields()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: {
+            fieldsArgs: [
+              { name: 'alpha', maxCount: 1 },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BaseRequestBodyRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BaseRequestBodyRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BaseRequestBodyRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(fieldsHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .not
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .toHaveBeenCalledWith(expected.fieldsArgs)
+      })
+    })
+
+    describe('should be return value of Multer#none()', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {},
+          },
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input }) => {
+        const multerUploaderTally = multer()
+        const noneHandlerTally = () => {}
+        const fieldsHandlerTally = () => {}
+
+        const createMulterUploaderSpy = jest.spyOn(BaseRequestBodyRenderer, 'createMulterUploader')
+          .mockReturnValue(multerUploaderTally)
+
+        jest.spyOn(BaseRequestBodyRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const noneSpy = jest.spyOn(multerUploaderTally, 'none')
+          .mockReturnValue(noneHandlerTally)
+        const fieldsSpy = jest.spyOn(multerUploaderTally, 'fields')
+          .mockReturnValue(fieldsHandlerTally)
+
+        const actual = BaseRequestBodyRenderer.defineMulterUploaderMiddleware()
+
+        expect(actual)
+          .toBe(noneHandlerTally) // same reference
+
+        expect(createMulterUploaderSpy)
+          .toHaveBeenCalledWith()
+
+        expect(noneSpy)
+          .toHaveBeenCalledWith()
+        expect(fieldsSpy)
+          .not
+          .toHaveBeenCalled()
+      })
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.createMulterUploader()', () => {
+    test('should be an instance of Multer', () => {
+      const multerUploaderTally = multer()
+
+      /** @type {typeof multer} */
+      const multerSpy = /** @type {*} */ (
+        jest.fn()
+          .mockReturnValue(multerUploaderTally)
+      )
+
+      jest.spyOn(BaseRequestBodyRenderer, 'multer', 'get')
+        .mockReturnValue(multerSpy)
+
+      const actual = BaseRequestBodyRenderer.createMulterUploader()
+
+      expect(actual)
+        .toBe(multerUploaderTally) // same reference
+
+      expect(multerSpy)
+        .toHaveBeenCalledWith()
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.get:multer', () => {
+    test('to be fixed value', () => {
+      const expected = multer
+
+      const actual = BaseRequestBodyRenderer.multer
+
+      expect(actual)
+        .toBe(expected) // same reference
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.buildMulterUploaderFieldsInput()', () => {
+    describe('should return array of config', () => {
+      const cases = [
+        {
+          input: {
+            fileFieldsConfigHash: {
+              alpha: 1,
+            },
+          },
+          expected: [
+            { name: 'alpha', maxCount: 1 },
+          ],
+        },
+        {
+          input: {
+            fileFieldsConfigHash: {
+              avatar: 1,
+              gallery: 8,
+            },
+          },
+          expected: [
+            { name: 'avatar', maxCount: 1 },
+            { name: 'gallery', maxCount: 8 },
+          ],
+        },
+      ]
+
+      test.each(cases)('with $input.fileFieldsConfigHash', ({ input, expected }) => {
+        jest.spyOn(BaseRequestBodyRenderer, 'fileFieldsConfigHash', 'get')
+          .mockReturnValue(input.fileFieldsConfigHash)
+
+        const actual = BaseRequestBodyRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+
+    describe('should return empty array', () => {
+      test('with default definition of .get:fileFieldsConfigHash', () => {
+        const expected = []
+
+        const actual = BaseRequestBodyRenderer.buildMulterUploaderFieldsInput()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRequestBodyRenderer', () => {
+  describe('.get:fileFieldsConfigHash', () => {
+    test('to be fixed value', () => {
+      const expected = {}
+
+      const actual = BaseRequestBodyRenderer.fileFieldsConfigHash
+
+      expect(actual)
+        .toEqual(expected)
+    })
+  })
+})
