@@ -72,11 +72,13 @@ declare global {
     type RenderInput<
       B extends RenderRequestBody,
       Q extends RenderRequestQuery,
+      C extends Context = BaseRestfulApiContext,
+      R extends Request = RestfulApiRequest
     > = {
       body: B | null
       query: Q | null
-      context: Context
-      request?: Request
+      context: C
+      request: R
     }
 
     type ErrorResponseEnvelope = {
