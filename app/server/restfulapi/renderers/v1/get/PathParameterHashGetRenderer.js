@@ -10,11 +10,11 @@ import RestfulApiResponse from '../../../../../../lib/server/restfulapi/interfac
  * Alpha external callback success renderer.
  *
  * @extends {BaseGetRenderer<
- *   PathParameterHashRendererInputQuery,
- *   PathParameterHashRendererResponse
+ *   PathParameterHashGetRendererInputQuery,
+ *   PathParameterHashGetRendererResponse
  * >}
  */
-export default class PathParameterHashRenderer extends BaseGetRenderer {
+export default class PathParameterHashGetRenderer extends BaseGetRenderer {
   /** @override */
   get routePath () {
     return '/path-parameter-hash/:id/:name'
@@ -88,7 +88,7 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
 }
 
 /**
- * @typedef {{}} PathParameterHashRendererInputQuery
+ * @typedef {{}} PathParameterHashGetRendererInputQuery
  */
 
 /**
@@ -98,5 +98,5 @@ export default class PathParameterHashRenderer extends BaseGetRenderer {
  *     id: number | null
  *     name: string | null
  *   }
- * }} PathParameterHashRendererResponse
+ * }} PathParameterHashGetRendererResponse
  */
