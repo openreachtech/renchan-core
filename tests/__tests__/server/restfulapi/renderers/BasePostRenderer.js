@@ -2,15 +2,15 @@ import multer from 'multer'
 
 import BasePostRenderer from '../../../../../lib/server/restfulapi/renderers/BasePostRenderer.js'
 
-import BaseRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRenderer.js'
+import BaseRequestBodyRenderer from '../../../../../lib/server/restfulapi/renderers/BaseRequestBodyRenderer.js'
 
 describe('BasePostRenderer', () => {
-  describe('super class', () => {
-    test('to be BaseRenderer', () => {
+  describe('inheritance', () => {
+    test('to be BaseRequestBodyRenderer', () => {
       const actual = BasePostRenderer.prototype
 
       expect(actual)
-        .toBeInstanceOf(BaseRenderer)
+        .toBeInstanceOf(BaseRequestBodyRenderer)
     })
   })
 })
