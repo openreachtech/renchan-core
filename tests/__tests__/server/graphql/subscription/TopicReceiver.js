@@ -789,7 +789,7 @@ describe('TopicReceiver', () => {
         const generatedReturnFunction = receiver.generateAsyncIteratorReturn()
 
         const expected = {
-          value: undefined,
+          value: null,
           done: true,
         }
 
