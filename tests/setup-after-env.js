@@ -22,10 +22,10 @@ globalThis.sequelizeActivator = sequelizeActivator
 /*
  * Set global hooks.
  */
-afterEach(() => { // eslint-disable-line jest/require-top-level-describe
+afterEach(() => {
   jest.restoreAllMocks()
 })
 
-afterAll(async () => { // eslint-disable-line jest/require-top-level-describe
+afterAll(async () => {
   await sequelizeActivator.sequelizeClient.close()
 })
