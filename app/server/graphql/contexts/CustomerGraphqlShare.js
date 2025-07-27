@@ -9,6 +9,14 @@ import AiResponseRedisClerk from '../../../client/redis/AiResponseRedisClerk.js'
  * please refer to this ExtraClient in this sample code.
  */
 const ExtraClient = class {
+  /**
+   * Factory method to create an instance of ExtraClient.
+   *
+   * @param {{
+   *   config: object
+   * }} params - Parameters of this method.
+   * @returns {ExtraClient} - An instance of ExtraClient.
+   */
   static create ({
     config,
   }) {
