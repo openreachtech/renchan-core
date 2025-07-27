@@ -153,7 +153,7 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
         },
@@ -209,11 +209,11 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
           expected: {
-            file: undefined,
+            // file: undefined,
           },
         },
       ])
@@ -261,7 +261,7 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
         },

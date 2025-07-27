@@ -369,8 +369,14 @@ describe('FilterSchemaHashBuilder', () => {
           sharedValue: Symbol.for('shared (5)'),
         },
         schemaCases: [
-          { schema: 'alpha', expected: undefined },
-          { schema: 'beta', expected: undefined },
+          {
+            schema: 'alpha',
+            // expected: undefined,
+          },
+          {
+            schema: 'beta',
+            // expected: undefined,
+          },
         ],
       },
     ]

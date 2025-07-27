@@ -390,7 +390,7 @@ describe('BaseGraphqlContext', () => {
           expected: 'Cannot destructure property \'expressRequest\' of \'object null\' as it is null.',
         },
         {
-          params: undefined,
+          // params: undefined,
           expected: 'Cannot destructure property \'expressRequest\' of \'undefined\' as it is undefined.',
         },
       ])
