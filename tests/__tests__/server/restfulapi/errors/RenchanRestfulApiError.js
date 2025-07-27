@@ -191,7 +191,12 @@ describe('RenchanRestfulApiError', () => {
                 alpha: 111,
               },
             },
-            expected: '100.X000.001 {"alpha":111}',
+            expected: [
+              '100.X000.001 {"alpha":111}',
+              {
+                cause: 'because it is not fine',
+              },
+            ],
           },
           {
             params: {
@@ -201,7 +206,10 @@ describe('RenchanRestfulApiError', () => {
               //   beta: 222,
               // },
             },
-            expected: '10.00.02',
+            expected: [
+              '10.00.02',
+              {},
+            ],
           },
           {
             params: {
@@ -211,7 +219,10 @@ describe('RenchanRestfulApiError', () => {
                 gamma: 333,
               },
             },
-            expected: '10.00.03 {"gamma":333}',
+            expected: [
+              '10.00.03 {"gamma":333}',
+              null,
+            ],
           },
           {
             params: {
@@ -221,7 +232,10 @@ describe('RenchanRestfulApiError', () => {
               //   delta: 444,
               // },
             },
-            expected: '10.00.04',
+            expected: [
+              '10.00.04',
+              null,
+            ],
           },
         ]
 
@@ -231,10 +245,7 @@ describe('RenchanRestfulApiError', () => {
           SpyClass.create(params)
 
           expect(SpyClass.__spy__)
-            .toHaveBeenCalledWith(
-              expected,
-              params.options
-            )
+            .toHaveBeenCalledWith(...expected)
         })
       })
 
@@ -250,7 +261,12 @@ describe('RenchanRestfulApiError', () => {
                 alpha: 111,
               },
             },
-            expected: '100.X000.001 {"alpha":111}',
+            expected: [
+              '100.X000.001 {"alpha":111}',
+              {
+                cause: 'because it is not fine',
+              },
+            ],
           },
           {
             params: {
@@ -260,7 +276,10 @@ describe('RenchanRestfulApiError', () => {
               //   beta: 222,
               // },
             },
-            expected: '10.00.02',
+            expected: [
+              '10.00.02',
+              {},
+            ],
           },
           {
             params: {
@@ -270,7 +289,10 @@ describe('RenchanRestfulApiError', () => {
                 gamma: 333,
               },
             },
-            expected: '10.00.03 {"gamma":333}',
+            expected: [
+              '10.00.03 {"gamma":333}',
+              null,
+            ],
           },
           {
             params: {
@@ -280,7 +302,10 @@ describe('RenchanRestfulApiError', () => {
               //   delta: 444,
               // },
             },
-            expected: '10.00.04',
+            expected: [
+              '10.00.04',
+              null,
+            ],
           },
         ]
 
@@ -298,10 +323,7 @@ describe('RenchanRestfulApiError', () => {
           SpyClass.create(args)
 
           expect(SpyClass.__spy__)
-            .toHaveBeenCalledWith(
-              expected,
-              params.options
-            )
+            .toHaveBeenCalledWith(...expected)
         })
       })
 
@@ -584,7 +606,7 @@ describe('RenchanRestfulApiError', () => {
           SpyClass.create()
 
           expect(SpyClass.__spy__)
-            .toHaveBeenCalledWith(params.code, undefined)
+            .toHaveBeenCalledWith(params.code, null)
         })
       })
     })
