@@ -295,8 +295,7 @@ export default class CurriculumsQueryResolver extends BaseQueryResolver {
       ? (alpha, beta) => alpha[targetColumn].localeCompare(beta[targetColumn])
       : (alpha, beta) => beta[targetColumn].localeCompare(alpha[targetColumn])
 
-    const sortedHaystacks = [...haystacks]
-      .sort(sortFunction)
+    const sortedHaystacks = haystacks.toSorted(sortFunction)
 
     return sortedHaystacks.splice(offset, limit)
   }
