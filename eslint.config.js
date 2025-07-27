@@ -1,56 +1,62 @@
-import openreachtechConfig from '@openreachtech/eslint-config'
+import globals from 'globals'
+
+import {
+  default as openreachtechConfig,
+  coreRuleOptionHash,
+} from '@openreachtech/eslint-config'
 
 export default [
   ...openreachtechConfig,
 
   {
-    ignores: [
-      'playground/**',
-    ],
-  },
+    rules: {
+      'no-shadow': [
+        'error',
+        {
+          allow: [
+            ...coreRuleOptionHash['no-shadow'].allow,
+            ...Object.keys(globals.browser),
 
-  {
-    languageOptions: {
-      sourceType: 'module',
-      globals: {
-        __dirname: 'readonly',
-        process: 'readonly',
-        crypto: 'readonly',
-
-        module: 'readonly',
-
-        sequelize: 'readonly', // namespace
-
-        setTimeout: 'readonly',
-
-        Buffer: 'readonly',
-      },
+            'Op', // Sequelize.Op
+          ],
+        },
+      ],
     },
   },
 
+  // Turn off some rules temporarily
   {
     files: [
-      '**/*.cjs',
+      'lib/server/graphql/GraphqlServerBuilder.js',
+      'lib/server/restfulapi/RestfulApiServerBuilder.js',
     ],
-    languageOptions: {
-      sourceType: 'commonjs',
+    rules: {
+      'no-console': 'off',
     },
   },
 
-  // Turn off some rules temporary
+  // Turn off some rules temporarily
   {
+    files: [
+      'tests/**/*.js',
+    ],
     rules: {
-      camelcase: 'off',
-      'sort-imports': 'off',
-
-      'jest/max-expects': 'off',
-      'jest/max-nested-describe': 'off',
-
-      'jsdoc/check-indentation': 'off',
-      'jsdoc/check-tag-names': 'off',
-      'jsdoc/no-undefined-types': 'off',
       'jsdoc/require-jsdoc': 'off',
-      'jsdoc/valid-types': 'off',
+    },
+  },
+
+  // Turn off some rules for specific files
+  {
+    // 🚨 Never add other files to this files.
+    files: [
+      'app/server/graphql/AdminGraphqlServerEngine.js',
+      'app/server/graphql/CustomerGraphqlServerEngine.js',
+      'lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js',
+      'app/server/restfulapi/AppRestfulApiServerEngine.js',
+    ],
+    rules: {
+      'eslint-comments/no-use': 'off',
+      'eslint-comments/require-description': 'off',
     },
   },
 ]
