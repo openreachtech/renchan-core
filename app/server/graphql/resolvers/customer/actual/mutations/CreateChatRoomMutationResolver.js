@@ -47,10 +47,10 @@ export default class CreateChatRoomMutationResolver extends BaseMutationResolver
         id,
         name,
       }))
-
-    rooms.toSorted((alpha, beta) =>
-      alpha.name.localeCompare(beta.name)
-    )
+      .toSorted(
+        (alpha, beta) =>
+          alpha.name.localeCompare(beta.name)
+      )
 
     await this.broadcastChatRooms({
       context,
@@ -112,10 +112,10 @@ export default class CreateChatRoomMutationResolver extends BaseMutationResolver
         id,
         name,
       }))
-
-    rooms.sort((alpha, beta) =>
-      alpha.name.localeCompare(beta.name)
-    )
+      .toSorted(
+        (alpha, beta) =>
+          alpha.name.localeCompare(beta.name)
+      )
 
     return {
       rooms,
