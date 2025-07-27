@@ -295,11 +295,6 @@ describe('FileContentReader', () => {
       const cases = [
         {
           params: {
-            file: undefined,
-          },
-        },
-        {
-          params: {
             // file: undefined,
           },
         },
@@ -650,11 +645,6 @@ describe('FileContentReader', () => {
       const cases = [
         {
           params: {
-            file: undefined,
-          },
-        },
-        {
-          params: {
             // file: undefined,
           },
         },
@@ -724,11 +714,6 @@ describe('FileContentReader', () => {
 
     describe('should return null when #file is not set', () => {
       const cases = [
-        {
-          params: {
-            file: undefined,
-          },
-        },
         {
           params: {
             // file: undefined,
@@ -802,11 +787,6 @@ describe('FileContentReader', () => {
       const cases = [
         {
           params: {
-            file: undefined,
-          },
-        },
-        {
-          params: {
             // file: undefined,
           },
         },
@@ -874,11 +854,6 @@ describe('FileContentReader', () => {
 
     describe('should be falsy', () => {
       const cases = [
-        {
-          params: {
-            file: undefined,
-          },
-        },
         {
           params: {
             // file: undefined,
