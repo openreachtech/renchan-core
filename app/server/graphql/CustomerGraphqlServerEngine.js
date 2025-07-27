@@ -160,7 +160,6 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
         userEntity,
         engine,
       }) =>
-
         /**
          * @type {Record<string, boolean> | null} - Schema permission hash. (null means that all schemas have permission)
          * @example
@@ -171,9 +170,9 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
          *   ...
          * }
          * ```
-         */
-        null
-      ,
+         */ (
+          null
+        ),
     }
   }
 
