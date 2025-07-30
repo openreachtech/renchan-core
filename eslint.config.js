@@ -16,8 +16,6 @@ export default [
           allow: [
             ...coreRuleOptionHash['no-shadow'].allow,
             ...Object.keys(globals.browser),
-
-            'Op', // Sequelize.Op
           ],
         },
       ],
