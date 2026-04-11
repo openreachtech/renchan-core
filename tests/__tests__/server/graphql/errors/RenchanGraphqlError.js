@@ -173,7 +173,7 @@ describe('RenchanGraphqlError', () => {
           }
 
           expect(() => RenchanGraphqlError.create(args))
-            .toThrow('concrete-member-not-found {"memberName":"RenchanGraphqlError.get:errorCode"}')
+            .toThrow('101.X000.001 {"memberName":"RenchanGraphqlError.get:errorCode"}')
         })
       })
     })
@@ -376,7 +376,7 @@ describe('RenchanGraphqlError', () => {
           }
 
           expect(() => RenchanGraphqlError.create(args))
-            .toThrow('concrete-member-not-found {"memberName":"RenchanGraphqlError.get:errorCode"}')
+            .toThrow('101.X000.001 {"memberName":"RenchanGraphqlError.get:errorCode"}')
         })
       })
     })
@@ -387,7 +387,7 @@ describe('RenchanGraphqlError', () => {
   describe('.get:errorCode', () => {
     test('to throw error', () => {
       expect(() => RenchanGraphqlError.errorCode)
-        .toThrow('concrete-member-not-found {"memberName":"RenchanGraphqlError.get:errorCode"}')
+        .toThrow('101.X000.001 {"memberName":"RenchanGraphqlError.get:errorCode"}')
     })
   })
 })
