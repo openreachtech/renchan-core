@@ -90,7 +90,7 @@ describe('BaseScalar', () => {
     describe('to throw error when called as it', () => {
       test('with concrete member not found error', () => {
         expect(() => BaseScalar.create())
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar.get:scalarName"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar.get:scalarName"}')
       })
     })
   })
@@ -101,7 +101,7 @@ describe('BaseScalar', () => {
     describe('to throw error', () => {
       test('with concrete member not found error', () => {
         expect(() => BaseScalar.scalarName)
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar.get:scalarName"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar.get:scalarName"}')
       })
     })
   })
@@ -112,7 +112,7 @@ describe('BaseScalar', () => {
     describe('to throw error', () => {
       test('with concrete member not found error', () => {
         expect(() => BaseScalar.description)
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar.get:description"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar.get:description"}')
       })
     })
   })
@@ -181,7 +181,7 @@ describe('BaseScalar', () => {
               value,
             })
           )
-            .toThrow('concrete-member-not-found {"memberName":"BaseScalar#serialize()"}')
+            .toThrow('101.X000.001 {"memberName":"BaseScalar#serialize()"}')
         })
       })
     })
@@ -225,7 +225,7 @@ describe('BaseScalar', () => {
               value,
             })
           )
-            .toThrow('concrete-member-not-found {"memberName":"BaseScalar#parseValue()"}')
+            .toThrow('101.X000.001 {"memberName":"BaseScalar#parseValue()"}')
         })
       })
     })
@@ -280,7 +280,7 @@ describe('BaseScalar', () => {
               ast,
             })
           )
-            .toThrow('concrete-member-not-found {"memberName":"BaseScalar#parseLiteral()"}')
+            .toThrow('101.X000.001 {"memberName":"BaseScalar#parseLiteral()"}')
         })
       })
     })
@@ -441,13 +441,13 @@ describe('BaseScalar', () => {
         })
 
         expect(() => serialize(serializeArgs))
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar#serialize()"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar#serialize()"}')
 
         expect(() => parseValue(parseValueArgs))
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar#parseValue()"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar#parseValue()"}')
 
         expect(() => parseLiteral(parseLiteralArgs))
-          .toThrow('concrete-member-not-found {"memberName":"BaseScalar#parseLiteral()"}')
+          .toThrow('101.X000.001 {"memberName":"BaseScalar#parseLiteral()"}')
 
         expect(serializeSpy)
           .toHaveBeenCalledWith({
