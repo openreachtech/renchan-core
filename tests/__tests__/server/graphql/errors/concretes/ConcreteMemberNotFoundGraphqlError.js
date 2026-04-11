@@ -15,7 +15,7 @@ describe('ConcreteMemberNotFoundGraphqlError', () => {
 describe('ConcreteMemberNotFoundGraphqlError', () => {
   describe('.get:errorCode', () => {
     test('to be fixed value', () => {
-      const expected = 'concrete-member-not-found'
+      const expected = '101.X000.001'
 
       const actual = ConcreteMemberNotFoundGraphqlError.errorCode
 
