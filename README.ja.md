@@ -191,4 +191,4 @@ npm test
 
 ## 著作権
 
-© 2024 Open Reach Tech inc.
+© 2024 Open Reach Tech Inc.
