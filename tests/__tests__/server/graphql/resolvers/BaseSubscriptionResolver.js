@@ -92,7 +92,7 @@ describe('BaseSubscriptionResolver', () => {
 
     describe('to call from Base class', () => {
       test('throw error', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseResolver.get:schema"}'
+        const expected = '101.X000.001 {"memberName":"BaseResolver.get:schema"}'
 
         expect(() => BaseSubscriptionResolver.channelPrefix)
           .toThrow(expected)
