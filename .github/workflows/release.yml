@@ -11,7 +11,7 @@ jobs:
     # Only run when PR is merged
     if: github.event.pull_request.merged == true
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, light]
 
     steps:
       - name: 🛎 Checkout code
