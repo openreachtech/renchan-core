@@ -639,7 +639,7 @@ describe('RestfulApiResponse', () => {
           const SpyClass = globalThis.constructorSpy.spyOn(RestfulApiResponse)
 
           expect(() => SpyClass.create(params))
-            .toThrow('concrete-member-not-found {"memberName":"RestfulApiResponse.get:statusCode"}')
+            .toThrow('101.X000.001 {"memberName":"RestfulApiResponse.get:statusCode"}')
 
           expect(SpyClass.__spy__)
             .toHaveBeenCalledTimes(0)
@@ -730,7 +730,7 @@ describe('RestfulApiResponse', () => {
             // errorMessage: 'first message',
             course: new Error('first course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:errorMessage"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:errorMessage"}',
         },
         {
           params: {
@@ -738,7 +738,7 @@ describe('RestfulApiResponse', () => {
             errorMessage: 'second message',
             course: new Error('second course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:statusCode"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:statusCode"}',
         },
         {
           params: {
@@ -746,7 +746,7 @@ describe('RestfulApiResponse', () => {
             // errorMessage: 'third message',
             course: new Error('third course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:errorMessage"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:errorMessage"}',
         },
         {
           params: {
@@ -754,7 +754,7 @@ describe('RestfulApiResponse', () => {
             // errorMessage: 'fourth message',
             // course: new Error('fourth course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:errorMessage"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:errorMessage"}',
         },
         {
           params: {
@@ -762,7 +762,7 @@ describe('RestfulApiResponse', () => {
             errorMessage: 'fifth message',
             // course: new Error('fifth course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:statusCode"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:statusCode"}',
         },
         {
           params: {
@@ -770,7 +770,7 @@ describe('RestfulApiResponse', () => {
             // errorMessage: 'sixth message',
             // course: new Error('sixth course'),
           },
-          expected: 'concrete-member-not-found {"memberName":"RestfulApiResponse.get:errorMessage"}',
+          expected: '101.X000.001 {"memberName":"RestfulApiResponse.get:errorMessage"}',
         },
       ]
 
@@ -787,7 +787,7 @@ describe('RestfulApiResponse', () => {
     describe('to throw', () => {
       test('without args', () => {
         expect(() => RestfulApiResponse.statusCode)
-          .toThrow('concrete-member-not-found {"memberName":"RestfulApiResponse.get:statusCode"}')
+          .toThrow('101.X000.001 {"memberName":"RestfulApiResponse.get:statusCode"}')
       })
     })
   })
@@ -798,7 +798,7 @@ describe('RestfulApiResponse', () => {
     describe('to throw', () => {
       test('without args', () => {
         expect(() => RestfulApiResponse.errorMessage)
-          .toThrow('concrete-member-not-found {"memberName":"RestfulApiResponse.get:errorMessage"}')
+          .toThrow('101.X000.001 {"memberName":"RestfulApiResponse.get:errorMessage"}')
       })
     })
   })
