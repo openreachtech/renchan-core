@@ -302,7 +302,7 @@ describe('BaseRenderer', () => {
   describe('.get:method', () => {
     describe('to throw error', () => {
       test('on call', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseRenderer.get:method"}'
+        const expected = '101.X000.001 {"memberName":"BaseRenderer.get:method"}'
 
         expect(() => BaseRenderer.method)
           .toThrow(expected)
@@ -315,7 +315,7 @@ describe('BaseRenderer', () => {
   describe('.get:routePath', () => {
     describe('to throw error', () => {
       test('on call', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseRenderer.get:routePath"}'
+        const expected = '101.X000.001 {"memberName":"BaseRenderer.get:routePath"}'
 
         expect(() => BaseRenderer.routePath)
           .toThrow(expected)
@@ -522,7 +522,7 @@ describe('BaseRenderer', () => {
       ]
 
       test.each(cases)('errorStructureHash: $params.errorStructureHash', ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseRenderer.get:method"}'
+        const expected = '101.X000.001 {"memberName":"BaseRenderer.get:method"}'
 
         const args = {
           errorStructureHash: params.errorStructureHash,
@@ -579,7 +579,7 @@ describe('BaseRenderer', () => {
       ]
 
       test.each(cases)('errorStructureHash: $params.errorStructureHash', ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseRenderer.get:routePath"}'
+        const expected = '101.X000.001 {"memberName":"BaseRenderer.get:routePath"}'
 
         const args = {
           errorStructureHash: params.errorStructureHash,
@@ -874,7 +874,7 @@ describe('BaseRenderer', () => {
       ]
 
       test.each(cases)('errorStructureHash: $params.errorStructureHash', async ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseRenderer#render()"}'
+        const expected = '101.X000.001 {"memberName":"BaseRenderer#render()"}'
 
         const args = {
           errorStructureHash: params.errorStructureHash,

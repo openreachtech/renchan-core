@@ -318,7 +318,7 @@ describe('BaseRestfulApiServerEngine', () => {
           }),
         }
 
-        const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine.get:config"}'
+        const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine.get:config"}'
 
         expect(() => BaseRestfulApiServerEngine.create(args))
           .toThrow(expected)
@@ -422,7 +422,7 @@ describe('BaseRestfulApiServerEngine', () => {
 describe('BaseRestfulApiServerEngine', () => {
   describe('.get:config', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine.get:config"}'
+      const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine.get:config"}'
 
       expect(() => BaseRestfulApiServerEngine.config)
         .toThrow(expected)
@@ -433,7 +433,7 @@ describe('BaseRestfulApiServerEngine', () => {
 describe('BaseRestfulApiServerEngine', () => {
   describe('.get:standardErrorEnvelopHash', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine.get:standardErrorEnvelopHash"}'
+      const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine.get:standardErrorEnvelopHash"}'
 
       expect(() => BaseRestfulApiServerEngine.standardErrorEnvelopHash)
         .toThrow(expected)
@@ -606,7 +606,7 @@ describe('BaseRestfulApiServerEngine', () => {
 describe('BaseRestfulApiServerEngine', () => {
   describe('.get:Share', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine.get:Share"}'
+      const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine.get:Share"}'
 
       expect(() => BaseRestfulApiServerEngine.Share)
         .toThrow(expected)
@@ -617,7 +617,7 @@ describe('BaseRestfulApiServerEngine', () => {
 describe('BaseRestfulApiServerEngine', () => {
   describe('.get:Context', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine.get:Context"}'
+      const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine.get:Context"}'
 
       expect(() => BaseRestfulApiServerEngine.Context)
         .toThrow(expected)
@@ -994,7 +994,7 @@ describe('BaseRestfulApiServerEngine', () => {
     ]
 
     test.each(cases)('pathPrefix: $params.config.pathPrefix', ({ params }) => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseRestfulApiServerEngine#generateFilterHandler()"}'
+      const expected = '101.X000.001 {"memberName":"BaseRestfulApiServerEngine#generateFilterHandler()"}'
 
       const engine = new BaseRestfulApiServerEngine(params)
 

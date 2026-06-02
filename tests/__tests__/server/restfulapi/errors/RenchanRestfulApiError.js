@@ -173,7 +173,7 @@ describe('RenchanRestfulApiError', () => {
           }
 
           expect(() => RenchanRestfulApiError.create(args))
-            .toThrow('concrete-member-not-found {"memberName":"RenchanRestfulApiError.get:errorCode"}')
+            .toThrow('101.X000.001 {"memberName":"RenchanRestfulApiError.get:errorCode"}')
         })
       })
     })
@@ -376,7 +376,7 @@ describe('RenchanRestfulApiError', () => {
           }
 
           expect(() => RenchanRestfulApiError.create(args))
-            .toThrow('concrete-member-not-found {"memberName":"RenchanRestfulApiError.get:errorCode"}')
+            .toThrow('101.X000.001 {"memberName":"RenchanRestfulApiError.get:errorCode"}')
         })
       })
     })
@@ -387,7 +387,7 @@ describe('RenchanRestfulApiError', () => {
   describe('.get:errorCode', () => {
     test('to throw error', () => {
       expect(() => RenchanRestfulApiError.errorCode)
-        .toThrow('concrete-member-not-found {"memberName":"RenchanRestfulApiError.get:errorCode"}')
+        .toThrow('101.X000.001 {"memberName":"RenchanRestfulApiError.get:errorCode"}')
     })
   })
 })
