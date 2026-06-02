@@ -635,7 +635,7 @@ describe('RestfulApiResponse', () => {
           },
         ]
 
-        test.each(cases)('$#', ({ params, expected }) => {
+        test.each(cases)('$#', ({ params }) => {
           const SpyClass = globalThis.constructorSpy.spyOn(RestfulApiResponse)
 
           expect(() => SpyClass.create(params))
