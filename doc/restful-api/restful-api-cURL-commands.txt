@@ -1,0 +1,31 @@
+curl -X POST \
+  -H "Content-Type: multipart/form-data" \
+  -d '{"first":"first value", "second":"second value"}' \
+  http://localhost:8001/v1/beta-external-callback/success
+
+curl -X POST \
+  -F "first=first value" \
+  -F "second=second value" \
+  http://localhost:8001/v1/beta-external-callback/success
+
+
+curl -X POST \
+  -F "first=first value" \
+  -F "second=second value" \
+  -F "gallery=@hige.png" \
+  http://localhost:8001/v1/beta-external-callback/success
+
+curl -X POST \
+  -F "first=first value" \
+  -F "second=second value" \
+  -F "avatar=@hige.png" \
+  http://localhost:8001/v1/beta-external-callback/success
+
+
+curl -X POST \
+  -F "first=first value" \
+  -F "second=second value" \
+  -F "avatar=@app/haystacks/images/blue-circle.svg" \
+  -F "images=@app/haystacks/images/green-checker.svg" \
+  -F "images=@app/haystacks/images/red-square.svg" \
+  http://localhost:8001/v1/upload-files
