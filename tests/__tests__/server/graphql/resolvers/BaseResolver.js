@@ -430,7 +430,7 @@ describe('BaseResolver', () => {
       })
     })
 
-    describe('to call RenchanGraphqlError.buildErrorHash()', () => {
+    describe('to call RenchanGraphqlError.declareGraphqlError()', () => {
       const cases = [
         {
           params: {
