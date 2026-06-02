@@ -351,7 +351,7 @@ describe('RestfulApiResponse', () => {
 
         test.each(cases)('$#', ({ params }) => {
           expect(() => RestfulApiResponse.create(params))
-            .toThrow('concrete-member-not-found {"memberName":"RestfulApiResponse.get:statusCode"}')
+            .toThrow('101.X000.001 {"memberName":"RestfulApiResponse.get:statusCode"}')
         })
       })
     })
