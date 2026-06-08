@@ -173,7 +173,7 @@ describe('SubscriptionTopicBuilder', () => {
             },
             {
               query: {
-                roomId: undefined,
+                // roomId: undefined,
               },
             },
             {
@@ -200,7 +200,9 @@ describe('SubscriptionTopicBuilder', () => {
 
         test.each(queryCases)('roomId: $query.roomId', ({ query }) => {
           const args = {
-            query,
+            query: {
+              roomId: query.roomId,
+            },
           }
 
           const actual = generator.generateChannel(args)

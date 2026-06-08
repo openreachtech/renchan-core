@@ -88,7 +88,7 @@ describe('MiddlewareExpressRoute', () => {
         },
         {
           params: {
-            path: undefined,
+            // path: undefined,
             handlers: [
               () => {},
               () => {},

@@ -320,7 +320,7 @@ describe('BaseGraphqlServerEngine', () => {
           }),
         }
 
-        const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine.get:config"}'
+        const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine.get:config"}'
 
         expect(() => BaseGraphqlServerEngine.create(args))
           .toThrow(expected)
@@ -517,7 +517,7 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.get:config', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine.get:config"}'
+      const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine.get:config"}'
 
       expect(() => BaseGraphqlServerEngine.config)
         .toThrow(expected)
@@ -528,7 +528,7 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.get:standardErrorCodeHash', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine.get:standardErrorCodeHash"}'
+      const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine.get:standardErrorCodeHash"}'
 
       expect(() => BaseGraphqlServerEngine.standardErrorCodeHash)
         .toThrow(expected)
@@ -592,7 +592,7 @@ describe('BaseGraphqlServerEngine', () => {
       })
     })
 
-    describe('to call RenchanGraphqlError.buildErrorHash()', () => {
+    describe('to call RenchanGraphqlError.declareGraphqlError()', () => {
       const cases = [
         {
           params: {
@@ -641,7 +641,7 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.get:Share', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine.get:Share"}'
+      const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine.get:Share"}'
 
       expect(() => BaseGraphqlServerEngine.Share)
         .toThrow(expected)
@@ -652,7 +652,7 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.get:Context', () => {
     test('throw error', () => {
-      const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine.get:Context"}'
+      const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine.get:Context"}'
 
       expect(() => BaseGraphqlServerEngine.Context)
         .toThrow(expected)
@@ -1024,7 +1024,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine#collectMiddleware()"}'
+        const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine#collectMiddleware()"}'
 
         const engine = await params.EngineCtor.createAsync(params)
 
@@ -1187,7 +1187,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseGraphqlServerEngine#generateFilterHandler()"}'
+        const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine#generateFilterHandler()"}'
 
         const engine = await params.EngineCtor.createAsync(params)
 

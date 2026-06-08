@@ -252,7 +252,7 @@ describe('BaseResolver', () => {
   describe('.get:operation', () => {
     describe('to throw', () => {
       test('with no args', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseResolver.get:operation"}'
+        const expected = '101.X000.001 {"memberName":"BaseResolver.get:operation"}'
 
         expect(() => BaseResolver.operation)
           .toThrow(expected)
@@ -350,7 +350,7 @@ describe('BaseResolver', () => {
 
     describe('to throw', () => {
       test('with no args', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseResolver.get:schema"}'
+        const expected = '101.X000.001 {"memberName":"BaseResolver.get:schema"}'
 
         expect(() => BaseResolver.schema)
           .toThrow(expected)
@@ -430,7 +430,7 @@ describe('BaseResolver', () => {
       })
     })
 
-    describe('to call RenchanGraphqlError.buildErrorHash()', () => {
+    describe('to call RenchanGraphqlError.declareGraphqlError()', () => {
       const cases = [
         {
           params: {
@@ -529,7 +529,7 @@ describe('BaseResolver', () => {
   describe('#get:operation', () => {
     describe('to throw', () => {
       test('with no args', () => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseResolver.get:operation"}'
+        const expected = '101.X000.001 {"memberName":"BaseResolver.get:operation"}'
 
         const resolver = BaseResolver.create()
 
@@ -634,7 +634,7 @@ describe('BaseResolver', () => {
       ]
 
       test.each(cases)('id: $params.variables.input.id', async ({ params }) => {
-        const expected = 'concrete-member-not-found {"memberName":"BaseResolver#resolve()"}'
+        const expected = '101.X000.001 {"memberName":"BaseResolver#resolve()"}'
 
         const resolver = BaseResolver.create()
 

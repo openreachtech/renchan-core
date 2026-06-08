@@ -136,7 +136,7 @@ describe('BigNumberScalar', () => {
         { value: {} },
         { value: [] },
         { value: null },
-        { value: undefined },
+        { /* value: undefined */ },
       ]
 
       test.each(cases)('value $value', ({ value }) => {
@@ -199,7 +199,7 @@ describe('BigNumberScalar', () => {
         { value: {} },
         { value: [] },
         { value: null },
-        { value: undefined },
+        { /* value: undefined */ },
       ]
 
       test.each(cases)('value $value', ({ value }) => {

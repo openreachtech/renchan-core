@@ -153,7 +153,7 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
         },
@@ -209,11 +209,11 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
           expected: {
-            file: undefined,
+            // file: undefined,
           },
         },
       ])
@@ -261,7 +261,7 @@ describe('FileContentReader', () => {
           params: {
             upload: {
               promise: Promise.resolve(),
-              file: undefined,
+              // file: undefined,
             },
           },
         },
@@ -293,11 +293,6 @@ describe('FileContentReader', () => {
   describe('#readContent()', () => {
     describe('to be null when no file is set', () => {
       const cases = [
-        {
-          params: {
-            file: undefined,
-          },
-        },
         {
           params: {
             // file: undefined,
@@ -650,11 +645,6 @@ describe('FileContentReader', () => {
       const cases = [
         {
           params: {
-            file: undefined,
-          },
-        },
-        {
-          params: {
             // file: undefined,
           },
         },
@@ -724,11 +714,6 @@ describe('FileContentReader', () => {
 
     describe('should return null when #file is not set', () => {
       const cases = [
-        {
-          params: {
-            file: undefined,
-          },
-        },
         {
           params: {
             // file: undefined,
@@ -802,11 +787,6 @@ describe('FileContentReader', () => {
       const cases = [
         {
           params: {
-            file: undefined,
-          },
-        },
-        {
-          params: {
             // file: undefined,
           },
         },
@@ -874,11 +854,6 @@ describe('FileContentReader', () => {
 
     describe('should be falsy', () => {
       const cases = [
-        {
-          params: {
-            file: undefined,
-          },
-        },
         {
           params: {
             // file: undefined,

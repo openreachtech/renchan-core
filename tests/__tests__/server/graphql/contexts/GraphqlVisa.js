@@ -166,7 +166,7 @@ describe('GraphqlVisa', () => {
           expected: 'Cannot destructure property \'hasAuthenticated\' of \'object null\' as it is null.',
         },
         {
-          params: undefined,
+          // params: undefined,
           expected: 'Cannot destructure property \'hasAuthenticated\' of \'undefined\' as it is undefined.',
         },
       ])
@@ -581,7 +581,7 @@ describe('GraphqlVisa', () => {
           { schema: 'secretPage' },
           { schema: '_unknown' },
           { schema: null },
-          { schema: undefined },
+          { /* schema: undefined */ },
         ],
       },
       {
@@ -602,7 +602,7 @@ describe('GraphqlVisa', () => {
           { schema: 'orders' },
           { schema: '_unknown' },
           { schema: null },
-          { schema: undefined },
+          { /* schema: undefined */ },
         ],
       },
     ]

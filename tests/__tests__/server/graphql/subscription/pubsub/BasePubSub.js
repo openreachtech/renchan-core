@@ -72,7 +72,7 @@ describe('BasePubSub', () => {
       test.each(cases)('channel: $params.channel', async ({ params }) => {
         await expect(pubSub.publish(params))
           .rejects
-          .toThrow('concrete-member-not-found {"memberName":"BasePubSub#publish()"}')
+          .toThrow('101.X000.001 {"memberName":"BasePubSub#publish()"}')
       })
     })
   })
@@ -245,7 +245,7 @@ describe('BasePubSub', () => {
       test.each(cases)('channel: $params.eventHub.channel', async ({ params }) => {
         await expect(pubSub.setupBroadcasterOnSubscribe(params))
           .rejects
-          .toThrow('concrete-member-not-found {"memberName":"BasePubSub#setupBroadcasterOnSubscribe()"}')
+          .toThrow('101.X000.001 {"memberName":"BasePubSub#setupBroadcasterOnSubscribe()"}')
       })
     })
   })
@@ -483,7 +483,7 @@ describe('BasePubSub', () => {
       test.each(cases)('channel: $params.eventHub.channel', async ({ params }) => {
         await expect(pubSub.teardownBroadcasterOnUnsubscribe(params))
           .rejects
-          .toThrow('concrete-member-not-found {"memberName":"BasePubSub#teardownBroadcasterOnUnsubscribe()"}')
+          .toThrow('101.X000.001 {"memberName":"BasePubSub#teardownBroadcasterOnUnsubscribe()"}')
       })
     })
   })
