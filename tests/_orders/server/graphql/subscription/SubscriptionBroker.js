@@ -147,6 +147,17 @@ describe('SubscriptionBroker', () => {
 })
 
 describe('SubscriptionBroker', () => {
+  describe('.get:LocalPubSubCtor', () => {
+    test('should be correct class', () => {
+      const actual = SubscriptionBroker.LocalPubSubCtor
+
+      expect(actual)
+        .toBe(LocalPubSub) // the same reference
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
   describe('.createRedisPubSub()', () => {
     describe('should be an instance of correct class', () => {
       // TODO: fulfill here
