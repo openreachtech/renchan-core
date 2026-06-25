@@ -136,6 +136,17 @@ describe('SubscriptionBroker', () => {
 })
 
 describe('SubscriptionBroker', () => {
+  describe('.get:RedisPubSubCtor', () => {
+    test('should be correct class', () => {
+      const actual = SubscriptionBroker.RedisPubSubCtor
+
+      expect(actual)
+        .toBe(RedisPubSub) // the same reference
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
     const redisPubSub = RedisPubSub.create({
       options: {
