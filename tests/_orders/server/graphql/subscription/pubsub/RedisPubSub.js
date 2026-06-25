@@ -199,6 +199,18 @@ describe('RedisPubSub', () => {
 })
 
 describe('RedisPubSub', () => {
+  describe('.resolveRedisClient()', () => {
+    describe('when redisClient is provided', () => {
+      // TODO: fulfill here
+    })
+
+    describe('when redisClient is not provided', () => {
+      // TODO: fulfill here
+    })
+  })
+})
+
+describe('RedisPubSub', () => {
   describe('.get:RedisCtor', () => {
     test('to be fixed value', () => {
       const actual = RedisPubSub.RedisCtor

@@ -136,6 +136,47 @@ describe('SubscriptionBroker', () => {
 })
 
 describe('SubscriptionBroker', () => {
+  describe('.get:RedisPubSubCtor', () => {
+    test('should be correct class', () => {
+      const actual = SubscriptionBroker.RedisPubSubCtor
+
+      expect(actual)
+        .toBe(RedisPubSub) // the same reference
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
+  describe('.get:LocalPubSubCtor', () => {
+    test('should be correct class', () => {
+      const actual = SubscriptionBroker.LocalPubSubCtor
+
+      expect(actual)
+        .toBe(LocalPubSub) // the same reference
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
+  describe('.createRedisPubSub()', () => {
+    describe('should be an instance of correct class', () => {
+      // TODO: fulfill here
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
+  describe('.createLocalPubSub()', () => {
+    test('should be an instance of correct class', () => {
+      const actual = SubscriptionBroker.createLocalPubSub()
+
+      expect(actual)
+        .toBeInstanceOf(LocalPubSub)
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
     const redisPubSub = RedisPubSub.create({
       options: {

@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/renchan",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
