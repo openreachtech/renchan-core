@@ -147,6 +147,14 @@ describe('SubscriptionBroker', () => {
 })
 
 describe('SubscriptionBroker', () => {
+  describe('.createRedisPubSub()', () => {
+    describe('should be an instance of correct class', () => {
+      // TODO: fulfill here
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
     const redisPubSub = RedisPubSub.create({
       options: {
