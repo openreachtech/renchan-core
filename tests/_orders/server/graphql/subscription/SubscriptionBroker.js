@@ -166,6 +166,17 @@ describe('SubscriptionBroker', () => {
 })
 
 describe('SubscriptionBroker', () => {
+  describe('.createLocalPubSub()', () => {
+    test('should be an instance of correct class', () => {
+      const actual = SubscriptionBroker.createLocalPubSub()
+
+      expect(actual)
+        .toBeInstanceOf(LocalPubSub)
+    })
+  })
+})
+
+describe('SubscriptionBroker', () => {
   describe('.createPubSub()', () => {
     const redisPubSub = RedisPubSub.create({
       options: {
