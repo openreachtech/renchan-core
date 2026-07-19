@@ -36,8 +36,13 @@ jobs:
           PR_TITLE=$(echo '${{ github.event.pull_request.title }}' | sed 's/`/\\`/g')
 
           # Default to patch
-          echo "bump=patch" >> $GITHUB_OUTPUT
-          echo "Bumping patch version (default)"
+          echo "bump=none" >> $GITHUB_OUTPUT
+          echo "Bumping none (default)"
+
+          if [[ "$PR_TITLE" == *"[patch]"* ]]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+            echo "Bumping patch version (from PR title)"
+          fi
 
           if [[ "$PR_TITLE" == *"[major]"* ]]; then
             echo "bump=major" >> $GITHUB_OUTPUT
@@ -60,10 +65,14 @@ jobs:
           MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
           PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
 
-          # Initialize with patch increment
-          NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          # Initialize
+          NEW_VERSION="$((MAJOR + 0)).$((MINOR + 0)).$((PATCH + 0))"
 
-          # Override with minor or major if specified
+          # Override if specified
+          if [ "${{ steps.bump_type.outputs.bump }}" == "patch" ]; then
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+
           if [ "${{ steps.bump_type.outputs.bump }}" == "minor" ]; then
             NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
           fi
@@ -76,6 +85,7 @@ jobs:
           echo "New version: $NEW_VERSION"
 
       - name: 🏷️ Create new version tag
+        if: steps.bump_type.outputs.bump != 'none'
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -86,7 +96,8 @@ jobs:
           echo "Created and pushed tag: $NEW_TAG"
 
       - name: 📢 Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        if: steps.bump_type.outputs.bump != 'none'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump_version.outputs.new_version }}
           name: ${{ steps.bump_version.outputs.new_version }}
