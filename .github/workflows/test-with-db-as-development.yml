@@ -1,13 +1,16 @@
 name: Node.js CI with SQLite
 
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - '**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -34,7 +37,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.TO_REPO_OF_ORT_PRIVATE }}
 
-      - name: 🔍 ESLint
+      - name: 🧵 ESLint
         run: npm run lint
 
       - name: 🧪 Jest
