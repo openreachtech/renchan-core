@@ -32,6 +32,20 @@ export default [
       'no-console': 'off',
     },
   },
+  {
+    files: [
+      'lib/client/redis/LocalRedis.js',
+      'lib/server/graphql/subscription/pubsub/tools/EventHub.js',
+      'lib/server/graphql/subscription/TopicReceiver.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'MethodDefinition[kind=constructor] BlockStatement CallExpression:not([callee.type=Super])'),
+      ],
+    },
+  },
 
   // Turn off some rules temporarily
   {
