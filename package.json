@@ -58,7 +58,7 @@
     "@openreachtech/renchan-tools": "^1.0.0",
     "@steweucen/fertile-forest-sequelize": "^0.1.1",
     "@types/jest": "^30.0.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.39.5",
     "jest": "^30.4.2",
     "mariadb": "^3.3.2",
     "nodemon": "^3.1.7",
