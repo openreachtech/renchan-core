@@ -1,5 +1,5 @@
 describe('Model', () => {
-  class TestKeeper {
+  class TestKeeper extends Object {
     static async findOne () {
       return Promise.resolve(null)
     }
