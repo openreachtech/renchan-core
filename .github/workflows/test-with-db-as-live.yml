@@ -58,6 +58,7 @@ jobs:
           # sweep to bump a pinned major across all of them. Pin a concrete version
           # here only in a repository that genuinely needs one.
           node-version: lts/*
+          registry-url: https://npm.pkg.github.com
 
       - name: 🖨️ Print runtime versions
         run: |
