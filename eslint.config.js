@@ -58,6 +58,18 @@ export default [
       ],
     },
   },
+  {
+    files: [
+      'tests/__tests__/tools/FileContentReader.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'CallExpression[callee.name=describe] IfStatement'),
+      ],
+    },
+  },
 
   // Turn off some rules temporarily
   {
