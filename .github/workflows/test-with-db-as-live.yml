@@ -19,7 +19,9 @@ jobs:
     # from the merge gate.
     name: CI Test
 
-    runs-on: ubuntu-latest
+    # private repository: self-hosted
+    # public repository: github-hosted
+    runs-on: ${{ fromJSON(github.event.repository.private && '["self-hosted", "light"]' || '["ubuntu-latest"]') }}
 
     timeout-minutes: 60
 
@@ -60,10 +62,14 @@ jobs:
           node-version: lts/*
           registry-url: https://npm.pkg.github.com
 
-      - name: 🖨️ Print runtime versions
+      - name: 🖨️ Print environment
+        env:
+          RUNNER_ENVIRONMENT: ${{ runner.environment }}
         run: |
-          node -v
-          npm -v
+          echo
+          echo "runner: $RUNNER_ENVIRONMENT"
+          echo "node:   $(node -v)"
+          echo "npm:    $(npm -v)"
 
       - name: 📦 Install packages
         run: npm ci

@@ -16,7 +16,9 @@ jobs:
   main-guard:
     name: Main Guard
 
-    runs-on: ubuntu-latest
+    # private repository: self-hosted
+    # public repository: github-hosted
+    runs-on: ${{ fromJSON(github.event.repository.private && '["self-hosted", "light"]' || '["ubuntu-latest"]') }}
 
     timeout-minutes: 5
 
