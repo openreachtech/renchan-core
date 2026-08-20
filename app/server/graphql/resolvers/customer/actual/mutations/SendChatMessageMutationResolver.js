@@ -38,12 +38,12 @@ export default class SendChatMessageMutationResolver extends BaseMutationResolve
       postedAt: context.now,
     }
 
-    const callback = await this.generateTransactionCallback({
+    const transactionHandler = await this.generateTransactionCallback({
       attributeHash,
     })
 
     /** @type {import('../../../../../../sequelize/models/ChatMessage.js').ChatMessageEntity | null} */
-    const result = await ChatMessage.beginTransaction(callback)
+    const result = await ChatMessage.beginTransaction(transactionHandler)
 
     if (!result) {
       throw new this.Error.FailToSave()
