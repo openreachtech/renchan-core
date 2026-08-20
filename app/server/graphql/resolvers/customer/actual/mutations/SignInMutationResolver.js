@@ -117,12 +117,12 @@ export default class SignInMutationResolver extends BaseMutationResolver {
     context,
     customerId,
   }) {
-    const callback = this.generateTransactionCallback({
+    const transactionHandler = this.generateTransactionCallback({
       customerId,
       now: context.now,
     })
 
-    return CustomerAccessToken.beginTransaction(callback)
+    return CustomerAccessToken.beginTransaction(transactionHandler)
   }
 
   /**

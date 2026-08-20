@@ -1,6 +1,6 @@
 import MockSequelizeModel from './MockSequelizeModel.js'
 
-export default class MockSequelize {
+export default class MockSequelize extends Object {
   /**
    * Factory method.
    *
