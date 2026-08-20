@@ -166,9 +166,9 @@ builder.buildHttpServer()
 
 ## ライセンス
 
-このプロジェクトは MIT ライセンスの下でリリースされています。
+本プロジェクトは Apache License 2.0 で公開されています。
 
-詳細は [LICENSE](./LICENSE) をご覧ください。
+詳細は [LICENSE ファイル](./LICENSE) を参照してください。
 
 ## コントリビューション
 
