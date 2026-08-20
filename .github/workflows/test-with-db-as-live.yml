@@ -14,11 +14,14 @@ permissions:
 
 jobs:
   test:
+    # ⚠️ Keep this name fixed. Required status checks are configured per-organization
+    # by check name, so renaming the job here silently exempts this repository
+    # from the merge gate.
+    name: CI Test
+
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+    timeout-minutes: 60
 
     services:
       mariadb:
@@ -33,8 +36,8 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
 
     steps:
-      - name: 🛎 Checkout repository code
-        uses: actions/checkout@v2
+      - name: 🛎️ Checkout repository code
+        uses: actions/checkout@v7
 
       - name: 📍 Verify MariaDB connection / Create database / Set port
         env:
@@ -46,13 +49,20 @@ jobs:
           echo "CREATE DATABASE IF NOT EXISTS test;" > test.sql
           mysql -uroot -ppassword -h"127.0.0.1" -P"3306" < test.sql
 
-      - name: 🏗 Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: 🏗️ Use Node.js
+        uses: actions/setup-node@v7
         with:
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-          node-version: ${{ matrix.node-version }}
-          registry-url: https://npm.pkg.github.com
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          package-manager-cache: false
+          # A floating LTS alias keeps every repository current without a scheduled
+          # sweep to bump a pinned major across all of them. Pin a concrete version
+          # here only in a repository that genuinely needs one.
+          node-version: lts/*
+
+      - name: 🖨️ Print runtime versions
+        run: |
+          node -v
+          npm -v
 
       - name: 📦 Install packages
         run: npm ci
