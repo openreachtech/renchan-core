@@ -46,6 +46,18 @@ export default [
       ],
     },
   },
+  {
+    files: [
+      'lib/server/graphql/GraphqlHttpHandlerBuilder.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'IfStatement[test] AwaitExpression'),
+      ],
+    },
+  },
 
   // Turn off some rules temporarily
   {
