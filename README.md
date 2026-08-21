@@ -186,7 +186,7 @@ npm test
 
 ## Developers
 
-[Open Reach Tech inc.](https://openreach.tech)
+[Open Reach Tech Inc.](https://openreach.tech)
 
 ## Copyright
 
