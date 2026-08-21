@@ -32,6 +32,44 @@ export default [
       'no-console': 'off',
     },
   },
+  {
+    files: [
+      'lib/client/redis/LocalRedis.js',
+      'lib/server/graphql/subscription/pubsub/tools/EventHub.js',
+      'lib/server/graphql/subscription/TopicReceiver.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'MethodDefinition[kind=constructor] BlockStatement CallExpression:not([callee.type=Super])'),
+      ],
+    },
+  },
+  {
+    files: [
+      'lib/server/graphql/GraphqlHttpHandlerBuilder.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'IfStatement[test] AwaitExpression'),
+      ],
+    },
+  },
+  {
+    files: [
+      'tests/__tests__/tools/FileContentReader.js',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...coreRuleOptionHash['no-restricted-syntax'].spreadOptions
+          .filter(it => it.selector !== 'CallExpression[callee.name=describe] IfStatement'),
+      ],
+    },
+  },
 
   // Turn off some rules temporarily
   {

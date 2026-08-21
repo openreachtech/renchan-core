@@ -10,18 +10,8 @@ Node.jsが必要です。まだインストールされていない場合は、�
 
 | ツール | バージョン |
 | :-- | :-- |
-| Node.js | ^20.19.2 |
+| Node.js | >=20.0.0 |
 | npm | ^10.9.0 |
-
-## `.npmrc` のセットアップ
-
-プロジェクトのルートディレクトリに `.npmrc` ファイルを作成し、必要な設定を追加してください。
-
-`.npmrc` ファイルに以下の行を追加してください。
-
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
 
 ## コマンド
 
@@ -166,9 +156,9 @@ builder.buildHttpServer()
 
 ## ライセンス
 
-このプロジェクトは MIT ライセンスの下でリリースされています。
+本プロジェクトは Apache License 2.0 で公開されています。
 
-詳細は [LICENSE](./LICENSE) をご覧ください。
+詳細は [LICENSE ファイル](./LICENSE) を参照してください。
 
 ## コントリビューション
 
@@ -187,7 +177,7 @@ npm test
 
 ## 開発者
 
-[Open Reach Tech inc.](https://openreach.tech)
+[Open Reach Tech Inc.](https://openreach.tech)
 
 ## 著作権
 

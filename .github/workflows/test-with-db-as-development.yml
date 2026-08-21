@@ -1,40 +1,57 @@
 name: Node.js CI with SQLite
 
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - '**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # ⚠️ Keep this name fixed. Required status checks are configured per-organization
+    # by check name, so renaming the job here silently exempts this repository
+    # from the merge gate.
+    name: CI Test
 
-    strategy:
-      matrix:
-        node-version: [20.x]
+    # private repository: self-hosted
+    # public repository: github-hosted
+    runs-on: ${{ fromJSON(github.event.repository.private && '["self-hosted", "light"]' || '["ubuntu-latest"]') }}
+
+    timeout-minutes: 60
 
     steps:
-      - name: 🛎 Checkout repository code
-        uses: actions/checkout@v2
+      - name: 🛎️ Checkout repository code
+        uses: actions/checkout@v7
 
-      - name: 🏗 Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: 🏗️ Use Node.js
+        uses: actions/setup-node@v7
         with:
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-          node-version: ${{ matrix.node-version }}
-          registry-url: https://npm.pkg.github.com
+          cache: ${{ runner.environment == 'github-hosted' && 'npm' || '' }}
+          package-manager-cache: false
+          # A floating LTS alias keeps every repository current without a scheduled
+          # sweep to bump a pinned major across all of them. Pin a concrete version
+          # here only in a repository that genuinely needs one.
+          node-version: lts/*
+
+      - name: 🖨️ Print environment
+        env:
+          RUNNER_ENVIRONMENT: ${{ runner.environment }}
+        run: |
+          echo
+          echo "runner: $RUNNER_ENVIRONMENT"
+          echo "node:   $(node -v)"
+          echo "npm:    $(npm -v)"
 
       - name: 📦 Install packages
         run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.TO_REPO_OF_ORT_PRIVATE }}
 
-      - name: 🔍 ESLint
+      - name: 🧵 ESLint
         run: npm run lint
 
       - name: 🧪 Jest

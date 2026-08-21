@@ -5,7 +5,7 @@ import {
 
 import {
   RandomTextGenerator,
-} from '@openreachtech/renchan-tools'
+} from '@openreachtech/mentsu-random-text-generator'
 
 const MILLISECONDS_PER_DAY = 60 * 60 * 24 * 1000 // milliseconds in a day
 
@@ -133,7 +133,9 @@ export default class CustomerAccessToken extends RenchanModel {
   } = {}) {
     const generator = RandomTextGenerator.create()
 
-    return generator.generate(length)
+    return generator.generate({
+      length,
+    })
   }
 
   /**

@@ -3,10 +3,10 @@ import FileContentReader from '../../../lib/tools/FileContentReader.js'
 describe('FileContentReader', () => {
   describe('constructor', () => {
     const alphaStreamMock = {
-      on: jest.fn((event, callback) => alphaStreamMock),
+      on: jest.fn((event, handler) => alphaStreamMock),
     }
     const betaStreamMock = {
-      on: jest.fn((event, callback) => betaStreamMock),
+      on: jest.fn((event, handler) => betaStreamMock),
     }
 
     describe('to keep properties', () => {
@@ -54,10 +54,10 @@ describe('FileContentReader', () => {
 describe('FileContentReader', () => {
   describe('create', () => {
     const alphaStreamMock = {
-      on: jest.fn((event, callback) => alphaStreamMock),
+      on: jest.fn((event, handler) => alphaStreamMock),
     }
     const betaStreamMock = {
-      on: jest.fn((event, callback) => betaStreamMock),
+      on: jest.fn((event, handler) => betaStreamMock),
     }
 
     /**
@@ -118,10 +118,10 @@ describe('FileContentReader', () => {
 describe('FileContentReader', () => {
   describe('createAsync', () => {
     const alphaStreamMock = {
-      on: jest.fn((event, callback) => alphaStreamMock),
+      on: jest.fn((event, handler) => alphaStreamMock),
     }
     const betaStreamMock = {
-      on: jest.fn((event, callback) => betaStreamMock),
+      on: jest.fn((event, handler) => betaStreamMock),
     }
 
     describe('to be instance of own class', () => {
@@ -315,30 +315,30 @@ describe('FileContentReader', () => {
 
     describe('should return file content as Buffer', () => {
       const alphaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'data') {
             // @ts-expect-error
-            callback(Buffer.from('alpha-chunk'))
+            handler(Buffer.from('alpha-chunk'))
           }
 
           if (event === 'end') {
             // @ts-expect-error
-            callback()
+            handler()
           }
 
           return alphaStreamMock
         }),
       }
       const betaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'data') {
             // @ts-expect-error
-            callback(Buffer.from('beta-chunk'))
+            handler(Buffer.from('beta-chunk'))
           }
 
           if (event === 'end') {
             // @ts-expect-error
-            callback()
+            handler()
           }
 
           return betaStreamMock
@@ -381,20 +381,20 @@ describe('FileContentReader', () => {
 
     describe('should handle stream errors', () => {
       const alphaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'error') {
             // @ts-expect-error
-            callback(new Error('Alpha stream error'))
+            handler(new Error('Alpha stream error'))
           }
 
           return alphaStreamMock
         }),
       }
       const betaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'error') {
             // @ts-expect-error
-            callback(new Error('Beta stream error'))
+            handler(new Error('Beta stream error'))
           }
 
           return betaStreamMock
@@ -441,17 +441,17 @@ describe('FileContentReader', () => {
     describe('should concatenate chunks from the stream', () => {
       /** @type {import('stream').Readable} */
       const alphaStreamMock = /** @type {*} */ ({
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'data') {
             // @ts-expect-error
-            callback(Buffer.from('alpha-chunk-first'))
+            handler(Buffer.from('alpha-chunk-first'))
             // @ts-expect-error
-            callback(Buffer.from('alpha-chunk-second'))
+            handler(Buffer.from('alpha-chunk-second'))
           }
 
           if (event === 'end') {
             // @ts-expect-error
-            callback()
+            handler()
           }
 
           return alphaStreamMock
@@ -460,17 +460,17 @@ describe('FileContentReader', () => {
 
       /** @type {import('stream').Readable} */
       const betaStreamMock = /** @type {*} */ ({
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'data') {
             // @ts-expect-error
-            callback(Buffer.from('beta-chunk-first'))
+            handler(Buffer.from('beta-chunk-first'))
             // @ts-expect-error
-            callback(Buffer.from('beta-chunk-second'))
+            handler(Buffer.from('beta-chunk-second'))
           }
 
           if (event === 'end') {
             // @ts-expect-error
-            callback()
+            handler()
           }
 
           return betaStreamMock
@@ -529,20 +529,20 @@ describe('FileContentReader', () => {
 
     describe('should handle stream errors during concatenation', () => {
       const alphaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'error') {
             // @ts-expect-error
-            callback(new Error('Alpha stream error'))
+            handler(new Error('Alpha stream error'))
           }
 
           return alphaStreamMock
         }),
       }
       const betaStreamMock = {
-        on: jest.fn((event, callback) => {
+        on: jest.fn((event, handler) => {
           if (event === 'error') {
             // @ts-expect-error
-            callback(new Error('Beta stream error'))
+            handler(new Error('Beta stream error'))
           }
 
           return betaStreamMock
