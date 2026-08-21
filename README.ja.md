@@ -187,7 +187,7 @@ npm test
 
 ## 開発者
 
-[Open Reach Tech inc.](https://openreach.tech)
+[Open Reach Tech Inc.](https://openreach.tech)
 
 ## 著作権
 
