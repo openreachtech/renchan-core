@@ -1,6 +1,6 @@
 import {
   RandomTextGenerator,
-} from '@openreachtech/renchan-tools'
+} from '@openreachtech/mentsu-random-text-generator'
 
 import RenewAccessTokenMutationResolver from '../../../../../../../../../app/server/graphql/resolvers/customer/actual/mutations/RenewAccessTokenMutationResolver.js'
 
