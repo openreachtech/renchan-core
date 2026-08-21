@@ -54,6 +54,7 @@
     "@openreachtech/eslint-config": "^4.5.0",
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-expect-each": "^1.0.3",
+    "@openreachtech/mentsu-random-text-generator": "^1.0.0",
     "@openreachtech/renchan-sequelize": "^2.2.1",
     "@openreachtech/renchan-tools": "^1.0.0",
     "@steweucen/fertile-forest-sequelize": "^0.1.3",
