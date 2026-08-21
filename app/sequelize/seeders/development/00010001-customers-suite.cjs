@@ -3,8 +3,8 @@
 const TimestampSeedsSupplier = require('@openreachtech/renchan-sequelize/lib/tools/TimestampSeedsSupplier.cjs')
 
 const {
-  Encipher,
-} = require('@openreachtech/renchan-tools')
+  default: Encipher,
+} = require('../../../tools/Encipher.js')
 
 const encipher = Encipher.create()
 
