@@ -57,7 +57,6 @@
     "@openreachtech/jest-expect-each": "^1.0.3",
     "@openreachtech/mentsu-random-text-generator": "^1.0.0",
     "@openreachtech/renchan-sequelize": "^2.2.1",
-    "@openreachtech/renchan-tools": "^1.0.0",
     "@steweucen/fertile-forest-sequelize": "^0.1.3",
     "@types/jest": "^30.0.0",
     "bcrypt": "^5.1.0",
