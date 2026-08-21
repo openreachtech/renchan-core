@@ -4,9 +4,7 @@ import {
   ModelAttributeFactory,
 } from '@openreachtech/renchan-sequelize'
 
-import {
-  Encipher,
-} from '@openreachtech/renchan-tools'
+import Encipher from '../../tools/Encipher.js'
 
 /**
  * CustomerPasswordHash model.
