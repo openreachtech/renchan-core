@@ -351,6 +351,46 @@ describe('RestfulApiServerBuilder', () => {
 })
 
 describe('RestfulApiServerBuilder', () => {
+  describe('#collectExpressSettings()', () => {
+    describe('to call engine', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            settingsTally: {},
+          },
+        },
+        {
+          params: {
+            EngineCtor: BetaRestfulApiServerEngine,
+            settingsTally: {
+              'case sensitive routing': true,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await RestfulApiServerBuilder.createAsync(args)
+
+        const collectExpressSettingsSpy = jest.spyOn(builder.engine, 'collectExpressSettings')
+          .mockReturnValue(params.settingsTally)
+
+        const actual = builder.collectExpressSettings()
+
+        expect(actual)
+          .toBe(params.settingsTally) // same reference
+        expect(collectExpressSettingsSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+  })
+})
+
+describe('RestfulApiServerBuilder', () => {
   describe('#get:config', () => {
     describe('to be fixed value', () => {
       const cases = [
@@ -493,6 +533,7 @@ describe('RestfulApiServerBuilder', () => {
         }
         const builder = await RestfulApiServerBuilder.createAsync(args)
 
+        const applyExpressSettingsSpy = jest.spyOn(builder, 'applyExpressSettings')
         const collectExpressRoutesSpy = jest.spyOn(builder, 'collectExpressRoutes')
           .mockReturnValue(middlewareRoutesTally)
         const collectRendererRoutesSpy = jest.spyOn(builder, 'collectRendererRoutes')
@@ -511,6 +552,8 @@ describe('RestfulApiServerBuilder', () => {
         expect(actual)
           .toBe(actualTally) // same reference
 
+        expect(applyExpressSettingsSpy)
+          .toHaveBeenCalledWith()
         expect(collectExpressRoutesSpy)
           .toHaveBeenCalledWith()
         expect(collectRendererRoutesSpy)
@@ -683,6 +726,57 @@ describe('RestfulApiServerBuilder', () => {
 })
 
 describe('RestfulApiServerBuilder', () => {
+  describe('#applyExpressSettings()', () => {
+    describe('to set settings to Express application', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            settingsTally: {
+              'case sensitive routing': true,
+              'strict routing': true,
+            },
+          },
+        },
+        {
+          params: {
+            EngineCtor: BetaRestfulApiServerEngine,
+            settingsTally: {
+              'case sensitive routing': false,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await RestfulApiServerBuilder.createAsync(args)
+
+        jest.spyOn(builder, 'collectExpressSettings')
+          .mockReturnValue(params.settingsTally)
+
+        const actual = builder.applyExpressSettings()
+
+        const actualSettings = Object.fromEntries(
+          Object.keys(params.settingsTally)
+            .map(key => [
+              key,
+              actual.get(key),
+            ])
+        )
+
+        expect(actual)
+          .toBe(builder.app) // same reference
+        expect(actualSettings)
+          .toEqual(params.settingsTally)
+      })
+    })
+  })
+})
+
+describe('RestfulApiServerBuilder', () => {
   describe('#buildServerRootApp()', () => {
     describe('to mount to #app', () => {
       const cases = [
@@ -767,6 +861,76 @@ describe('RestfulApiServerBuilder', () => {
           .toEqual(expected)
         expect(listenSpy)
           .toHaveBeenCalledWith(...listenExpected)
+      })
+    })
+
+    describe('to forward every argument to listen', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            listenArgs: [
+              2999,
+            ],
+          },
+          expected: [
+            2999,
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            listenArgs: [
+              2999,
+              '127.0.0.1',
+            ],
+          },
+          expected: [
+            2999,
+            '127.0.0.1',
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: BetaRestfulApiServerEngine,
+            listenArgs: [
+              3999,
+              '::1',
+              511,
+            ],
+          },
+          expected: [
+            3999,
+            '::1',
+            511,
+            expect.any(Function),
+          ],
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name, listenArgs: $params.listenArgs', async ({ params, expected }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await RestfulApiServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        const listenSpy = jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            () => serverTally
+          )
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        actual.listen(...params.listenArgs)
+
+        expect(listenSpy)
+          .toHaveBeenCalledWith(...expected)
       })
     })
   })
