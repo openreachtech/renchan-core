@@ -769,5 +769,75 @@ describe('RestfulApiServerBuilder', () => {
           .toHaveBeenCalledWith(...listenExpected)
       })
     })
+
+    describe('to forward every argument to listen', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            listenArgs: [
+              2999,
+            ],
+          },
+          expected: [
+            2999,
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            listenArgs: [
+              2999,
+              '127.0.0.1',
+            ],
+          },
+          expected: [
+            2999,
+            '127.0.0.1',
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: BetaRestfulApiServerEngine,
+            listenArgs: [
+              3999,
+              '::1',
+              511,
+            ],
+          },
+          expected: [
+            3999,
+            '::1',
+            511,
+            expect.any(Function),
+          ],
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name, listenArgs: $params.listenArgs', async ({ params, expected }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await RestfulApiServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        const listenSpy = jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            () => serverTally
+          )
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        actual.listen(...params.listenArgs)
+
+        expect(listenSpy)
+          .toHaveBeenCalledWith(...expected)
+      })
+    })
   })
 })
