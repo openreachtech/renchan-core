@@ -18,6 +18,7 @@ declare global {
     type Response = ExpressResponse
     type NextFunction = ExpressNextFunction
     type Middleware = Handler
+    type Settings = Record<string, any>
 
     type Route = BaseExpressRoute
 
