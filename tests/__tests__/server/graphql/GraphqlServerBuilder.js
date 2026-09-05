@@ -411,6 +411,57 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#applyExpressSettings()', () => {
+    describe('to set settings to Express application', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            settingsTally: {
+              'case sensitive routing': true,
+              'strict routing': true,
+            },
+          },
+        },
+        {
+          params: {
+            EngineCtor: AdminGraphqlServerEngine,
+            settingsTally: {
+              'case sensitive routing': false,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        jest.spyOn(builder, 'collectExpressSettings')
+          .mockReturnValue(params.settingsTally)
+
+        const actual = builder.applyExpressSettings()
+
+        const actualSettings = Object.fromEntries(
+          Object.keys(params.settingsTally)
+            .map(key => [
+              key,
+              actual.get(key),
+            ])
+        )
+
+        expect(actual)
+          .toBe(builder.app) // same reference
+        expect(actualSettings)
+          .toEqual(params.settingsTally)
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#collectExpressRoutes()', () => {
     describe('when call on development/live environment as is', () => {
       const cases = [
@@ -737,6 +788,46 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#collectExpressSettings()', () => {
+    describe('to call engine', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            settingsTally: {},
+          },
+        },
+        {
+          params: {
+            EngineCtor: AdminGraphqlServerEngine,
+            settingsTally: {
+              'case sensitive routing': true,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const collectExpressSettingsSpy = jest.spyOn(builder.engine, 'collectExpressSettings')
+          .mockReturnValue(params.settingsTally)
+
+        const actual = builder.collectExpressSettings()
+
+        expect(actual)
+          .toBe(params.settingsTally) // same reference
+        expect(collectExpressSettingsSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('.get:GraphqlHttpHandlerBuilder', () => {
     test('to be bridge class', () => {
       const actual = GraphqlServerBuilder.GraphqlHttpHandlerBuilder
@@ -1011,6 +1102,7 @@ describe('GraphqlServerBuilder', () => {
           listen: () => {},
         })
 
+        const applyExpressSettingsSpy = jest.spyOn(builder, 'applyExpressSettings')
         const collectExpressRoutesSpy = jest.spyOn(builder, 'collectExpressRoutes')
           .mockReturnValue(collectExpressRoutesTally)
         const createGraphqlHttpRouteSpy = jest.spyOn(builder, 'createGraphqlHttpRoute')
@@ -1029,6 +1121,8 @@ describe('GraphqlServerBuilder', () => {
         expect(actual)
           .toBe(buildHttpServerTally) // same reference
 
+        expect(applyExpressSettingsSpy)
+          .toHaveBeenCalledWith()
         expect(collectExpressRoutesSpy)
           .toHaveBeenCalledWith()
         expect(createGraphqlHttpRouteSpy)
@@ -1201,6 +1295,76 @@ describe('GraphqlServerBuilder', () => {
           .toEqual(expected)
         expect(listenSpy)
           .toHaveBeenCalledWith(...listenExpected)
+      })
+    })
+
+    describe('to forward every argument to listen', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            listenArgs: [
+              2999,
+            ],
+          },
+          expected: [
+            2999,
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            listenArgs: [
+              2999,
+              '127.0.0.1',
+            ],
+          },
+          expected: [
+            2999,
+            '127.0.0.1',
+            expect.any(Function),
+          ],
+        },
+        {
+          params: {
+            EngineCtor: AdminGraphqlServerEngine,
+            listenArgs: [
+              3999,
+              '::1',
+              511,
+            ],
+          },
+          expected: [
+            3999,
+            '::1',
+            511,
+            expect.any(Function),
+          ],
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name, listenArgs: $params.listenArgs', async ({ params, expected }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        const listenSpy = jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            () => serverTally
+          )
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        actual.listen(...params.listenArgs)
+
+        expect(listenSpy)
+          .toHaveBeenCalledWith(...expected)
       })
     })
   })

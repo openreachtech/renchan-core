@@ -1003,3 +1003,45 @@ describe('BaseRestfulApiServerEngine', () => {
     })
   })
 })
+
+describe('BaseRestfulApiServerEngine', () => {
+  describe('#collectExpressSettings()', () => {
+    describe('to be empty as default', () => {
+      const cases = [
+        {
+          params: {
+            config: {
+              pathPrefix: null,
+              renderersPath: '/path/to/renderers/',
+              staticPath: '/path/to/static/',
+            },
+            share: /** @type {*} */ ({}),
+            errorResponseHash: {},
+          },
+        },
+        {
+          params: {
+            config: {
+              pathPrefix: '/v2',
+              renderersPath: '/path/to/renderers/',
+              staticPath: '/path/to/static/',
+            },
+            share: /** @type {*} */ ({}),
+            errorResponseHash: {},
+          },
+        },
+      ]
+
+      test.each(cases)('pathPrefix: $params.config.pathPrefix', ({ params }) => {
+        const expected = {}
+
+        const engine = new BaseRestfulApiServerEngine(params)
+
+        const actual = engine.collectExpressSettings()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})

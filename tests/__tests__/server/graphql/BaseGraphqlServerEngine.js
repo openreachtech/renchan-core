@@ -1687,3 +1687,59 @@ describe('BaseGraphqlServerEngine', () => {
     })
   })
 })
+
+describe('BaseGraphqlServerEngine', () => {
+  describe('#collectExpressSettings()', () => {
+    /** @type {GraphqlType.Config} */
+    const mockConfig = /** @type {*} */ ({
+      redisOptions: null,
+    })
+    const mockBroker = SubscriptionBroker.create({
+      config: mockConfig,
+    })
+
+    describe('to be empty as default', () => {
+      const cases = [
+        {
+          params: {
+            config: {
+              graphqlEndpoint: '/graphql-customer',
+              schemaPath: '/path/to/schema-customer',
+              actualResolversPath: '/path/to/resolvers/customer/actual/',
+              stubResolversPath: '/path/to/resolvers/customer/stub/',
+            },
+            share: /** @type {*} */ ({
+              broker: mockBroker,
+            }),
+            errorHash: {},
+          },
+        },
+        {
+          params: {
+            config: {
+              graphqlEndpoint: '/graphql-admin',
+              schemaPath: '/path/to/schema-admin',
+              actualResolversPath: '/path/to/resolvers/admin/actual/',
+              stubResolversPath: '/path/to/resolvers/admin/stub/',
+            },
+            share: /** @type {*} */ ({
+              broker: mockBroker,
+            }),
+            errorHash: {},
+          },
+        },
+      ]
+
+      test.each(cases)('graphqlEndpoint: $params.config.graphqlEndpoint', ({ params }) => {
+        const expected = {}
+
+        const engine = new BaseGraphqlServerEngine(params)
+
+        const actual = engine.collectExpressSettings()
+
+        expect(actual)
+          .toEqual(expected)
+      })
+    })
+  })
+})
