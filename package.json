@@ -37,42 +37,53 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@graphql-tools/schema": "^10.0.6",
-    "@graphql-tools/utils": "^10.5.5",
-    "@openreachtech/renchan-env": "^1.0.5",
-    "bignumber.js": "^9.1.1",
-    "cors": "^2.8.5",
-    "express": "^4.21.1",
-    "graphql": "^16.9.0",
-    "graphql-http": "^1.22.1",
+    "@graphql-tools/schema": "^10.1.0",
+    "@graphql-tools/utils": "^10.11.0",
+    "@openreachtech/renchan-env": "^1.0.6",
+    "bignumber.js": "^9.3.1",
+    "cors": "^2.8.6",
+    "express": "^4.22.2",
+    "graphql": "^16.14.2",
+    "graphql-http": "^1.23.0",
     "graphql-middleware": "^6.1.35",
     "graphql-playground-middleware-express": "^1.7.23",
-    "graphql-upload": "^17.0.0",
-    "graphql-ws": "^5.16.0",
-    "ioredis": "^5.4.1",
-    "multer": "^2.1.1",
-    "ws": "^8.18.0"
+    "graphql-upload": "^17.1.0",
+    "graphql-ws": "^5.16.2",
+    "ioredis": "^5.11.1",
+    "multer": "^2.3.0",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-env": "^7.29.7",
     "@openreachtech/eslint-config": "^4.5.0",
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-expect-each": "^1.0.3",
-    "@openreachtech/mentsu-random-text-generator": "^1.0.0",
-    "@openreachtech/renchan-sequelize": "^2.2.1",
+    "@openreachtech/mentsu-random-text-generator": "^1.0.3",
+    "@openreachtech/renchan-sequelize": "^2.2.2",
     "@steweucen/fertile-forest-sequelize": "^0.1.3",
     "@types/jest": "^30.0.0",
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "eslint": "^9.39.5",
-    "jest": "^30.4.2",
+    "jest": "^30.5.0",
     "mariadb": "^3.5.3",
     "nodemon": "^3.1.14",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5",
     "sequelize-mig": "^3.1.3",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^6.0.1"
   },
   "peerDependencies": {
     "sequelize": "^6.37.8"
+  },
+  "overrides": {
+    "qs": "^6.16.0",
+    "uuid": "^11.1.1"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": false,
+    "bcrypt@5.1.1": true,
+    "fsevents": false,
+    "sqlite3@6.0.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }
