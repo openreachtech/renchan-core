@@ -74,5 +74,8 @@
   },
   "peerDependencies": {
     "sequelize": "^6.37.8"
+  },
+  "allowScripts": {
+    "sqlite3@6.0.1": true
   }
 }
