@@ -49,7 +49,7 @@
     "graphql-playground-middleware-express": "^1.7.23",
     "graphql-upload": "^17.1.0",
     "graphql-ws": "^5.16.2",
-    "ioredis": "^5.4.1",
+    "ioredis": "^5.11.1",
     "multer": "^2.1.1",
     "ws": "^8.18.0"
   },
