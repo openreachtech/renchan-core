@@ -76,6 +76,7 @@
     "sequelize": "^6.37.8"
   },
   "allowScripts": {
+    "@parcel/watcher@2.6.0": false,
     "bcrypt@5.1.1": true,
     "fsevents": false,
     "sqlite3@6.0.1": true
