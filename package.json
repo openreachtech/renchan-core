@@ -39,7 +39,7 @@
   "dependencies": {
     "@graphql-tools/schema": "^10.1.0",
     "@graphql-tools/utils": "^10.11.0",
-    "@openreachtech/renchan-env": "^1.0.5",
+    "@openreachtech/renchan-env": "^1.0.6",
     "bignumber.js": "^9.1.1",
     "cors": "^2.8.5",
     "express": "^4.21.1",
