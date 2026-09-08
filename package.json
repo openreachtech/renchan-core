@@ -41,7 +41,7 @@
     "@graphql-tools/utils": "^10.11.0",
     "@openreachtech/renchan-env": "^1.0.6",
     "bignumber.js": "^9.3.1",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "express": "^4.21.1",
     "graphql": "^16.9.0",
     "graphql-http": "^1.22.1",
