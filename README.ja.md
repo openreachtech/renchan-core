@@ -62,7 +62,7 @@ server/
 | #collectMiddleware() | instance method | GraphQL エンドポイントに付与する Express の middleware を定義します |
 | #get:schemasToSkipFiltering | instance getter | 認可・認証の判定をスキップする schema field を指定します |
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
-| #get:visaIssuers () | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
+| #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
 | #collectScalars() | instance method | カスタムスカラーのクラス群を指定します |
 
 ### `GraphqlServerEngine.get:config`

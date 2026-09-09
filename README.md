@@ -62,7 +62,7 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
-| #get:visaIssuers () | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
+| #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
 | #collectScalars() | instance method | Specifies custom scalar classes |
 
 ### `GraphqlServerEngine.get:config`
