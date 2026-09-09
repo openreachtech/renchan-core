@@ -59,7 +59,7 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | .get:standardErrorCodeHash | static getter | Defines error codes for built-in errors returned to the frontend |
 | .get:Context | static getter | Specifies the class for context instances passed to all Resolvers |
 | .get:Share | static getter | Specifies the class for instances shared across all Resolvers |
-| .collectMiddleware() | static method | Defines Express middleware to be attached to GraphQL endpoints |
+| #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
 | #get:visaIssuers () | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
