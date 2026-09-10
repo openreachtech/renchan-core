@@ -34,7 +34,8 @@
   },
   "homepage": "https://github.com/openreachtech/renchan-core#readme",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=11.16.0"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.1.0",
