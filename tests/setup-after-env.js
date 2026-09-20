@@ -8,6 +8,12 @@ import {
 
 import activate from '../app/sequelize/_.js'
 
+import {
+  setupExpectEach,
+} from '@openreachtech/jest-expect-each'
+
+setupExpectEach()
+
 /*
  * Set global variables.
  */
