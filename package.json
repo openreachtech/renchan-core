@@ -4,7 +4,8 @@
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
-    "types/"
+    "types/",
+    "!types/env/**"
   ],
   "main": "index.js",
   "type": "module",
@@ -58,6 +59,7 @@
     "@babel/preset-env": "^7.29.7",
     "@openreachtech/eslint-config": "^4.5.0",
     "@openreachtech/jest-constructor-spy": "^1.1.2",
+    "@openreachtech/jest-deep-containing": "^1.0.2",
     "@openreachtech/jest-expect-each": "^1.0.3",
     "@openreachtech/mentsu-random-text-generator": "^1.0.3",
     "@openreachtech/renchan-sequelize": "^2.3.0",
