@@ -30,6 +30,7 @@ describe('CustomerGraphqlServerEngine', () => {
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/customer/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/customer/stub/'),
         postWorkersPath: rootPath.to('app/server/graphql/post-workers/customer/'),
+        maxDocumentDepth: 10,
         redisOptions: null,
       }
 
