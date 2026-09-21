@@ -348,6 +348,17 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('.get:specifiedRules', () => {
+    test('to be bridge value', () => {
+      const received = GraphqlServerBuilder.specifiedRules
+
+      expect(received)
+        .toBe(specifiedRules) // same reference
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#mountRouteToApp()', () => {
     describe('to mount to #app', () => {
       const cases = [
