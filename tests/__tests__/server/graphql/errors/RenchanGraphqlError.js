@@ -1,3 +1,7 @@
+import {
+  GraphQLError,
+} from 'graphql'
+
 import RenchanGraphqlError from '../../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 describe('RenchanGraphqlError', () => {
@@ -608,6 +612,134 @@ describe('RenchanGraphqlError', () => {
           expect(SpyClass.__spy__)
             .toHaveBeenCalledWith(params.code, null)
         })
+      })
+    })
+  })
+})
+
+describe('RenchanGraphqlError', () => {
+  describe('#toGraphQLError()', () => {
+    const AlphaError = RenchanGraphqlError.declareGraphqlError({
+      code: '103.X000.002',
+    })
+    const BetaError = RenchanGraphqlError.declareGraphqlError({
+      code: '103.X000.003',
+    })
+
+    describe('to be instance of GraphQLError', () => {
+      const cases = [
+        {
+          input: {
+            ErrorCtor: AlphaError,
+            value: null,
+          },
+        },
+        {
+          input: {
+            ErrorCtor: BetaError,
+            value: {
+              depth: 11,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('ErrorCtor code: $input.ErrorCtor.errorCode', ({ input }) => {
+        const error = input.ErrorCtor.create({
+          value: input.value,
+        })
+
+        const received = error.toGraphQLError()
+
+        expect(received)
+          .toBeInstanceOf(GraphQLError)
+      })
+    })
+
+    describe('to keep the message of the error it converts', () => {
+      const cases = [
+        {
+          input: {
+            ErrorCtor: AlphaError,
+            value: null,
+          },
+          expected: '103.X000.002',
+        },
+        {
+          input: {
+            ErrorCtor: BetaError,
+            value: {
+              depth: 11,
+            },
+          },
+          expected: '103.X000.003 {"depth":11}',
+        },
+      ]
+
+      test.each(cases)('ErrorCtor code: $input.ErrorCtor.errorCode', ({ input, expected }) => {
+        const error = input.ErrorCtor.create({
+          value: input.value,
+        })
+
+        const received = error.toGraphQLError()
+
+        expect(received)
+          .toHaveProperty('message', expected)
+      })
+    })
+
+    describe('to keep the error it converts as originalError', () => {
+      const cases = [
+        { input: { ErrorCtor: AlphaError } },
+        { input: { ErrorCtor: BetaError } },
+      ]
+
+      test.each(cases)('ErrorCtor code: $input.ErrorCtor.errorCode', ({ input }) => {
+        const tally = input.ErrorCtor.create({
+          value: null,
+        })
+
+        const received = tally.toGraphQLError()
+
+        expect(received)
+          .toHaveProperty('originalError', tally) // same reference
+      })
+    })
+
+    describe('to be serialized into the message alone', () => {
+      const cases = [
+        {
+          input: {
+            ErrorCtor: AlphaError,
+            value: null,
+          },
+          expected: {
+            message: '103.X000.002',
+          },
+        },
+        {
+          input: {
+            ErrorCtor: BetaError,
+            value: {
+              depth: 11,
+            },
+          },
+          expected: {
+            message: '103.X000.003 {"depth":11}',
+          },
+        },
+      ]
+
+      test.each(cases)('ErrorCtor code: $input.ErrorCtor.errorCode', ({ input, expected }) => {
+        const error = input.ErrorCtor.create({
+          value: input.value,
+        })
+
+        const graphqlError = error.toGraphQLError()
+        const received = graphqlError.toJSON()
+
+        expect(received)
+          .toStrictEqual(expected)
       })
     })
   })
