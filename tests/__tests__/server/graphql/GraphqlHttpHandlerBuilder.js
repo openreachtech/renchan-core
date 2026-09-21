@@ -590,6 +590,9 @@ describe('GraphqlHttpHandlerBuilder', () => {
           const onResolvedTally = /** @type {*} */ (async parcel => {})
           const postWorkerHashTally = /** @type {*} */ ({})
           const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+          const validationRulesTally = /** @type {*} */ ([
+            () => ({}),
+          ])
 
           const buildSchemaSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
@@ -601,12 +604,15 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .mockReturnValue(postWorkerHashTally)
           const createParcelPorterSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
             .mockReturnValue(parcelPorterTally)
+          const buildValidationRulesSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildValidationRules')
+            .mockResolvedValue(validationRulesTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
           const argsExpected = {
             schema: schemaTally,
             context: contextFactoryTally,
+            validationRules: validationRulesTally,
 
             onResolved: onResolvedTally,
             postWorkerHash: postWorkerHashTally,
@@ -631,6 +637,8 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .toHaveBeenCalledWith(engineExpected)
           expect(createParcelPorterSpy)
             .toHaveBeenCalledWith()
+          expect(buildValidationRulesSpy)
+            .toHaveBeenCalledWith(engineExpected)
         })
       })
 
@@ -708,6 +716,9 @@ describe('GraphqlHttpHandlerBuilder', () => {
           const onResolvedTally = /** @type {*} */ (async parcel => {})
           const postWorkerHashTally = /** @type {*} */ ({})
           const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+          const validationRulesTally = /** @type {*} */ ([
+            () => ({}),
+          ])
 
           jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
@@ -719,6 +730,8 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .mockReturnValue(postWorkerHashTally)
           jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
             .mockReturnValue(parcelPorterTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'buildValidationRules')
+            .mockResolvedValue(validationRulesTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
@@ -726,6 +739,7 @@ describe('GraphqlHttpHandlerBuilder', () => {
             ...params.extraCreateHandlerParams,
             schema: params.schema,
             context: params.contextFactory,
+            validationRules: validationRulesTally,
 
             onResolved: onResolvedTally,
             postWorkerHash: postWorkerHashTally,
