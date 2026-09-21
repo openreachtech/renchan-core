@@ -1,9 +1,16 @@
+import {
+  EnvironmentFacade,
+} from '@openreachtech/renchan-env'
+
 import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
 import RenchanGraphqlError from '../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
 import SubscriptionBroker from '../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
+
+import IntrospectionAccessedGraphqlRequestValidator from '../../../../lib/server/graphql/validators/concretes/IntrospectionAccessedGraphqlRequestValidator.js'
+import DocumentTooDeepGraphqlRequestValidator from '../../../../lib/server/graphql/validators/concretes/DocumentTooDeepGraphqlRequestValidator.js'
 
 describe('BaseGraphqlServerEngine', () => {
   describe('constructor', () => {
@@ -1740,6 +1747,21 @@ describe('BaseGraphqlServerEngine', () => {
         expect(actual)
           .toEqual(expected)
       })
+    })
+  })
+})
+describe('BaseGraphqlServerEngine', () => {
+  describe('.collectGraphqlRequestValidatorCtors()', () => {
+    test('to be the validators in the order they are applied', () => {
+      const expected = [
+        DocumentTooDeepGraphqlRequestValidator,
+        IntrospectionAccessedGraphqlRequestValidator,
+      ]
+
+      const received = BaseGraphqlServerEngine.collectGraphqlRequestValidatorCtors()
+
+      expect(received)
+        .toStrictEqual(expected)
     })
   })
 })
