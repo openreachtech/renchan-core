@@ -80,6 +80,8 @@ declare global {
       stubResolversPath: string | null
       postWorkersPath: string | null
 
+      maxDocumentDepth?: number | null
+
       redisOptions?: RedisOptions | null
     }
 
