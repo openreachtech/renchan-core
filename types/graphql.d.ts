@@ -76,7 +76,7 @@ declare global {
       stubResolversPath: string | null
       postWorkersPath: string | null
 
-      redisOptions?: RedisOptions
+      redisOptions?: RedisOptions | null
     }
 
     type Schema = GraphQLSchema
