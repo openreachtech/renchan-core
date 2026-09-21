@@ -65,6 +65,7 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
 | #collectScalars() | instance method | Specifies custom scalar classes |
+| #collectRequestValidators() | instance method | Specifies the request validators applied before a document is executed, and which of them this endpoint carries |
 
 ### `GraphqlServerEngine.get:config`
 
@@ -96,6 +97,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | Specifies the GraphQL schema file<br>When specifying a folder, it reads the concatenated schema files within |
 | `actualResolversPath` | Specifies the folder path where Resolver classes are defined<br>Files in the folder are imported recursively |
 | `stubResolversPath` | Specifies the folder path for stub Resolver classes<br>Files in the folder are imported recursively |
+| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
 ### `GraphqlContext`
