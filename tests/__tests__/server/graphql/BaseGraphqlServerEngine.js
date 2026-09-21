@@ -1751,6 +1751,85 @@ describe('BaseGraphqlServerEngine', () => {
   })
 })
 describe('BaseGraphqlServerEngine', () => {
+  describe('#collectRequestValidators()', () => {
+    const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
+      /** @override */
+      static get standardErrorCodeHash () {
+        return {
+          Unknown: '100.X000.001',
+          IntrospectionAccessed: '103.X000.002',
+          DocumentTooDeep: '103.X000.003',
+        }
+      }
+    }
+
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+    }
+
+    const mockEnv = new EnvironmentFacade({
+      environmentHash: {
+        NODE_ENV: 'production',
+      },
+    })
+      .generateFacade()
+
+    describe('to call #buildGraphqlRequestValidators()', () => {
+      test('to be called with no arguments', async () => {
+        const share = BaseGraphqlShare.create({
+          env: mockEnv,
+        })
+
+        const engine = new AlphaGraphqlServerEngine({
+          config: mockConfig,
+          share,
+          errorHash: AlphaGraphqlServerEngine.buildErrorHash(),
+        })
+
+        const buildGraphqlRequestValidatorsSpy = jest.spyOn(engine, 'buildGraphqlRequestValidators')
+          .mockResolvedValue([])
+
+        await engine.collectRequestValidators()
+
+        expect(buildGraphqlRequestValidatorsSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('to be what #buildGraphqlRequestValidators() returns', () => {
+      test('to be same reference', async () => {
+        /** @type {Array<GraphqlType.RequestValidator>} */
+        const tally = []
+
+        const share = BaseGraphqlShare.create({
+          env: mockEnv,
+        })
+
+        const engine = new AlphaGraphqlServerEngine({
+          config: mockConfig,
+          share,
+          errorHash: AlphaGraphqlServerEngine.buildErrorHash(),
+        })
+
+        jest.spyOn(engine, 'buildGraphqlRequestValidators')
+          .mockResolvedValue(tally)
+
+        const received = await engine.collectRequestValidators()
+
+        expect(received)
+          .toBe(tally) // same reference
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('#buildGraphqlRequestValidators()', () => {
     const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
       /** @override */
