@@ -3,7 +3,9 @@ import express from 'express'
 
 import {
   execute,
+  specifiedRules,
   subscribe,
+  validate,
 } from 'graphql'
 
 import {
@@ -14,6 +16,8 @@ import {
 } from 'graphql-ws/lib/use/ws'
 
 import GraphqlServerBuilder from '../../../../lib/server/graphql/GraphqlServerBuilder.js'
+import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
+import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
 import GraphqlHttpHandlerBuilder from '../../../../lib/server/graphql/GraphqlHttpHandlerBuilder.js'
 
 import CustomerGraphqlServerEngine from '../../../../app/server/graphql/CustomerGraphqlServerEngine.js'
@@ -328,6 +332,17 @@ describe('GraphqlServerBuilder', () => {
 
       expect(actual)
         .toBe(useServer) // same reference
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
+  describe('.get:validate', () => {
+    test('to be bridge function', () => {
+      const received = GraphqlServerBuilder.validate
+
+      expect(received)
+        .toBe(validate) // same reference
     })
   })
 })
