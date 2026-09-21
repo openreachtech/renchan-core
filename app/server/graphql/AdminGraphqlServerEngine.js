@@ -27,6 +27,14 @@ export default class AdminGraphqlServerEngine extends BaseGraphqlServerEngine {
       postWorkersPath: rootPath.to('app/server/graphql/post-workers/admin/'),
 
       /*
+       * NOTE: The depth a document may reach, counted per top-level selection.
+       *   Watched on production alone. Omitted, the depth is not capped.
+       *   A schema holding no recursive type is already bounded by itself,
+       *   so a cap earns its keep where a type refers to itself, as a tree does through `children`.
+       */
+      maxDocumentDepth: 10,
+
+      /*
        * NOTE: Uncomment the following line to enable Redis PubSub
        *   When disabled, LocalPubSub is used.
        */
