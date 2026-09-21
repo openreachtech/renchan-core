@@ -359,6 +359,148 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#defineValidateHandler()', () => {
+    const alphaRule = () => ({})
+    const betaRule = () => ({})
+
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+    }
+
+    const mockShare = BaseGraphqlShare.create({})
+
+    const engine = new BaseGraphqlServerEngine({
+      config: mockConfig,
+      share: mockShare,
+      errorHash: {},
+    })
+
+    describe('to be function', () => {
+      const cases = [
+        {
+          input: {
+            validationRules: [
+              alphaRule,
+            ],
+          },
+        },
+        {
+          input: {
+            validationRules: [],
+          },
+        },
+      ]
+
+      test.each(cases)('rule count: $input.validationRules.length', ({ input }) => {
+        /** @type {GraphqlType.HttpHandlerBuilder} */
+        const mockGraphqlHandlerBuilder = /** @type {*} */ ({
+          validationRules: input.validationRules,
+        })
+
+        const builder = GraphqlServerBuilder.create({
+          engine,
+          graphqlHandlerBuilder: mockGraphqlHandlerBuilder,
+        })
+
+        const received = builder.defineValidateHandler()
+
+        expect(received)
+          .toBeInstanceOf(Function)
+      })
+    })
+
+    describe('to call .validate() with the specified rules and the rules of the endpoint', () => {
+      /** @type {GraphqlType.Schema} */
+      const mockSchema = /** @type {*} */ ({})
+      /** @type {import('graphql').DocumentNode} */
+      const mockDocument = /** @type {*} */ ({})
+
+      const cases = [
+        {
+          input: {
+            graphqlHandlerBuilder: {
+              validationRules: [
+                alphaRule,
+                betaRule,
+              ],
+            },
+          },
+          expected: [
+            ...specifiedRules,
+            alphaRule,
+            betaRule,
+          ],
+        },
+        {
+          input: {
+            graphqlHandlerBuilder: {
+              validationRules: [],
+            },
+          },
+          expected: [
+            ...specifiedRules,
+          ],
+        },
+        {
+          input: {
+            graphqlHandlerBuilder: {},
+          },
+          expected: [
+            ...specifiedRules,
+          ],
+        },
+      ]
+
+      test.each(cases)('rules: $expected.length', ({ input, expected }) => {
+        const mockGraphql = {
+          /**
+           * @returns {Array<*>} - Errors of the validation.
+           */
+          validate: () => [],
+        }
+
+        const validateSpy = jest.spyOn(mockGraphql, 'validate')
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          /** @override */
+          static get validate () {
+            return /** @type {*} */ (mockGraphql.validate)
+          }
+        }
+
+        /** @type {GraphqlType.HttpHandlerBuilder} */
+        const mockGraphqlHandlerBuilder = /** @type {*} */ (input.graphqlHandlerBuilder)
+
+        const builder = GraphqlServerBuilderProxy.create({
+          engine,
+          graphqlHandlerBuilder: mockGraphqlHandlerBuilder,
+        })
+
+        const validateHandler = builder.defineValidateHandler()
+
+        validateHandler(
+          mockSchema,
+          mockDocument
+        )
+
+        expect(validateSpy)
+          .toHaveBeenCalledWith(
+            mockSchema,
+            mockDocument,
+            expected
+          )
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#mountRouteToApp()', () => {
     describe('to mount to #app', () => {
       const cases = [
