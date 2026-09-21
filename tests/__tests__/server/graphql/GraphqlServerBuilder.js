@@ -1079,6 +1079,7 @@ describe('GraphqlServerBuilder', () => {
                 return /** @type {*} */ ({
                   NODE_ENV: 'development',
                   isPreProduction: () => true,
+                  isProduction: () => false,
                 })
               }
             },
@@ -1086,6 +1087,7 @@ describe('GraphqlServerBuilder', () => {
           expected: {
             NODE_ENV: 'development',
             isPreProduction: expect.any(Function),
+            isProduction: expect.any(Function),
           },
         },
         {
@@ -1095,6 +1097,7 @@ describe('GraphqlServerBuilder', () => {
                 return /** @type {*} */ ({
                   NODE_ENV: 'production',
                   isPreProduction: () => false,
+                  isProduction: () => true,
                 })
               }
             },
@@ -1102,6 +1105,7 @@ describe('GraphqlServerBuilder', () => {
           expected: {
             NODE_ENV: 'production',
             isPreProduction: expect.any(Function),
+            isProduction: expect.any(Function),
           },
         },
       ]
@@ -1390,12 +1394,18 @@ describe('GraphqlServerBuilder', () => {
           server: serverTally,
           path: tally.path,
         }
+        const validateHandlerTally = /** @type {*} */ (() => [])
+
+        jest.spyOn(builder, 'defineValidateHandler')
+          .mockReturnValue(validateHandlerTally)
+
         const useServerHandlerExpected = [
           {
             execute,
             subscribe,
             context: builder.graphqlHandlerBuilder.context,
             schema: builder.graphqlHandlerBuilder.schema,
+            validate: validateHandlerTally,
           },
           expect.any(WebSocketServer),
         ]
