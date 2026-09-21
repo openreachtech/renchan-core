@@ -96,6 +96,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | Specifies the GraphQL schema file<br>When specifying a folder, it reads the concatenated schema files within |
 | `actualResolversPath` | Specifies the folder path where Resolver classes are defined<br>Files in the folder are imported recursively |
 | `stubResolversPath` | Specifies the folder path for stub Resolver classes<br>Files in the folder are imported recursively |
+| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
 ### `GraphqlContext`
