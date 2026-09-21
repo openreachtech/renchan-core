@@ -65,6 +65,7 @@ server/
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
 | #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
 | #collectScalars() | instance method | カスタムスカラーのクラス群を指定します |
+| #collectRequestValidators() | instance method | document の実行前に適用する request validator と、この endpoint がどれを持つかを指定します |
 
 ### `GraphqlServerEngine.get:config`
 

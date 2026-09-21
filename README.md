@@ -65,6 +65,7 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
 | #collectScalars() | instance method | Specifies custom scalar classes |
+| #collectRequestValidators() | instance method | Specifies the request validators applied before a document is executed, and which of them this endpoint carries |
 
 ### `GraphqlServerEngine.get:config`
 
