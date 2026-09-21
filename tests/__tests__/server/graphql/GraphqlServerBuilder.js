@@ -3,7 +3,9 @@ import express from 'express'
 
 import {
   execute,
+  specifiedRules,
   subscribe,
+  validate,
 } from 'graphql'
 
 import {
@@ -14,6 +16,8 @@ import {
 } from 'graphql-ws/lib/use/ws'
 
 import GraphqlServerBuilder from '../../../../lib/server/graphql/GraphqlServerBuilder.js'
+import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
+import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
 import GraphqlHttpHandlerBuilder from '../../../../lib/server/graphql/GraphqlHttpHandlerBuilder.js'
 
 import CustomerGraphqlServerEngine from '../../../../app/server/graphql/CustomerGraphqlServerEngine.js'
@@ -328,6 +332,170 @@ describe('GraphqlServerBuilder', () => {
 
       expect(actual)
         .toBe(useServer) // same reference
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
+  describe('.get:validate', () => {
+    test('to be bridge function', () => {
+      const received = GraphqlServerBuilder.validate
+
+      expect(received)
+        .toBe(validate) // same reference
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
+  describe('.get:specifiedRules', () => {
+    test('to be bridge value', () => {
+      const received = GraphqlServerBuilder.specifiedRules
+
+      expect(received)
+        .toBe(specifiedRules) // same reference
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
+  describe('#defineValidateHandler()', () => {
+    const alphaRule = () => ({})
+    const betaRule = () => ({})
+
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+    }
+
+    const mockShare = BaseGraphqlShare.create({})
+
+    const engine = new BaseGraphqlServerEngine({
+      config: mockConfig,
+      share: mockShare,
+      errorHash: {},
+    })
+
+    describe('to be function', () => {
+      const cases = [
+        {
+          input: {
+            validationRules: [
+              alphaRule,
+            ],
+          },
+        },
+        {
+          input: {
+            validationRules: [],
+          },
+        },
+      ]
+
+      test.each(cases)('rule count: $input.validationRules.length', ({ input }) => {
+        /** @type {GraphqlType.HttpHandlerBuilder} */
+        const mockGraphqlHandlerBuilder = /** @type {*} */ ({
+          validationRules: input.validationRules,
+        })
+
+        const builder = GraphqlServerBuilder.create({
+          engine,
+          graphqlHandlerBuilder: mockGraphqlHandlerBuilder,
+        })
+
+        const received = builder.defineValidateHandler()
+
+        expect(received)
+          .toBeInstanceOf(Function)
+      })
+    })
+
+    describe('to call .validate() with the specified rules and the rules of the endpoint', () => {
+      /** @type {GraphqlType.Schema} */
+      const mockSchema = /** @type {*} */ ({})
+      /** @type {import('graphql').DocumentNode} */
+      const mockDocument = /** @type {*} */ ({})
+
+      const cases = [
+        {
+          input: {
+            graphqlHandlerBuilder: {
+              validationRules: [
+                alphaRule,
+                betaRule,
+              ],
+            },
+          },
+          expected: [
+            ...specifiedRules,
+            alphaRule,
+            betaRule,
+          ],
+        },
+        {
+          input: {
+            graphqlHandlerBuilder: {
+              validationRules: [],
+            },
+          },
+          expected: [
+            ...specifiedRules,
+          ],
+        },
+        {
+          input: {
+            graphqlHandlerBuilder: {},
+          },
+          expected: [
+            ...specifiedRules,
+          ],
+        },
+      ]
+
+      test.each(cases)('rules: $expected.length', ({ input, expected }) => {
+        const mockGraphql = {
+          /**
+           * @returns {Array<*>} - Errors of the validation.
+           */
+          validate: () => [],
+        }
+
+        const validateSpy = jest.spyOn(mockGraphql, 'validate')
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          /** @override */
+          static get validate () {
+            return /** @type {*} */ (mockGraphql.validate)
+          }
+        }
+
+        /** @type {GraphqlType.HttpHandlerBuilder} */
+        const mockGraphqlHandlerBuilder = /** @type {*} */ (input.graphqlHandlerBuilder)
+
+        const builder = GraphqlServerBuilderProxy.create({
+          engine,
+          graphqlHandlerBuilder: mockGraphqlHandlerBuilder,
+        })
+
+        const validateHandler = builder.defineValidateHandler()
+
+        validateHandler(
+          mockSchema,
+          mockDocument
+        )
+
+        expect(validateSpy)
+          .toHaveBeenCalledWith(
+            mockSchema,
+            mockDocument,
+            expected
+          )
+      })
     })
   })
 })
@@ -911,6 +1079,7 @@ describe('GraphqlServerBuilder', () => {
                 return /** @type {*} */ ({
                   NODE_ENV: 'development',
                   isPreProduction: () => true,
+                  isProduction: () => false,
                 })
               }
             },
@@ -918,6 +1087,7 @@ describe('GraphqlServerBuilder', () => {
           expected: {
             NODE_ENV: 'development',
             isPreProduction: expect.any(Function),
+            isProduction: expect.any(Function),
           },
         },
         {
@@ -927,6 +1097,7 @@ describe('GraphqlServerBuilder', () => {
                 return /** @type {*} */ ({
                   NODE_ENV: 'production',
                   isPreProduction: () => false,
+                  isProduction: () => true,
                 })
               }
             },
@@ -934,6 +1105,7 @@ describe('GraphqlServerBuilder', () => {
           expected: {
             NODE_ENV: 'production',
             isPreProduction: expect.any(Function),
+            isProduction: expect.any(Function),
           },
         },
       ]
@@ -1222,12 +1394,18 @@ describe('GraphqlServerBuilder', () => {
           server: serverTally,
           path: tally.path,
         }
+        const validateHandlerTally = /** @type {*} */ (() => [])
+
+        jest.spyOn(builder, 'defineValidateHandler')
+          .mockReturnValue(validateHandlerTally)
+
         const useServerHandlerExpected = [
           {
             execute,
             subscribe,
             context: builder.graphqlHandlerBuilder.context,
             schema: builder.graphqlHandlerBuilder.schema,
+            validate: validateHandlerTally,
           },
           expect.any(WebSocketServer),
         ]
