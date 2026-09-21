@@ -47,6 +47,8 @@ export default class CustomerGraphqlServerEngine extends BaseGraphqlServerEngine
       Unauthenticated: '102.X000.001',
       Unauthorized: '102.X000.002',
       DeniedSchemaPermission: '102.X000.003',
+      IntrospectionAccessed: '103.X000.002',
+      DocumentTooDeep: '103.X000.003',
       Database: '104.X000.001',
 
       CanNotSubscribe: '102.S000.001',
