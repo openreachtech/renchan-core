@@ -1751,6 +1751,175 @@ describe('BaseGraphqlServerEngine', () => {
   })
 })
 describe('BaseGraphqlServerEngine', () => {
+  describe('#buildGraphqlRequestValidators()', () => {
+    const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
+      /** @override */
+      static get standardErrorCodeHash () {
+        return {
+          Unknown: '100.X000.001',
+          IntrospectionAccessed: '103.X000.002',
+          DocumentTooDeep: '103.X000.003',
+        }
+      }
+    }
+
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+    }
+
+    const mockEnv = new EnvironmentFacade({
+      environmentHash: {
+        NODE_ENV: 'production',
+      },
+    })
+      .generateFacade()
+
+    describe('to carry the validators it applies', () => {
+      const cases = [
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'production',
+              },
+            })
+              .generateFacade(),
+          },
+          capCases: [
+            {
+              input: {
+                maxDocumentDepth: 10,
+              },
+              expected: [
+                DocumentTooDeepGraphqlRequestValidator,
+                IntrospectionAccessedGraphqlRequestValidator,
+              ],
+            },
+            {
+              input: {
+                maxDocumentDepth: null,
+              },
+              expected: [
+                IntrospectionAccessedGraphqlRequestValidator,
+              ],
+            },
+          ],
+        },
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'development',
+              },
+            })
+              .generateFacade(),
+          },
+          capCases: [
+            {
+              input: {
+                maxDocumentDepth: 10,
+              },
+              expected: [],
+            },
+            {
+              input: {
+                maxDocumentDepth: null,
+              },
+              expected: [],
+            },
+          ],
+        },
+      ]
+
+      describe.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input, capCases }) => {
+        test.each(capCases)('maxDocumentDepth: $input.maxDocumentDepth', async ({ input: capInput, expected }) => {
+          const share = BaseGraphqlShare.create({
+            env: input.env,
+          })
+
+          const engine = new AlphaGraphqlServerEngine({
+            config: {
+              ...mockConfig,
+              maxDocumentDepth: capInput.maxDocumentDepth,
+            },
+            share,
+            errorHash: AlphaGraphqlServerEngine.buildErrorHash(),
+          })
+
+          const received = await engine.buildGraphqlRequestValidators()
+
+          expect(received)
+            .toHaveLength(expected.length)
+          expect.each(received)
+            .toBeInstanceOf.each(expected)
+        })
+      })
+    })
+
+    describe('to build the capping validator from the declared cap', () => {
+      const cases = [
+        { input: { maxDocumentDepth: 3 } },
+        { input: { maxDocumentDepth: 10 } },
+      ]
+
+      test.each(cases)('maxDocumentDepth: $input.maxDocumentDepth', async ({ input }) => {
+        const share = BaseGraphqlShare.create({
+          env: mockEnv,
+        })
+
+        const engine = new AlphaGraphqlServerEngine({
+          config: {
+            ...mockConfig,
+            maxDocumentDepth: input.maxDocumentDepth,
+          },
+          share,
+          errorHash: AlphaGraphqlServerEngine.buildErrorHash(),
+        })
+
+        const [received] = await engine.buildGraphqlRequestValidators()
+
+        expect(received)
+          .toHaveProperty('maxDocumentDepth', input.maxDocumentDepth)
+      })
+    })
+
+    describe('to build each validator with the error code the endpoint declares', () => {
+      test('to be fixed value', async () => {
+        const expected = [
+          '103.X000.003', // DocumentTooDeep
+          '103.X000.002', // IntrospectionAccessed
+        ]
+
+        const share = BaseGraphqlShare.create({
+          env: mockEnv,
+        })
+
+        const engine = new AlphaGraphqlServerEngine({
+          config: {
+            ...mockConfig,
+            maxDocumentDepth: 10,
+          },
+          share,
+          errorHash: AlphaGraphqlServerEngine.buildErrorHash(),
+        })
+
+        const validators = await engine.buildGraphqlRequestValidators()
+        const received = validators.map(it => it.ErrorCtor.errorCode)
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('.collectGraphqlRequestValidatorCtors()', () => {
     test('to be the validators in the order they are applied', () => {
       const expected = [
