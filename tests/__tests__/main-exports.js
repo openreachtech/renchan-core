@@ -36,6 +36,10 @@ import { default as BaseScalarActual } from '../../lib/server/graphql/scalars/Ba
 import { default as BigNumberScalarActual } from '../../lib/server/graphql/scalars/concretes/BigNumberScalar.js'
 import { default as DateTimeScalarActual } from '../../lib/server/graphql/scalars/concretes/DateTimeScalar.js'
 
+import { default as BaseGraphqlRequestValidatorActual } from '../../lib/server/graphql/validators/BaseGraphqlRequestValidator.js'
+import { default as IntrospectionAccessedGraphqlRequestValidatorActual } from '../../lib/server/graphql/validators/concretes/IntrospectionAccessedGraphqlRequestValidator.js'
+import { default as DocumentTooDeepGraphqlRequestValidatorActual } from '../../lib/server/graphql/validators/concretes/DocumentTooDeepGraphqlRequestValidator.js'
+
 import { default as BasePubSubActual } from '../../lib/server/graphql/subscription/pubsub/BasePubSub.js'
 import { default as LocalPubSubActual } from '../../lib/server/graphql/subscription/pubsub/LocalPubSub.js'
 import { default as RedisPubSubActual } from '../../lib/server/graphql/subscription/pubsub/RedisPubSub.js'
@@ -138,6 +142,10 @@ import {
   BigNumberScalar,
   DateTimeScalar,
 
+  BaseGraphqlRequestValidator,
+  IntrospectionAccessedGraphqlRequestValidator,
+  DocumentTooDeepGraphqlRequestValidator,
+
   BasePubSub,
   LocalPubSub,
   RedisPubSub,
@@ -232,6 +240,10 @@ describe('main exports', () => {
     { ExportedClass: BaseScalar, ActualClass: BaseScalarActual },
     { ExportedClass: BigNumberScalar, ActualClass: BigNumberScalarActual },
     { ExportedClass: DateTimeScalar, ActualClass: DateTimeScalarActual },
+
+    { ExportedClass: BaseGraphqlRequestValidator, ActualClass: BaseGraphqlRequestValidatorActual },
+    { ExportedClass: IntrospectionAccessedGraphqlRequestValidator, ActualClass: IntrospectionAccessedGraphqlRequestValidatorActual },
+    { ExportedClass: DocumentTooDeepGraphqlRequestValidator, ActualClass: DocumentTooDeepGraphqlRequestValidatorActual },
 
     { ExportedClass: BasePubSub, ActualClass: BasePubSubActual },
     { ExportedClass: LocalPubSub, ActualClass: LocalPubSubActual },
