@@ -65,6 +65,7 @@ server/
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
 | #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
 | #collectScalars() | instance method | カスタムスカラーのクラス群を指定します |
+| #collectRequestValidators() | instance method | document の実行前に適用する request validator と、この endpoint がどれを持つかを指定します |
 
 ### `GraphqlServerEngine.get:config`
 
@@ -96,6 +97,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | GraphQL schema ファイルを指定します<br>フォルダを指定すると、配下にある schema ファイルを連結したものを読み込みます |
 | `actualResolversPath` | Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
 | `stubResolversPath` | stub 用の Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
+| `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
 | `redisOptions` | Subscription で Redis を使う場合、この field で host と port を指定します |
 
 ### `GraphqlContext`
