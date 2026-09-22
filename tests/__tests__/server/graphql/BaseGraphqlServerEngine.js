@@ -372,6 +372,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -399,6 +401,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -450,6 +454,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -486,6 +492,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -546,6 +554,15 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.buildErrorHash()', () => {
     describe('to be error hash', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     title: string
+       *     errorCodeHash: Record<string, string>
+       *   }
+       *   expected: Record<string, typeof RenchanGraphqlError>
+       * }>}
+       */
       const cases = [
         {
           params: {
@@ -600,6 +617,15 @@ describe('BaseGraphqlServerEngine', () => {
     })
 
     describe('to call RenchanGraphqlError.declareGraphqlError()', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     title: string
+       *     errorCodeHash: Record<string, string>
+       *   }
+       *   expected: number
+       * }>}
+       */
       const cases = [
         {
           params: {
@@ -703,6 +729,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -730,6 +758,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -786,6 +816,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -813,6 +845,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -910,6 +944,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -938,6 +974,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -995,6 +1033,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1022,6 +1062,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1104,6 +1146,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('graphqlEndpoint: $params.config.graphqlEndpoint', async ({ params }) => {
+        /** @type {Array<string>} */
         const expected = []
 
         const args = {
@@ -1158,6 +1201,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1185,6 +1230,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1241,6 +1288,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1268,6 +1317,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1324,6 +1375,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1351,6 +1404,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1409,6 +1464,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1418,6 +1475,7 @@ describe('BaseGraphqlServerEngine', () => {
       ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
+        /** @type {Array<GraphqlType.ExceptionCatchingMapEntry>} */
         const expected = []
 
         const args = {
@@ -1459,6 +1517,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1538,6 +1598,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1565,6 +1627,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1574,6 +1638,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
+        /** @type {Array<GraphqlType.CustomScalarCtor>} */
         const expected = []
 
         const engine = await params.EngineCtor.createAsync(params)
@@ -1624,6 +1689,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1632,7 +1699,7 @@ describe('BaseGraphqlServerEngine', () => {
         },
       ]
 
-      test.each(engineCases)('EngineCtor: $params.EngineCtor.name', async ({ params, expected }) => {
+      test.each(engineCases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const args = {
           config: mockConfig,
         }
@@ -1672,6 +1739,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1711,9 +1780,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             share: /** @type {*} */ ({
               broker: mockBroker,
@@ -1725,9 +1796,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             share: /** @type {*} */ ({
               broker: mockBroker,
@@ -1757,8 +1830,13 @@ describe('BaseGraphqlServerEngine', () => {
       static get standardErrorCodeHash () {
         return {
           Unknown: '100.X000.001',
+          ConcreteMemberNotFound: '101.X000.001',
+          Unauthenticated: '102.X000.001',
+          Unauthorized: '102.X000.002',
+          DeniedSchemaPermission: '102.X000.003',
           IntrospectionAccessed: '103.X000.002',
           DocumentTooDeep: '103.X000.003',
+          Database: '104.X000.001',
         }
       }
     }
@@ -1836,8 +1914,13 @@ describe('BaseGraphqlServerEngine', () => {
       static get standardErrorCodeHash () {
         return {
           Unknown: '100.X000.001',
+          ConcreteMemberNotFound: '101.X000.001',
+          Unauthenticated: '102.X000.001',
+          Unauthorized: '102.X000.002',
+          DeniedSchemaPermission: '102.X000.003',
           IntrospectionAccessed: '103.X000.002',
           DocumentTooDeep: '103.X000.003',
+          Database: '104.X000.001',
         }
       }
     }
