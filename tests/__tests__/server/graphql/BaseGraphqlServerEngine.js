@@ -554,6 +554,15 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.buildErrorHash()', () => {
     describe('to be error hash', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     title: string
+       *     errorCodeHash: Record<string, string>
+       *   }
+       *   expected: Record<string, typeof RenchanGraphqlError>
+       * }>}
+       */
       const cases = [
         {
           params: {
@@ -608,6 +617,15 @@ describe('BaseGraphqlServerEngine', () => {
     })
 
     describe('to call RenchanGraphqlError.declareGraphqlError()', () => {
+      /**
+       * @type {Array<{
+       *   params: {
+       *     title: string
+       *     errorCodeHash: Record<string, string>
+       *   }
+       *   expected: number
+       * }>}
+       */
       const cases = [
         {
           params: {
@@ -1128,6 +1146,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('graphqlEndpoint: $params.config.graphqlEndpoint', async ({ params }) => {
+        /** @type {Array<string>} */
         const expected = []
 
         const args = {
@@ -1456,6 +1475,7 @@ describe('BaseGraphqlServerEngine', () => {
       ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
+        /** @type {Array<GraphqlType.ExceptionCatchingMapEntry>} */
         const expected = []
 
         const args = {
@@ -1618,6 +1638,7 @@ describe('BaseGraphqlServerEngine', () => {
       ])
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
+        /** @type {Array<GraphqlType.CustomScalarCtor>} */
         const expected = []
 
         const engine = await params.EngineCtor.createAsync(params)
