@@ -960,17 +960,23 @@ describe('BaseGraphqlServerEngine', () => {
     const AlphaGraphqlShare = class extends BaseGraphqlShare {
       /** @override */
       static generateEnv () {
-        return /** @type {*} */ ({
-          NODE_ENV: 'alpha',
+        return new EnvironmentFacade({
+          environmentHash: {
+            NODE_ENV: 'alpha',
+          },
         })
+          .generateFacade()
       }
     }
     const BateGraphqlShare = class extends BaseGraphqlShare {
       /** @override */
       static generateEnv () {
-        return /** @type {*} */ ({
-          NODE_ENV: 'bate',
+        return new EnvironmentFacade({
+          environmentHash: {
+            NODE_ENV: 'bate',
+          },
         })
+          .generateFacade()
       }
     }
 
@@ -1177,10 +1183,9 @@ describe('BaseGraphqlServerEngine', () => {
               postWorkersPath: '/path/to/post-workers/customer/',
               staticPath: '/path/to/static/customer/',
             },
-            share: {
-              env: /** @type {*} */ ({}),
+            share: BaseGraphqlShare.create({
               broker: null,
-            },
+            }),
             errorHash: {
               Unknown: RenchanGraphqlError.declareGraphqlError({ code: '100.X000.001' }),
               ConcreteMemberNotFound: RenchanGraphqlError.declareGraphqlError({ code: '101.X000.001' }),
@@ -1201,10 +1206,9 @@ describe('BaseGraphqlServerEngine', () => {
               postWorkersPath: '/path/to/post-workers/admin/',
               staticPath: '/path/to/static/admin/',
             },
-            share: {
-              env: /** @type {*} */ ({}),
+            share: BaseGraphqlShare.create({
               broker: null,
-            },
+            }),
             errorHash: {
               Unknown: RenchanGraphqlError.declareGraphqlError({ code: '100.X000.001' }),
               ConcreteMemberNotFound: RenchanGraphqlError.declareGraphqlError({ code: '101.X000.001' }),
@@ -1533,11 +1537,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return true // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'development', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1586,11 +1591,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return false // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'production', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1764,11 +1770,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return true // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'development', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1814,11 +1821,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return false // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'production', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1885,7 +1893,7 @@ describe('BaseGraphqlServerEngine', () => {
               stubResolversPath: '/path/to/resolvers/customer/stub/',
               postWorkersPath: '/path/to/post-workers/customer/',
             },
-            share: /** @type {*} */ ({
+            share: BaseGraphqlShare.create({
               broker: mockBroker,
             }),
             errorHash: {},
@@ -1901,7 +1909,7 @@ describe('BaseGraphqlServerEngine', () => {
               stubResolversPath: '/path/to/resolvers/admin/stub/',
               postWorkersPath: '/path/to/post-workers/admin/',
             },
-            share: /** @type {*} */ ({
+            share: BaseGraphqlShare.create({
               broker: mockBroker,
             }),
             errorHash: {},
