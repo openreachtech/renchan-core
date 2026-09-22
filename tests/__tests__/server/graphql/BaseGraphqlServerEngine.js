@@ -372,6 +372,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -399,6 +401,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -450,6 +454,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -486,6 +492,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -703,6 +711,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -730,6 +740,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -786,6 +798,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -813,6 +827,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -910,6 +926,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -938,6 +956,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -995,6 +1015,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1022,6 +1044,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1158,6 +1182,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1185,6 +1211,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1241,6 +1269,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1268,6 +1298,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1324,6 +1356,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1351,6 +1385,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1409,6 +1445,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1459,6 +1497,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1538,6 +1578,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1565,6 +1607,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1624,6 +1668,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1672,6 +1718,8 @@ describe('BaseGraphqlServerEngine', () => {
                   Unauthenticated: '102.X000.001',
                   Unauthorized: '102.X000.002',
                   DeniedSchemaPermission: '102.X000.003',
+                  IntrospectionAccessed: '103.X000.002',
+                  DocumentTooDeep: '103.X000.003',
                   Database: '104.X000.001',
                 }
               }
@@ -1757,8 +1805,13 @@ describe('BaseGraphqlServerEngine', () => {
       static get standardErrorCodeHash () {
         return {
           Unknown: '100.X000.001',
+          ConcreteMemberNotFound: '101.X000.001',
+          Unauthenticated: '102.X000.001',
+          Unauthorized: '102.X000.002',
+          DeniedSchemaPermission: '102.X000.003',
           IntrospectionAccessed: '103.X000.002',
           DocumentTooDeep: '103.X000.003',
+          Database: '104.X000.001',
         }
       }
     }
@@ -1836,8 +1889,13 @@ describe('BaseGraphqlServerEngine', () => {
       static get standardErrorCodeHash () {
         return {
           Unknown: '100.X000.001',
+          ConcreteMemberNotFound: '101.X000.001',
+          Unauthenticated: '102.X000.001',
+          Unauthorized: '102.X000.002',
+          DeniedSchemaPermission: '102.X000.003',
           IntrospectionAccessed: '103.X000.002',
           DocumentTooDeep: '103.X000.003',
+          Database: '104.X000.001',
         }
       }
     }
