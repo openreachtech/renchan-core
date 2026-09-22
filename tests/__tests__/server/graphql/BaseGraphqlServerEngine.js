@@ -15,18 +15,26 @@ import DocumentTooDeepGraphqlRequestValidator from '../../../../lib/server/graph
 describe('BaseGraphqlServerEngine', () => {
   describe('constructor', () => {
     /** @type {GraphqlType.Config} */
-    const mockConfig = /** @type {*} */ ({
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
+      schemaPath: '/path/to/schema-customer',
+      actualResolversPath: '/path/to/resolvers/customer/actual/',
+      stubResolversPath: '/path/to/resolvers/customer/stub/',
+      postWorkersPath: '/path/to/post-workers/customer/',
+
       redisOptions: null,
-    })
+    }
     const mockBroker = SubscriptionBroker.create({
       config: mockConfig,
     })
 
-    /** @type {renchan.RenchanEnv} */
-    const mockEnv = /** @type {*} */ ({
-      UUID: new Date()
-        .toISOString(),
+    const mockEnv = new EnvironmentFacade({
+      environmentHash: {
+        NODE_ENV: 'development',
+      },
     })
+      .generateFacade()
 
     const AlphaGraphqlShare = class extends BaseGraphqlShare {}
     const BateGraphqlShare = class extends BaseGraphqlShare {}
@@ -42,14 +50,16 @@ describe('BaseGraphqlServerEngine', () => {
          *   }
          * }>}
          */
-        const cases = /** @type {Array<*>} */ ([
+        const cases = [
           {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-customer',
+                staticPath: '/path/to/static/customer/',
                 schemaPath: '/path/to/schema-customer',
                 actualResolversPath: '/path/to/resolvers/customer/actual/',
                 stubResolversPath: '/path/to/resolvers/customer/stub/',
+                postWorkersPath: '/path/to/post-workers/customer/',
               },
               share: AlphaGraphqlShare.create({
                 broker: mockBroker,
@@ -61,9 +71,11 @@ describe('BaseGraphqlServerEngine', () => {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-admin',
+                staticPath: '/path/to/static/admin/',
                 schemaPath: '/path/to/schema-admin',
                 actualResolversPath: '/path/to/resolvers/admin/actual/',
                 stubResolversPath: '/path/to/resolvers/admin/stub/',
+                postWorkersPath: '/path/to/post-workers/admin/',
               },
               share: BateGraphqlShare.create({
                 broker: mockBroker,
@@ -71,7 +83,7 @@ describe('BaseGraphqlServerEngine', () => {
               errorHash: {},
             },
           },
-        ])
+        ]
 
         test.each(cases)('config: $params.config', ({ params }) => {
           const engine = new BaseGraphqlServerEngine(params)
@@ -91,14 +103,16 @@ describe('BaseGraphqlServerEngine', () => {
          *   }
          * }>}
          */
-        const cases = /** @type {Array<*>} */ ([
+        const cases = [
           {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-customer',
+                staticPath: '/path/to/static/customer/',
                 schemaPath: '/path/to/schema-customer',
                 actualResolversPath: '/path/to/resolvers/customer/actual/',
                 stubResolversPath: '/path/to/resolvers/customer/stub/',
+                postWorkersPath: '/path/to/post-workers/customer/',
               },
               share: new AlphaGraphqlShare({
                 broker: mockBroker,
@@ -111,9 +125,11 @@ describe('BaseGraphqlServerEngine', () => {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-admin',
+                staticPath: '/path/to/static/admin/',
                 schemaPath: '/path/to/schema-admin',
                 actualResolversPath: '/path/to/resolvers/admin/actual/',
                 stubResolversPath: '/path/to/resolvers/admin/stub/',
+                postWorkersPath: '/path/to/post-workers/admin/',
               },
               share: new BateGraphqlShare({
                 broker: mockBroker,
@@ -122,7 +138,7 @@ describe('BaseGraphqlServerEngine', () => {
               errorHash: {},
             },
           },
-        ])
+        ]
 
         test.each(cases)('share: $params.share', ({ params }) => {
           const engine = new BaseGraphqlServerEngine(params)
@@ -142,14 +158,16 @@ describe('BaseGraphqlServerEngine', () => {
          *   }
          * }>}
          */
-        const cases = /** @type {Array<*>} */ ([
+        const cases = [
           {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-customer',
+                staticPath: '/path/to/static/customer/',
                 schemaPath: '/path/to/schema-customer',
                 actualResolversPath: '/path/to/resolvers/customer/actual/',
                 stubResolversPath: '/path/to/resolvers/customer/stub/',
+                postWorkersPath: '/path/to/post-workers/customer/',
               },
               share: new AlphaGraphqlShare({
                 broker: mockBroker,
@@ -169,9 +187,11 @@ describe('BaseGraphqlServerEngine', () => {
             params: {
               config: {
                 graphqlEndpoint: '/graphql-admin',
+                staticPath: '/path/to/static/admin/',
                 schemaPath: '/path/to/schema-admin',
                 actualResolversPath: '/path/to/resolvers/admin/actual/',
                 stubResolversPath: '/path/to/resolvers/admin/stub/',
+                postWorkersPath: '/path/to/post-workers/admin/',
               },
               share: new BateGraphqlShare({
                 broker: mockBroker,
@@ -185,7 +205,7 @@ describe('BaseGraphqlServerEngine', () => {
               },
             },
           },
-        ])
+        ]
 
         test.each(cases)('errorHash: $params.errorHash', ({ params }) => {
           const engine = new BaseGraphqlServerEngine(params)
@@ -201,9 +221,16 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('.create()', () => {
     /** @type {GraphqlType.Config} */
-    const mockConfig = /** @type {*} */ ({
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
+      schemaPath: '/path/to/schema-customer',
+      actualResolversPath: '/path/to/resolvers/customer/actual/',
+      stubResolversPath: '/path/to/resolvers/customer/stub/',
+      postWorkersPath: '/path/to/post-workers/customer/',
+
       redisOptions: null,
-    })
+    }
     const mockBroker = SubscriptionBroker.create({
       config: mockConfig,
     })
@@ -212,12 +239,12 @@ describe('BaseGraphqlServerEngine', () => {
     const BateGraphqlShare = class extends BaseGraphqlShare {}
 
     const errorHashMock = {
-      Unknown: RenchanGraphqlError.create({ code: '100.X000.001' }),
-      ConcreteMemberNotFound: RenchanGraphqlError.create({ code: '101.X000.001' }),
-      Unauthenticated: RenchanGraphqlError.create({ code: '102.X000.001' }),
-      Unauthorized: RenchanGraphqlError.create({ code: '102.X000.002' }),
-      DeniedSchemaPermission: RenchanGraphqlError.create({ code: '102.X000.003' }),
-      Database: RenchanGraphqlError.create({ code: '104.X000.001' }),
+      Unknown: RenchanGraphqlError.declareGraphqlError({ code: '100.X000.001' }),
+      ConcreteMemberNotFound: RenchanGraphqlError.declareGraphqlError({ code: '101.X000.001' }),
+      Unauthenticated: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.001' }),
+      Unauthorized: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.002' }),
+      DeniedSchemaPermission: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.003' }),
+      Database: RenchanGraphqlError.declareGraphqlError({ code: '104.X000.001' }),
     }
 
     describe('to be instance of own class', () => {
@@ -230,14 +257,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             share: AlphaGraphqlShare.create({
               broker: mockBroker,
@@ -249,9 +278,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             share: BateGraphqlShare.create({
               broker: mockBroker,
@@ -259,7 +290,7 @@ describe('BaseGraphqlServerEngine', () => {
             errorHash: errorHashMock,
           },
         },
-      ])
+      ]
 
       test.each(cases)('config: $params.config', ({ params }) => {
         const engine = BaseGraphqlServerEngine.create(params)
@@ -275,17 +306,20 @@ describe('BaseGraphqlServerEngine', () => {
        *   params: {
        *     config: GraphqlType.Config
        *     share: BaseGraphqlShare
+       *     errorHash: Record<string, typeof RenchanGraphqlError>
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             share: AlphaGraphqlShare.create({
               broker: mockBroker,
@@ -297,9 +331,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             share: BateGraphqlShare.create({
               broker: mockBroker,
@@ -307,7 +343,7 @@ describe('BaseGraphqlServerEngine', () => {
             errorHash: errorHashMock,
           },
         },
-      ])
+      ]
 
       test.each(cases)('config: $params.config', ({ params }) => {
         const SpyClass = globalThis.constructorSpy.spyOn(BaseGraphqlServerEngine)
@@ -350,14 +386,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -384,9 +422,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -409,7 +449,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('Share: $params.EngineCtor.name', async ({ params }) => {
         const engine = await params.EngineCtor.createAsync(params)
@@ -432,14 +472,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -464,9 +506,11 @@ describe('BaseGraphqlServerEngine', () => {
           expected: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             share: expect.any(AlphaGraphqlShare),
           },
@@ -475,9 +519,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -502,14 +548,16 @@ describe('BaseGraphqlServerEngine', () => {
           expected: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             share: expect.any(BateGraphqlShare),
           },
         },
-      ])
+      ]
 
       test.each(cases)('Share: $params.EngineCtor.name', async ({ params, expected }) => {
         const createSpy = jest.spyOn(BaseGraphqlServerEngine, 'create')
@@ -707,14 +755,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -741,9 +791,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -766,7 +818,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const engine = await params.EngineCtor.createAsync(params)
@@ -794,14 +846,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const engineCases = /** @type {Array<*>} */ ([
+      const engineCases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -828,9 +882,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -853,9 +909,15 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       describe.each(engineCases)('EngineCtor: $params.EngineCtor.name', ({ params }) => {
+        /**
+         * @type {Array<{
+         *   method: 'isProduction' | 'isStaging' | 'isLive' | 'isDevelopment'
+         *   expected: boolean
+         * }>}
+         */
         const cases = [
           {
             method: 'isProduction',
@@ -881,7 +943,7 @@ describe('BaseGraphqlServerEngine', () => {
           const envObject = engine.env
 
           /** @type {Function} */
-          const booleanMethod = /** @type {*} */ (envObject[method])
+          const booleanMethod = envObject[method]
 
           const actual = booleanMethod()
 
@@ -898,17 +960,23 @@ describe('BaseGraphqlServerEngine', () => {
     const AlphaGraphqlShare = class extends BaseGraphqlShare {
       /** @override */
       static generateEnv () {
-        return /** @type {*} */ ({
-          NODE_ENV: 'alpha',
+        return new EnvironmentFacade({
+          environmentHash: {
+            NODE_ENV: 'alpha',
+          },
         })
+          .generateFacade()
       }
     }
     const BateGraphqlShare = class extends BaseGraphqlShare {
       /** @override */
       static generateEnv () {
-        return /** @type {*} */ ({
-          NODE_ENV: 'bate',
+        return new EnvironmentFacade({
+          environmentHash: {
+            NODE_ENV: 'bate',
+          },
         })
+          .generateFacade()
       }
     }
 
@@ -922,14 +990,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   expected: string
        * }>}
        */
-      const engineCases = /** @type {Array<*>} */ ([
+      const engineCases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -957,9 +1027,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -983,7 +1055,7 @@ describe('BaseGraphqlServerEngine', () => {
           },
           expected: 'bate',
         },
-      ])
+      ]
 
       test.each(engineCases)('EngineCtor: $params.EngineCtor.name', async ({ params, expected }) => {
         const engine = await params.EngineCtor.createAsync(params)
@@ -1011,14 +1083,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1045,9 +1119,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1070,7 +1146,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine#collectMiddleware()"}'
@@ -1096,7 +1172,7 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {*} */ ([
+      const cases = [
         {
           params: {
             config: {
@@ -1104,19 +1180,19 @@ describe('BaseGraphqlServerEngine', () => {
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
               staticPath: '/path/to/static/customer/',
             },
-            share: {
-              env: /** @type {*} */ ({}),
+            share: BaseGraphqlShare.create({
               broker: null,
-            },
+            }),
             errorHash: {
-              Unknown: RenchanGraphqlError.create({ code: '100.X000.001' }),
-              ConcreteMemberNotFound: RenchanGraphqlError.create({ code: '101.X000.001' }),
-              Unauthenticated: RenchanGraphqlError.create({ code: '102.X000.001' }),
-              Unauthorized: RenchanGraphqlError.create({ code: '102.X000.002' }),
-              DeniedSchemaPermission: RenchanGraphqlError.create({ code: '102.X000.003' }),
-              Database: RenchanGraphqlError.create({ code: '104.X000.001' }),
+              Unknown: RenchanGraphqlError.declareGraphqlError({ code: '100.X000.001' }),
+              ConcreteMemberNotFound: RenchanGraphqlError.declareGraphqlError({ code: '101.X000.001' }),
+              Unauthenticated: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.001' }),
+              Unauthorized: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.002' }),
+              DeniedSchemaPermission: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.003' }),
+              Database: RenchanGraphqlError.declareGraphqlError({ code: '104.X000.001' }),
             },
           },
         },
@@ -1127,23 +1203,23 @@ describe('BaseGraphqlServerEngine', () => {
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
               staticPath: '/path/to/static/admin/',
             },
-            share: {
-              env: /** @type {*} */ ({}),
+            share: BaseGraphqlShare.create({
               broker: null,
-            },
+            }),
             errorHash: {
-              Unknown: RenchanGraphqlError.create({ code: '100.X000.001' }),
-              ConcreteMemberNotFound: RenchanGraphqlError.create({ code: '101.X000.001' }),
-              Unauthenticated: RenchanGraphqlError.create({ code: '102.X000.001' }),
-              Unauthorized: RenchanGraphqlError.create({ code: '102.X000.002' }),
-              DeniedSchemaPermission: RenchanGraphqlError.create({ code: '102.X000.003' }),
-              Database: RenchanGraphqlError.create({ code: '104.X000.001' }),
+              Unknown: RenchanGraphqlError.declareGraphqlError({ code: '100.X000.001' }),
+              ConcreteMemberNotFound: RenchanGraphqlError.declareGraphqlError({ code: '101.X000.001' }),
+              Unauthenticated: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.001' }),
+              Unauthorized: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.002' }),
+              DeniedSchemaPermission: RenchanGraphqlError.declareGraphqlError({ code: '102.X000.003' }),
+              Database: RenchanGraphqlError.declareGraphqlError({ code: '104.X000.001' }),
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('graphqlEndpoint: $params.config.graphqlEndpoint', async ({ params }) => {
         /** @type {Array<string>} */
@@ -1179,14 +1255,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1213,9 +1291,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1238,7 +1318,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const expected = '101.X000.001 {"memberName":"BaseGraphqlServerEngine#generateFilterHandler()"}'
@@ -1266,14 +1346,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1300,9 +1382,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1325,7 +1409,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const engine = await params.EngineCtor.createAsync(params)
@@ -1353,14 +1437,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1387,9 +1473,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1412,7 +1500,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const expected = {}
@@ -1431,12 +1519,14 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('#collectExceptionCatchingMapEntries()', () => {
     /** @type {GraphqlType.Config} */
-    const mockConfig = /** @type {*} */ ({
+    const mockConfig = {
       graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
       schemaPath: '/path/to/schema-customer',
       actualResolversPath: '/path/to/resolvers/customer/actual/',
       stubResolversPath: '/path/to/resolvers/customer/stub/',
-    })
+      postWorkersPath: '/path/to/post-workers/customer/',
+    }
 
     describe('to be empty value on pre-production environment', () => {
       const cases = [
@@ -1447,11 +1537,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return true // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'development', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1500,11 +1591,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return false // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'production', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1576,14 +1668,16 @@ describe('BaseGraphqlServerEngine', () => {
        *   }
        * }>}
        */
-      const cases = /** @type {Array<*>} */ ([
+      const cases = [
         {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             EngineCtor: class AlphaEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1610,9 +1704,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             EngineCtor: class BateEngine extends BaseGraphqlServerEngine {
               static get Share () {
@@ -1635,7 +1731,7 @@ describe('BaseGraphqlServerEngine', () => {
             },
           },
         },
-      ])
+      ]
 
       test.each(cases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         /** @type {Array<GraphqlType.CustomScalarCtor>} */
@@ -1655,12 +1751,14 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('#passesThoughError()', () => {
     /** @type {GraphqlType.Config} */
-    const mockConfig = /** @type {*} */ ({
+    const mockConfig = {
       graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
       schemaPath: '/path/to/schema-customer',
       actualResolversPath: '/path/to/resolvers/customer/actual/',
       stubResolversPath: '/path/to/resolvers/customer/stub/',
-    })
+      postWorkersPath: '/path/to/post-workers/customer/',
+    }
 
     describe('to be truthy', () => {
       const engineCases = [
@@ -1672,11 +1770,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return true // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'development', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1722,11 +1821,12 @@ describe('BaseGraphqlServerEngine', () => {
                 return class extends BaseGraphqlShare {
                   /** @override */
                   static generateEnv () {
-                    return /** @type {*} */ ({
-                      isPreProduction () {
-                        return false // <--- 👀
+                    return new EnvironmentFacade({
+                      environmentHash: {
+                        NODE_ENV: 'production', // <--- 👀 isPreProduction() is !isProduction()
                       },
                     })
+                      .generateFacade()
                   }
                 }
               }
@@ -1767,9 +1867,16 @@ describe('BaseGraphqlServerEngine', () => {
 describe('BaseGraphqlServerEngine', () => {
   describe('#collectExpressSettings()', () => {
     /** @type {GraphqlType.Config} */
-    const mockConfig = /** @type {*} */ ({
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
+      schemaPath: '/path/to/schema-customer',
+      actualResolversPath: '/path/to/resolvers/customer/actual/',
+      stubResolversPath: '/path/to/resolvers/customer/stub/',
+      postWorkersPath: '/path/to/post-workers/customer/',
+
       redisOptions: null,
-    })
+    }
     const mockBroker = SubscriptionBroker.create({
       config: mockConfig,
     })
@@ -1786,7 +1893,7 @@ describe('BaseGraphqlServerEngine', () => {
               stubResolversPath: '/path/to/resolvers/customer/stub/',
               postWorkersPath: '/path/to/post-workers/customer/',
             },
-            share: /** @type {*} */ ({
+            share: BaseGraphqlShare.create({
               broker: mockBroker,
             }),
             errorHash: {},
@@ -1802,7 +1909,7 @@ describe('BaseGraphqlServerEngine', () => {
               stubResolversPath: '/path/to/resolvers/admin/stub/',
               postWorkersPath: '/path/to/post-workers/admin/',
             },
-            share: /** @type {*} */ ({
+            share: BaseGraphqlShare.create({
               broker: mockBroker,
             }),
             errorHash: {},
