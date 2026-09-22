@@ -1759,9 +1759,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
               schemaPath: '/path/to/schema-customer',
               actualResolversPath: '/path/to/resolvers/customer/actual/',
               stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
             },
             share: /** @type {*} */ ({
               broker: mockBroker,
@@ -1773,9 +1775,11 @@ describe('BaseGraphqlServerEngine', () => {
           params: {
             config: {
               graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
               schemaPath: '/path/to/schema-admin',
               actualResolversPath: '/path/to/resolvers/admin/actual/',
               stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
             },
             share: /** @type {*} */ ({
               broker: mockBroker,
