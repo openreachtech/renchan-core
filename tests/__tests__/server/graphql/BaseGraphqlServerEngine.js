@@ -1632,7 +1632,7 @@ describe('BaseGraphqlServerEngine', () => {
         },
       ]
 
-      test.each(engineCases)('EngineCtor: $params.EngineCtor.name', async ({ params, expected }) => {
+      test.each(engineCases)('EngineCtor: $params.EngineCtor.name', async ({ params }) => {
         const args = {
           config: mockConfig,
         }
