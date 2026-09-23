@@ -100,6 +100,36 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
+### `GraphqlServerEngine#collectRequestValidators()`
+
+Before a GraphQL document is executed, the request validators below are applied to it. Both are watched on production alone.
+
+| Validator | What it refuses | Error name |
+| :-- | :-- | :-- |
+| `IntrospectionAccessedGraphqlRequestValidator` | Every field resolving to an introspection type, such as `__schema` and `__type` | `IntrospectionAccessed` |
+| `DocumentTooDeepGraphqlRequestValidator` | A document deeper than `maxDocumentDepth` of `.get:config`<br>Applied only where `maxDocumentDepth` is declared | `DocumentTooDeep` |
+
+Introspection is therefore refused on production.
+
+A refusal is returned with the error code declared under its error name in `.get:standardErrorCodeHash`. When the name is not declared there, the code of `Unknown` is returned.
+
+```js
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static get standardErrorCodeHash () {
+    return {
+      Unknown: '100.X000.001',
+      ...
+      IntrospectionAccessed: '103.X000.002',
+      DocumentTooDeep: '103.X000.003',
+    }
+  }
+
+  ...
+}
+```
+
 ### `GraphqlContext`
 
 A class that inherits from `BaseGraphqlContext`. Used when generating context instances passed to all Resolvers.
