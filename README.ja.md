@@ -100,6 +100,36 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
 | `redisOptions` | Subscription で Redis を使う場合、この field で host と port を指定します |
 
+### `GraphqlServerEngine#collectRequestValidators()`
+
+GraphQL document の実行前に、下表の request validator が適用されます。どちらも production でのみ監視します。
+
+| Validator | 拒否するもの | Error name |
+| :-- | :-- | :-- |
+| `IntrospectionAccessedGraphqlRequestValidator` | `__schema` や `__type` など、introspection の型に解決されるすべての field | `IntrospectionAccessed` |
+| `DocumentTooDeepGraphqlRequestValidator` | `.get:config` の `maxDocumentDepth` より深い document<br>`maxDocumentDepth` を宣言したときだけ適用されます | `DocumentTooDeep` |
+
+そのため、production では introspection が拒否されます。
+
+拒否したときは、`.get:standardErrorCodeHash` でその error name に宣言した error code を返します。宣言がなければ、`Unknown` の error code を返します。
+
+```js
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static get standardErrorCodeHash () {
+    return {
+      Unknown: '100.X000.001',
+      ...
+      IntrospectionAccessed: '103.X000.002',
+      DocumentTooDeep: '103.X000.003',
+    }
+  }
+
+  ...
+}
+```
+
 ### `GraphqlContext`
 
 `BaseGraphqlContext` を継承したクラス。全 Resolver に渡される context のインスタンスを生成する際に使われます。
