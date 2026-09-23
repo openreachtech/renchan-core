@@ -39,12 +39,12 @@
     "npm": ">=11.16.0"
   },
   "dependencies": {
-    "@graphql-tools/schema": "^10.1.0",
+    "@graphql-tools/schema": "^10.1.1",
     "@graphql-tools/utils": "^10.11.0",
     "@openreachtech/renchan-env": "^1.0.6",
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "graphql": "^16.14.2",
     "graphql-http": "^1.23.0",
     "graphql-middleware": "^6.1.35",
@@ -52,7 +52,7 @@
     "graphql-upload": "^17.1.0",
     "graphql-ws": "^5.16.2",
     "ioredis": "^5.11.1",
-    "multer": "^2.3.0",
+    "multer": "^2.4.0",
     "ws": "^8.21.3"
   },
   "devDependencies": {
