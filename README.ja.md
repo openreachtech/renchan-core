@@ -59,11 +59,13 @@ server/
 | .get:standardErrorCodeHash | static getter | フロントエンドに返すビルトインエラーのエラーコードを定義します |
 | .get:Context | static getter | 全 Resolver に渡される context インスタンスのクラスを指定します |
 | .get:Share | static getter | 全 Resolver でシェアされるインスタンスのクラスを指定します |
-| .collectMiddleware() | static method | GraphQL エンドポイントに付与する Express の middleware を定義します |
+| #collectMiddleware() | instance method | GraphQL エンドポイントに付与する Express の middleware を定義します |
+| #collectExpressSettings() | instance method | `case sensitive routing` など、Express アプリケーションの設定を定義します |
 | #get:schemasToSkipFiltering | instance getter | 認可・認証の判定をスキップする schema field を指定します |
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
-| #get:visaIssuers () | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
+| #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
 | #collectScalars() | instance method | カスタムスカラーのクラス群を指定します |
+| #collectRequestValidators() | instance method | document の実行前に適用する request validator と、この endpoint がどれを持つかを指定します |
 
 ### `GraphqlServerEngine.get:config`
 
@@ -95,7 +97,38 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | GraphQL schema ファイルを指定します<br>フォルダを指定すると、配下にある schema ファイルを連結したものを読み込みます |
 | `actualResolversPath` | Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
 | `stubResolversPath` | stub 用の Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
+| `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
 | `redisOptions` | Subscription で Redis を使う場合、この field で host と port を指定します |
+
+### `GraphqlServerEngine#collectRequestValidators()`
+
+GraphQL document の実行前に、下表の request validator が適用されます。どちらも production でのみ監視します。
+
+| Validator | 拒否するもの | Error name |
+| :-- | :-- | :-- |
+| `IntrospectionAccessedGraphqlRequestValidator` | `__schema` や `__type` など、introspection の型に解決されるすべての field | `IntrospectionAccessed` |
+| `DocumentTooDeepGraphqlRequestValidator` | `.get:config` の `maxDocumentDepth` より深い document<br>`maxDocumentDepth` を宣言したときだけ適用されます | `DocumentTooDeep` |
+
+そのため、production では introspection が拒否されます。
+
+拒否したときは、`.get:standardErrorCodeHash` でその error name に宣言した error code を返します。宣言がなければ、`Unknown` の error code を返します。
+
+```js
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static get standardErrorCodeHash () {
+    return {
+      Unknown: '100.X000.001',
+      ...
+      IntrospectionAccessed: '103.X000.002',
+      DocumentTooDeep: '103.X000.003',
+    }
+  }
+
+  ...
+}
+```
 
 ### `GraphqlContext`
 
@@ -148,6 +181,170 @@ import MyAppGraphqlServerEngine from './server/graphql/MyAppGraphqlServerEngine.
 
 const builder = await GraphqlServerBuilder.createAsync({
   Engine: MyAppGraphqlServerEngine,
+})
+
+builder.buildHttpServer()
+  .listen(4000)
+```
+
+# RESTful API Server
+
+RESTful API Server は、アプリケーションで必要な実装箇所をテンプレート形式で提供します。
+
+ひとつの RESTful API エンドポイント群を構築するのに必要なファイル構成は以下に示されます。
+
+エンドポイントを `https://example.com/v1` の配下とした場合の構成
+
+```
+server/
+└── restfulapi/
+    ├── contexts/
+    │   ├── MyAppRestfulApiContext.js
+    │   └── MyAppRestfulApiShare.js
+    ├── renderers/
+    │   └── v1/
+    │       ├── get/
+    │       │   ├── AlphaGetRenderer.js
+    │       │   └── BetaGetRenderer.js
+    │       ├── post/
+    │       │   ├── GammaPostRenderer.js
+    │       │   └── DeltaPostRenderer.js
+    │       └── ︙
+    └── MyAppRestfulApiServerEngine.js
+```
+
+## クラス構成
+
+### `RestfulApiServerEngine`
+
+`BaseRestfulApiServerEngine` を継承したクラス。Express + RESTful API サーバーで必須となる処理をテンプレート式で実装できます。
+
+| Members | Kind of | Description |
+| :-- | :-- | :-- |
+| .get:config | static getter | Express + RESTful API サーバーで使う configuration を定義します |
+| .get:standardErrorEnvelopHash | static getter | フロントエンドに返すビルトインエラーの status code とメッセージを定義します |
+| .get:Context | static getter | 全 Renderer に渡される context インスタンスのクラスを指定します |
+| .get:Share | static getter | 全 Renderer でシェアされるインスタンスのクラスを指定します |
+| #collectMiddleware() | instance method | 全 route に付与する Express の middleware を定義します |
+| #collectExpressSettings() | instance method | `case sensitive routing` など、Express アプリケーションの設定を定義します |
+| #generateFilterHandler() | instance method | 全 Renderer の直前で認可・認証するロジックを定義します |
+| #get:visaIssuers | instance getter | 認証、認可、path 毎のパーミッションを判定するロジックを定義します |
+| #passesThoughError() | instance method | 予期しないエラーのメッセージをそのまま返すかどうかを指定します |
+
+### `RestfulApiServerEngine.get:config`
+
+RESTful API サーバーの環境設定は、ServerEngine クラス内で定義します。
+
+```js
+class MyAppRestfulApiServerEngine extends BaseRestfulApiServerEngine {
+  ...
+
+  static get config () {
+    return {
+      pathPrefix: '/v1',
+      renderersPath: rootPath.to('app/server/restfulapi/renderers/v1/'),
+      staticPath: rootPath.to('public/'),
+    }
+  }
+
+  ...
+}
+```
+
+| Field | Description |
+| :-- | :-- |
+| `pathPrefix` | 全 Renderer の route path に前置する path を指定します<br>前置しない場合は `null` を指定します |
+| `renderersPath` | Renderer クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
+| `staticPath` | RESTful API サーバーと同じ origin でアクセスできる静的ファイルのフォルダを指定します<br>`#collectMiddleware()` の `express.static()` で付与します |
+
+### `RestfulApiContext`
+
+`BaseRestfulApiContext` を継承したクラス。全 Renderer に渡される context のインスタンスを生成する際に使われます。
+
+`BaseRestfulApiContext.findUser()` をオーバーライドして、認証・認可の対象となるユーザーの entity を、RESTful API リクエスト毎に生成できます。
+
+全 Renderer に渡される `context` インスタンスから、以下を取得できます。
+
+| Features | Kind of | Description |
+| :-- | :-- | :-- |
+| #userEntity | property | `.findUser()` で取得した user entity が保持されます |
+| #uuid | property | リクエスト毎に生成される UUID を返す |
+| #get:env | instance getter | 1. `.env` に設定した変数<br>2. terminal で定義した環境変数 |
+| #get:NODE_ENV | instance getter | `#get:env.NODE_ENV` を返す |
+| #get:userId | instance getter | `#userEntity.id` を返す |
+| #get:now | instance getter | RESTful API がリクエストされた日時を返す |
+| #get:share | instance getter | 共有された `Share` クラスのインスタンスを返す |
+| #hasAuthenticated() | instance method | visa issuer の `hasAuthenticated` の判定結果を返す |
+| #hasAuthorized() | instance method | visa issuer の `hasAuthorized` の判定結果を返す |
+| #hasPathPermission() | instance method | visa issuer の `hasPathPermission` の判定結果を返す |
+
+### `RestfulApiShare`
+
+`BaseRestfulApiShare` を継承したクラス。全 Renderer で共有したいインスタンス群を保持する Hub の役目を担います。
+
+アプリケーションで特に共有するインスタンスがない場合は、`BaseRestfulApiShare` を継承した空のクラスを定義しておきます。
+
+### `Renderer`
+
+route ひとつにつき、ひとつの Renderer クラスを定義します。
+
+Renderer は、応答する HTTP method の base クラス（`BaseGetRenderer`、`BasePostRenderer`、`BasePutRenderer`、`BasePatchRenderer`、`BaseDeleteRenderer`、`BaseHeadRenderer`、`BaseOptionsRenderer`、`BaseConnectRenderer`、`BaseTraceRenderer`）を継承します。`.get:method` を定義するのは、この base クラスです。
+
+以下のメンバーを定義します。
+
+| Members | Kind of | Description |
+| :-- | :-- | :-- |
+| .get:method | static getter | route の HTTP method を定義します<br>HTTP method 毎の base クラスが定義しています |
+| .get:routePath | static getter | その Renderer が応答する route path を定義します |
+| .get:errorStructureHash | static getter | Renderer 内で返しうるエラーを定義します |
+| .get:FlusherCtor | static getter | response を書き出すクラスを指定します<br>オーバーライドしない場合は `JsonRestfulApiResponseFlusher` です |
+| .buildPreExpressHandlers() | static method | その route にのみ付与する Express の middleware を定義します |
+| #render() | instance method | route の response を返すロジックを定義します |
+
+Renderer クラスは、どこにも登録しません。`.get:config.renderersPath` の配下にあり `BaseRenderer` を継承したクラスが再帰的に取り込まれ、それぞれが `.get:config.pathPrefix` + `.get:routePath` の route に、`.get:method` の HTTP method で mount されます。
+
+したがって以下の Renderer は、`pathPrefix` が `/v1` のとき `GET /v1/alpha/:id` に応答します。Renderer が置かれたフォルダは、route に関与しません。
+
+```js
+import {
+  BaseGetRenderer,
+  RestfulApiResponse,
+} from '@openreachtech/renchan'
+
+export default class AlphaGetRenderer extends BaseGetRenderer {
+  static get routePath () {
+    return '/alpha/:id'
+  }
+
+  async render ({
+    body,
+    query,
+    context,
+    request,
+  }) {
+    return RestfulApiResponse.create({
+      statusCode: 200,
+      content: {
+        id: request.pathParameterHash.id,
+      },
+    })
+  }
+}
+```
+
+## RESTful API サーバーのセットアップ
+
+サーバーを立ち上げる bootstrap となるファイルの実装例です。
+
+```js
+import {
+  RestfulApiServerBuilder,
+} from '@openreachtech/renchan'
+
+import MyAppRestfulApiServerEngine from './server/restfulapi/MyAppRestfulApiServerEngine.js'
+
+const builder = await RestfulApiServerBuilder.createAsync({
+  Engine: MyAppRestfulApiServerEngine,
 })
 
 builder.buildHttpServer()

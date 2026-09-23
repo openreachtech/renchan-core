@@ -29,6 +29,7 @@ describe('AdminGraphqlServerEngine', () => {
         actualResolversPath: rootPath.to('app/server/graphql/resolvers/admin/actual/'),
         stubResolversPath: rootPath.to('app/server/graphql/resolvers/admin/stub/'),
         postWorkersPath: rootPath.to('app/server/graphql/post-workers/admin/'),
+        maxDocumentDepth: 10,
         redisOptions: null,
       }
 
@@ -49,6 +50,8 @@ describe('AdminGraphqlServerEngine', () => {
         Unauthenticated: '102.X000.001',
         Unauthorized: '102.X000.002',
         DeniedSchemaPermission: '102.X000.003',
+        IntrospectionAccessed: '103.X000.002',
+        DocumentTooDeep: '103.X000.003',
         Database: '104.X000.001',
         CanNotSubscribe: '102.S000.001',
       }

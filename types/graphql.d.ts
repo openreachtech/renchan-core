@@ -2,6 +2,8 @@ import type {
   GraphQLResolveInfo,
   GraphQLSchema,
   GraphQLScalarType,
+  ValidationContext as ValidationContextActual,
+  ValidationRule as ValidationRuleActual,
 } from 'graphql'
 
 import type {
@@ -27,6 +29,8 @@ import GraphqlPostWorkerHashBuilder from '../lib/server/graphql/post-workers/Gra
 import GraphqlResolvedParcelPorter from '../lib/server/graphql/post-workers/GraphqlResolvedParcelPorter'
 
 import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
+
+import BaseGraphqlRequestValidator from '../lib/server/graphql/validators/BaseGraphqlRequestValidator'
 
 import SubscriptionBroker from '../lib/server/graphql/subscription/SubscriptionBroker'
 import TopicReceiver from '../lib/server/graphql/subscription/TopicReceiver'
@@ -76,7 +80,9 @@ declare global {
       stubResolversPath: string | null
       postWorkersPath: string | null
 
-      redisOptions?: RedisOptions
+      maxDocumentDepth?: number | null
+
+      redisOptions?: RedisOptions | null
     }
 
     type Schema = GraphQLSchema
@@ -161,6 +167,13 @@ declare global {
         error: Error | null
       }
     }
+
+    // GraphQL request validator
+    type RequestValidator = BaseGraphqlRequestValidator
+    type RequestValidatorCtor = typeof BaseGraphqlRequestValidator
+
+    type ValidationRule = ValidationRuleActual
+    type ValidationContext = ValidationContextActual
 
     // GraphQL custom scalar
     type CustomScalar = BaseScalar

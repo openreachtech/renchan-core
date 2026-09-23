@@ -11,6 +11,8 @@ import {
 } from 'graphql-middleware'
 
 import GraphqlHttpHandlerBuilder from '../../../../lib/server/graphql/GraphqlHttpHandlerBuilder.js'
+import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
+import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
 import GraphqlSchemaBuilder from '../../../../lib/server/graphql/GraphqlSchemaBuilder.js'
 import AdminGraphqlServerEngine from '../../../../app/server/graphql/AdminGraphqlServerEngine.js'
 import CustomerGraphqlServerEngine from '../../../../app/server/graphql/CustomerGraphqlServerEngine.js'
@@ -588,6 +590,9 @@ describe('GraphqlHttpHandlerBuilder', () => {
           const onResolvedTally = /** @type {*} */ (async parcel => {})
           const postWorkerHashTally = /** @type {*} */ ({})
           const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+          const validationRulesTally = /** @type {*} */ ([
+            () => ({}),
+          ])
 
           const buildSchemaSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
@@ -599,12 +604,15 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .mockReturnValue(postWorkerHashTally)
           const createParcelPorterSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
             .mockReturnValue(parcelPorterTally)
+          const buildValidationRulesSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'buildValidationRules')
+            .mockResolvedValue(validationRulesTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
           const argsExpected = {
             schema: schemaTally,
             context: contextFactoryTally,
+            validationRules: validationRulesTally,
 
             onResolved: onResolvedTally,
             postWorkerHash: postWorkerHashTally,
@@ -629,6 +637,8 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .toHaveBeenCalledWith(engineExpected)
           expect(createParcelPorterSpy)
             .toHaveBeenCalledWith()
+          expect(buildValidationRulesSpy)
+            .toHaveBeenCalledWith(engineExpected)
         })
       })
 
@@ -706,6 +716,9 @@ describe('GraphqlHttpHandlerBuilder', () => {
           const onResolvedTally = /** @type {*} */ (async parcel => {})
           const postWorkerHashTally = /** @type {*} */ ({})
           const parcelPorterTally = GraphqlResolvedParcelPorter.create()
+          const validationRulesTally = /** @type {*} */ ([
+            () => ({}),
+          ])
 
           jest.spyOn(GraphqlHttpHandlerBuilder, 'buildSchema')
             .mockResolvedValue(schemaTally)
@@ -717,6 +730,8 @@ describe('GraphqlHttpHandlerBuilder', () => {
             .mockReturnValue(postWorkerHashTally)
           jest.spyOn(GraphqlHttpHandlerBuilder, 'createParcelPorter')
             .mockReturnValue(parcelPorterTally)
+          jest.spyOn(GraphqlHttpHandlerBuilder, 'buildValidationRules')
+            .mockResolvedValue(validationRulesTally)
 
           const createSpy = jest.spyOn(GraphqlHttpHandlerBuilder, 'create')
 
@@ -724,6 +739,7 @@ describe('GraphqlHttpHandlerBuilder', () => {
             ...params.extraCreateHandlerParams,
             schema: params.schema,
             context: params.contextFactory,
+            validationRules: validationRulesTally,
 
             onResolved: onResolvedTally,
             postWorkerHash: postWorkerHashTally,
@@ -738,6 +754,204 @@ describe('GraphqlHttpHandlerBuilder', () => {
           expect(createSpy)
             .toHaveBeenCalledWith(argsExpected)
         })
+      })
+    })
+  })
+})
+
+describe('GraphqlHttpHandlerBuilder', () => {
+  describe('.buildValidationRules()', () => {
+    const alphaRule = () => ({})
+    const betaRule = () => ({})
+    const extraRule = () => ({})
+
+    const alphaValidator = /** @type {*} */ ({
+      defineValidationRule: () => alphaRule,
+    })
+    const betaValidator = /** @type {*} */ ({
+      defineValidationRule: () => betaRule,
+    })
+
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+    }
+
+    const mockShare = BaseGraphqlShare.create({})
+
+    describe('to be the rules of the collected validators', () => {
+      const cases = [
+        {
+          input: {
+            validators: [
+              alphaValidator,
+              betaValidator,
+            ],
+          },
+          expected: [
+            alphaRule,
+            betaRule,
+          ],
+        },
+        {
+          input: {
+            validators: [
+              betaValidator,
+              alphaValidator,
+            ],
+          },
+          expected: [
+            betaRule,
+            alphaRule,
+          ],
+        },
+      ]
+
+      test.each(cases)('validator count: $input.validators.length', async ({ input, expected }) => {
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share: mockShare,
+          errorHash: {},
+        })
+
+        jest.spyOn(engine, 'collectRequestValidators')
+          .mockResolvedValue(input.validators)
+
+        const args = {
+          engine,
+        }
+
+        const received = await GraphqlHttpHandlerBuilder.buildValidationRules(args)
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('to be no rule where the engine carries no validator', () => {
+      test('to be empty', async () => {
+        const expected = []
+
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share: mockShare,
+          errorHash: {},
+        })
+
+        jest.spyOn(engine, 'collectRequestValidators')
+          .mockResolvedValue([])
+
+        const args = {
+          engine,
+        }
+
+        const received = await GraphqlHttpHandlerBuilder.buildValidationRules(args)
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('to concatenate the rules of .get:extraCreateHandlerParams', () => {
+      const cases = [
+        {
+          input: {
+            extraCreateHandlerParams: {
+              validationRules: [
+                extraRule,
+              ],
+            },
+          },
+          expected: [
+            extraRule,
+            alphaRule,
+          ],
+        },
+        {
+          input: {
+            extraCreateHandlerParams: {
+              validationRules: [],
+            },
+          },
+          expected: [
+            alphaRule,
+          ],
+        },
+        {
+          input: {
+            extraCreateHandlerParams: {},
+          },
+          expected: [
+            alphaRule,
+          ],
+        },
+      ]
+
+      test.each(cases)('extra rules: $expected.length', async ({ input, expected }) => {
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share: mockShare,
+          errorHash: {},
+        })
+
+        jest.spyOn(engine, 'collectRequestValidators')
+          .mockResolvedValue([
+            alphaValidator,
+          ])
+
+        const GraphqlHttpHandlerBuilderSpy = class extends GraphqlHttpHandlerBuilder {
+          /** @override */
+          static get extraCreateHandlerParams () {
+            return input.extraCreateHandlerParams
+          }
+        }
+
+        const args = {
+          engine,
+        }
+
+        const received = await GraphqlHttpHandlerBuilderSpy.buildValidationRules(args)
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('to ask each collected validator for its rule', () => {
+      const cases = [
+        { input: { validator: alphaValidator } },
+        { input: { validator: betaValidator } },
+      ]
+
+      test.each(cases)('rule: $input.validator.defineValidationRule.name', async ({ input }) => {
+        const defineValidationRuleSpy = jest.spyOn(input.validator, 'defineValidationRule')
+
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share: mockShare,
+          errorHash: {},
+        })
+
+        jest.spyOn(engine, 'collectRequestValidators')
+          .mockResolvedValue([
+            input.validator,
+          ])
+
+        const args = {
+          engine,
+        }
+
+        await GraphqlHttpHandlerBuilder.buildValidationRules(args)
+
+        expect(defineValidationRuleSpy)
+          .toHaveBeenNthCalledWith(1)
+        expect(defineValidationRuleSpy)
+          .toHaveBeenCalledTimes(1)
       })
     })
   })
