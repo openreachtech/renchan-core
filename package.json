@@ -44,7 +44,7 @@
     "@openreachtech/renchan-env": "^1.0.6",
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "graphql": "^16.14.2",
     "graphql-http": "^1.23.0",
     "graphql-middleware": "^6.1.35",
