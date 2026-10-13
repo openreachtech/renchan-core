@@ -79,6 +79,9 @@
     "sequelize": "^6.37.8"
   },
   "overrides": {
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^4.3.2"
+    },
     "graphql-middleware": {
       "@graphql-tools/delegate": "^12.2.0",
       "@graphql-tools/schema": "$@graphql-tools/schema"
