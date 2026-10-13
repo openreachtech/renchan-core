@@ -347,6 +347,62 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
       })
     })
 
+    describe('should be truthy where a derived class watches the environment', () => {
+      const cases = [
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'development',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'live',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+      ]
+
+      test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
+        const EveryEnvironmentValidator = class extends DocumentTooDeepGraphqlRequestValidator {
+          /** @override */
+          static isWatchedEnvironment () {
+            return true
+          }
+        }
+
+        const share = BaseGraphqlShare.create({
+          env: input.env,
+        })
+
+        const engine = new BaseGraphqlServerEngine({
+          config: {
+            ...mockConfig,
+            maxDocumentDepth: 10,
+          },
+          share,
+          errorHash: {},
+        })
+
+        const args = {
+          engine,
+        }
+
+        const received = EveryEnvironmentValidator.isAcceptable(args)
+
+        expect(received)
+          .toBeTruthy()
+      })
+    })
+
     describe('should be falsy', () => {
       describe('where the cap is no integer of one or more', () => {
         const cases = [
@@ -431,6 +487,113 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
           expect(received)
             .toBeFalsy()
         })
+      })
+    })
+  })
+})
+
+describe('DocumentTooDeepGraphqlRequestValidator', () => {
+  describe('.isWatchedEnvironment()', () => {
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-alpha',
+      staticPath: '/path/to/static/',
+      schemaPath: '/path/to/schema',
+      actualResolversPath: '/path/to/actual/',
+      stubResolversPath: null,
+      postWorkersPath: null,
+      maxDocumentDepth: 10,
+    }
+
+    describe('should be truthy', () => {
+      const cases = [
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'production',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+      ]
+
+      test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
+        const share = BaseGraphqlShare.create({
+          env: input.env,
+        })
+
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share,
+          errorHash: {},
+        })
+
+        const args = {
+          engine,
+        }
+
+        const received = DocumentTooDeepGraphqlRequestValidator.isWatchedEnvironment(args)
+
+        expect(received)
+          .toBeTruthy()
+      })
+    })
+
+    describe('should be falsy', () => {
+      const cases = [
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'development',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'staging',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'live',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+      ]
+
+      test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
+        const share = BaseGraphqlShare.create({
+          env: input.env,
+        })
+
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share,
+          errorHash: {},
+        })
+
+        const args = {
+          engine,
+        }
+
+        const received = DocumentTooDeepGraphqlRequestValidator.isWatchedEnvironment(args)
+
+        expect(received)
+          .toBeFalsy()
       })
     })
   })
