@@ -1,150 +1,282 @@
 import BaseExpressMiddleware from '../../../../../lib/server/express/middleware/BaseExpressMiddleware.js'
 
+import BaseGraphqlServerEngine from '../../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
+import BaseGraphqlShare from '../../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
+import BaseRestfulApiServerEngine from '../../../../../lib/server/restfulapi/BaseRestfulApiServerEngine.js'
+import BaseRestfulApiShare from '../../../../../lib/server/restfulapi/contexts/BaseRestfulApiShare.js'
+
 describe('BaseExpressMiddleware', () => {
   describe('constructor', () => {
-    describe('to keep properties', () => {
+    describe('should keep property', () => {
       describe('#engine', () => {
         const cases = [
           {
-            params: {
-              engine: { share: { name: 'alpha' } },
+            input: {
+              engine: BaseGraphqlServerEngine.create({
+                config: {
+                  graphqlEndpoint: '/graphql-customer',
+                  staticPath: '/path/to/static/customer/',
+                  schemaPath: '/path/to/schema-customer',
+                  actualResolversPath: '/path/to/resolvers/customer/actual/',
+                  stubResolversPath: '/path/to/resolvers/customer/stub/',
+                  postWorkersPath: '/path/to/post-workers/customer/',
+                },
+                share: BaseGraphqlShare.create({
+                  broker: null,
+                }),
+                errorHash: {},
+              }),
             },
           },
           {
-            params: {
-              engine: { share: { name: 'beta' } },
+            input: {
+              engine: BaseRestfulApiServerEngine.create({
+                config: {
+                  pathPrefix: '/v1',
+                  renderersPath: '/path/to/renderers/customer/',
+                  staticPath: '/path/to/static/customer/',
+                },
+                share: BaseRestfulApiShare.create(),
+                errorResponseHash: {},
+              }),
             },
           },
         ]
 
-        test.each(cases)('engine: $params.engine.share.name', ({ params }) => {
-          const middleware = new BaseExpressMiddleware({
-            engine: params.engine,
-          })
+        test.each(cases)('engine: $input.engine.constructor.name', ({ input }) => {
+          const received = new BaseExpressMiddleware(input)
 
-          expect(middleware)
-            .toHaveProperty('engine', params.engine)
+          expect(received)
+            .toHaveProperty('engine', input.engine)
         })
       })
     })
   })
+})
 
+describe('BaseExpressMiddleware', () => {
   describe('.create()', () => {
-    describe('to return an instance of own class', () => {
-      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {}
-      const BetaExpressMiddleware = class extends BaseExpressMiddleware {}
+    class AlphaExpressMiddleware extends BaseExpressMiddleware {}
 
+    class BetaExpressMiddleware extends BaseExpressMiddleware {}
+
+    const graphqlEngine = BaseGraphqlServerEngine.create({
+      config: {
+        graphqlEndpoint: '/graphql-customer',
+        staticPath: '/path/to/static/customer/',
+        schemaPath: '/path/to/schema-customer',
+        actualResolversPath: '/path/to/resolvers/customer/actual/',
+        stubResolversPath: '/path/to/resolvers/customer/stub/',
+        postWorkersPath: '/path/to/post-workers/customer/',
+      },
+      share: BaseGraphqlShare.create({
+        broker: null,
+      }),
+      errorHash: {},
+    })
+    const restfulEngine = BaseRestfulApiServerEngine.create({
+      config: {
+        pathPrefix: '/v1',
+        renderersPath: '/path/to/renderers/customer/',
+        staticPath: '/path/to/static/customer/',
+      },
+      share: BaseRestfulApiShare.create(),
+      errorResponseHash: {},
+    })
+
+    describe('should be an instance of own class', () => {
       const cases = [
         {
-          params: {
+          input: {
+            Ctor: BaseExpressMiddleware,
+            engine: graphqlEngine,
+          },
+        },
+        {
+          input: {
+            Ctor: AlphaExpressMiddleware,
+            engine: restfulEngine,
+          },
+        },
+        {
+          input: {
+            Ctor: BetaExpressMiddleware,
+            engine: graphqlEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Ctor: $input.Ctor.name', ({ input }) => {
+        const args = {
+          engine: input.engine,
+        }
+
+        const received = input.Ctor.create(args)
+
+        expect(received)
+          .toBeInstanceOf(input.Ctor)
+      })
+    })
+
+    describe('should call constructor', () => {
+      const cases = [
+        {
+          input: {
             Ctor: BaseExpressMiddleware,
           },
-        },
-        {
-          params: {
-            Ctor: AlphaExpressMiddleware,
+          tally: {
+            engine: graphqlEngine,
           },
         },
         {
-          params: {
+          input: {
+            Ctor: AlphaExpressMiddleware,
+          },
+          tally: {
+            engine: restfulEngine,
+          },
+        },
+        {
+          input: {
             Ctor: BetaExpressMiddleware,
           },
+          tally: {
+            engine: graphqlEngine,
+          },
         },
       ]
 
-      test.each(cases)('Ctor: $params.Ctor.name', ({ params }) => {
-        const engine = { share: {} }
+      test.each(cases)('Ctor: $input.Ctor.name', ({ input, tally }) => {
+        const SpyClass = globalThis.constructorSpy.spyOn(input.Ctor)
 
-        const actual = params.Ctor.create({
-          engine,
-        })
+        SpyClass.create(tally)
 
-        expect(actual)
-          .toBeInstanceOf(params.Ctor)
-        expect(actual)
-          .toHaveProperty('engine', engine)
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(tally)
       })
     })
   })
+})
 
+describe('BaseExpressMiddleware', () => {
   describe('#get:Ctor', () => {
-    describe('to be own constructor', () => {
-      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {}
+    class AlphaExpressMiddleware extends BaseExpressMiddleware {}
 
+    class BetaExpressMiddleware extends BaseExpressMiddleware {}
+
+    describe('should be constructor of instance', () => {
       const cases = [
         {
-          params: {
-            Ctor: BaseExpressMiddleware,
-          },
+          input: { Ctor: BaseExpressMiddleware },
+          expected: BaseExpressMiddleware,
         },
         {
-          params: {
-            Ctor: AlphaExpressMiddleware,
-          },
+          input: { Ctor: AlphaExpressMiddleware },
+          expected: AlphaExpressMiddleware,
+        },
+        {
+          input: { Ctor: BetaExpressMiddleware },
+          expected: BetaExpressMiddleware,
         },
       ]
 
-      test.each(cases)('Ctor: $params.Ctor.name', ({ params }) => {
-        const middleware = params.Ctor.create({
-          engine: { share: {} },
+      test.each(cases)('Ctor: $input.Ctor.name', ({ input, expected }) => {
+        const middleware = new input.Ctor({
+          engine: null,
         })
 
-        expect(middleware.Ctor)
-          .toBe(params.Ctor)
+        const received = middleware.Ctor
+
+        expect(received)
+          .toBe(expected)
       })
     })
   })
+})
 
+describe('BaseExpressMiddleware', () => {
   describe('#get:share', () => {
-    describe('to be share of engine', () => {
+    describe('should be share of engine', () => {
+      const alphaShare = BaseGraphqlShare.create({
+        broker: null,
+      })
+      const betaShare = BaseRestfulApiShare.create()
+
       const cases = [
         {
-          params: {
-            share: { name: 'alpha' },
+          input: {
+            engine: BaseGraphqlServerEngine.create({
+              config: {
+                graphqlEndpoint: '/graphql-customer',
+                staticPath: '/path/to/static/customer/',
+                schemaPath: '/path/to/schema-customer',
+                actualResolversPath: '/path/to/resolvers/customer/actual/',
+                stubResolversPath: '/path/to/resolvers/customer/stub/',
+                postWorkersPath: '/path/to/post-workers/customer/',
+              },
+              share: alphaShare,
+              errorHash: {},
+            }),
           },
+          expected: alphaShare,
         },
         {
-          params: {
-            share: { name: 'beta' },
+          input: {
+            engine: BaseRestfulApiServerEngine.create({
+              config: {
+                pathPrefix: '/v1',
+                renderersPath: '/path/to/renderers/customer/',
+                staticPath: '/path/to/static/customer/',
+              },
+              share: betaShare,
+              errorResponseHash: {},
+            }),
           },
+          expected: betaShare,
         },
       ]
 
-      test.each(cases)('share: $params.share.name', ({ params }) => {
-        const middleware = BaseExpressMiddleware.create({
-          engine: { share: params.share },
-        })
+      test.each(cases)('engine: $input.engine.constructor.name', ({ input, expected }) => {
+        const middleware = new BaseExpressMiddleware(input)
 
-        expect(middleware.share)
-          .toBe(params.share)
+        const received = middleware.share
+
+        expect(received)
+          .toBe(expected)
       })
     })
   })
+})
 
+describe('BaseExpressMiddleware', () => {
   describe('#composeMiddleware()', () => {
-    describe('to throw', () => {
-      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {}
+    describe('when not inherited', () => {
+      class AlphaExpressMiddleware extends BaseExpressMiddleware {}
+
+      class BetaExpressMiddleware extends BaseExpressMiddleware {}
 
       const cases = [
         {
-          params: {
-            Ctor: BaseExpressMiddleware,
-          },
+          input: { Ctor: BaseExpressMiddleware },
+          expected: '101.X000.001 {"memberName":"BaseExpressMiddleware#composeMiddleware()"}',
         },
         {
-          params: {
-            Ctor: AlphaExpressMiddleware,
-          },
+          input: { Ctor: AlphaExpressMiddleware },
+          expected: '101.X000.001 {"memberName":"AlphaExpressMiddleware#composeMiddleware()"}',
+        },
+        {
+          input: { Ctor: BetaExpressMiddleware },
+          expected: '101.X000.001 {"memberName":"BetaExpressMiddleware#composeMiddleware()"}',
         },
       ]
 
-      test.each(cases)('Ctor: $params.Ctor.name', ({ params }) => {
-        const middleware = params.Ctor.create({
-          engine: { share: {} },
+      test.each(cases)('Ctor: $input.Ctor.name', ({ input, expected }) => {
+        const middleware = new input.Ctor({
+          engine: null,
         })
 
         expect(() => middleware.composeMiddleware())
-          .toThrow('101.X000.001 {"memberName":"BaseExpressMiddleware#composeMiddleware()"}')
+          .toThrow(expected)
       })
     })
   })
