@@ -1,5 +1,7 @@
 import BaseRestfulApiServerEngine from '../../../../lib/server/restfulapi/BaseRestfulApiServerEngine.js'
 
+import BaseExpressMiddleware from '../../../../lib/server/express/middleware/BaseExpressMiddleware.js'
+
 import BaseRestfulApiShare from '../../../../lib/server/restfulapi/contexts/BaseRestfulApiShare.js'
 import RestfulApiResponse from '../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 
@@ -1041,6 +1043,124 @@ describe('BaseRestfulApiServerEngine', () => {
 
         expect(actual)
           .toEqual(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRestfulApiServerEngine', () => {
+  describe('.get:ExpressMiddleware', () => {
+    describe('to be empty by default', () => {
+      test('ExpressMiddleware', () => {
+        expect(BaseRestfulApiServerEngine.ExpressMiddleware)
+          .toEqual([])
+      })
+    })
+  })
+})
+
+describe('BaseRestfulApiServerEngine', () => {
+  describe('#composeExpressMiddleware()', () => {
+    describe('to return an empty array without family', () => {
+      test('EngineCtor: BaseRestfulApiServerEngine', () => {
+        const engine = BaseRestfulApiServerEngine.create({
+          config: {
+            pathPrefix: '/v1',
+            renderersPath: '/path/to/renderers/customer/',
+            staticPath: '/path/to/static/customer/',
+          },
+          share: BaseRestfulApiShare.create(),
+          errorResponseHash: {},
+        })
+
+        const actual = engine.composeExpressMiddleware()
+
+        expect(actual)
+          .toEqual([])
+      })
+    })
+
+    describe('to compose the middleware of the family in order', () => {
+      const alphaMiddleware = () => 'alpha'
+      const betaMiddleware = () => 'beta'
+
+      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {
+        composeMiddleware () {
+          return alphaMiddleware
+        }
+      }
+      const BetaExpressMiddleware = class extends BaseExpressMiddleware {
+        composeMiddleware () {
+          return betaMiddleware
+        }
+      }
+
+      const cases = [
+        {
+          params: {
+            ExpressMiddleware: [
+              AlphaExpressMiddleware,
+            ],
+          },
+          expected: [
+            alphaMiddleware,
+          ],
+        },
+        {
+          params: {
+            ExpressMiddleware: [
+              AlphaExpressMiddleware,
+              BetaExpressMiddleware,
+            ],
+          },
+          expected: [
+            alphaMiddleware,
+            betaMiddleware,
+          ],
+        },
+        {
+          params: {
+            ExpressMiddleware: [
+              BetaExpressMiddleware,
+              AlphaExpressMiddleware,
+            ],
+          },
+          expected: [
+            betaMiddleware,
+            alphaMiddleware,
+          ],
+        },
+      ]
+
+      test.each(cases)('family size: $params.ExpressMiddleware.length', ({ params, expected }) => {
+        const EngineCtor = class extends BaseRestfulApiServerEngine {
+          /** @override */
+          static get ExpressMiddleware () {
+            return params.ExpressMiddleware
+          }
+        }
+        const engine = EngineCtor.create({
+          config: {
+            pathPrefix: '/v1',
+            renderersPath: '/path/to/renderers/customer/',
+            staticPath: '/path/to/static/customer/',
+          },
+          share: BaseRestfulApiShare.create(),
+          errorResponseHash: {},
+        })
+        const createSpies = params.ExpressMiddleware.map(Ctor => jest.spyOn(Ctor, 'create'))
+
+        const actual = engine.composeExpressMiddleware()
+
+        expect(actual)
+          .toEqual(expected)
+        createSpies.forEach(spy => {
+          expect(spy)
+            .toHaveBeenCalledWith({
+              engine,
+            })
+          spy.mockRestore()
+        })
       })
     })
   })
