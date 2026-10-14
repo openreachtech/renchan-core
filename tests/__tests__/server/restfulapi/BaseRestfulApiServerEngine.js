@@ -1050,10 +1050,12 @@ describe('BaseRestfulApiServerEngine', () => {
 
 describe('BaseRestfulApiServerEngine', () => {
   describe('.get:ExpressMiddleware', () => {
-    describe('to be empty by default', () => {
-      test('ExpressMiddleware', () => {
-        expect(BaseRestfulApiServerEngine.ExpressMiddleware)
-          .toEqual([])
+    describe('when called as is', () => {
+      test('should be an empty array', () => {
+        const received = BaseRestfulApiServerEngine.ExpressMiddleware
+
+        expect(received)
+          .toStrictEqual([])
       })
     })
   })
@@ -1061,70 +1063,93 @@ describe('BaseRestfulApiServerEngine', () => {
 
 describe('BaseRestfulApiServerEngine', () => {
   describe('#composeExpressMiddleware()', () => {
-    describe('to return an empty array without family', () => {
-      test('EngineCtor: BaseRestfulApiServerEngine', () => {
-        const engine = BaseRestfulApiServerEngine.create({
-          config: {
-            pathPrefix: '/v1',
-            renderersPath: '/path/to/renderers/customer/',
-            staticPath: '/path/to/static/customer/',
-          },
-          share: BaseRestfulApiShare.create(),
-          errorResponseHash: {},
-        })
+    const alphaMiddleware = () => 'alpha'
+    const betaMiddleware = () => 'beta'
 
-        const actual = engine.composeExpressMiddleware()
-
-        expect(actual)
-          .toEqual([])
-      })
-    })
-
-    describe('to compose the middleware of the family in order', () => {
-      const alphaMiddleware = () => 'alpha'
-      const betaMiddleware = () => 'beta'
-
-      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {
-        composeMiddleware () {
-          return alphaMiddleware
-        }
+    class AlphaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return alphaMiddleware
       }
-      const BetaExpressMiddleware = class extends BaseExpressMiddleware {
-        composeMiddleware () {
-          return betaMiddleware
-        }
-      }
+    }
 
+    class BetaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return betaMiddleware
+      }
+    }
+
+    class OnlyAlphaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    class OnlyBetaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class AlphaThenBetaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class BetaThenAlphaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    const mockConfig = {
+      pathPrefix: '/v1',
+      renderersPath: '/path/to/renderers/customer/',
+      staticPath: '/path/to/static/customer/',
+    }
+    const mockArgs = {
+      config: mockConfig,
+      share: BaseRestfulApiShare.create(),
+      errorResponseHash: {},
+    }
+
+    describe('should compose the middleware of the family in order', () => {
       const cases = [
         {
-          params: {
-            ExpressMiddleware: [
-              AlphaExpressMiddleware,
-            ],
-          },
+          input: { Engine: BaseRestfulApiServerEngine },
+          expected: [],
+        },
+        {
+          input: { Engine: OnlyAlphaEngine },
           expected: [
             alphaMiddleware,
           ],
         },
         {
-          params: {
-            ExpressMiddleware: [
-              AlphaExpressMiddleware,
-              BetaExpressMiddleware,
-            ],
-          },
+          input: { Engine: OnlyBetaEngine },
+          expected: [
+            betaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: AlphaThenBetaEngine },
           expected: [
             alphaMiddleware,
             betaMiddleware,
           ],
         },
         {
-          params: {
-            ExpressMiddleware: [
-              BetaExpressMiddleware,
-              AlphaExpressMiddleware,
-            ],
-          },
+          input: { Engine: BetaThenAlphaEngine },
           expected: [
             betaMiddleware,
             alphaMiddleware,
@@ -1132,35 +1157,42 @@ describe('BaseRestfulApiServerEngine', () => {
         },
       ]
 
-      test.each(cases)('family size: $params.ExpressMiddleware.length', ({ params, expected }) => {
-        const EngineCtor = class extends BaseRestfulApiServerEngine {
-          /** @override */
-          static get ExpressMiddleware () {
-            return params.ExpressMiddleware
-          }
-        }
-        const engine = EngineCtor.create({
-          config: {
-            pathPrefix: '/v1',
-            renderersPath: '/path/to/renderers/customer/',
-            staticPath: '/path/to/static/customer/',
+      test.each(cases)('Engine: $input.Engine.name', ({ input, expected }) => {
+        const engine = input.Engine.create(mockArgs)
+
+        const received = engine.composeExpressMiddleware()
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('should create each middleware with the engine', () => {
+      const cases = [
+        {
+          input: {
+            Engine: OnlyAlphaEngine,
+            MiddlewareCtor: AlphaExpressMiddleware,
           },
-          share: BaseRestfulApiShare.create(),
-          errorResponseHash: {},
-        })
-        const createSpies = params.ExpressMiddleware.map(Ctor => jest.spyOn(Ctor, 'create'))
+        },
+        {
+          input: {
+            Engine: OnlyBetaEngine,
+            MiddlewareCtor: BetaExpressMiddleware,
+          },
+        },
+      ]
 
-        const actual = engine.composeExpressMiddleware()
+      test.each(cases)('Engine: $input.Engine.name', ({ input }) => {
+        const engine = input.Engine.create(mockArgs)
+        const createSpy = jest.spyOn(input.MiddlewareCtor, 'create')
 
-        expect(actual)
-          .toEqual(expected)
-        createSpies.forEach(spy => {
-          expect(spy)
-            .toHaveBeenCalledWith({
-              engine,
-            })
-          spy.mockRestore()
-        })
+        engine.composeExpressMiddleware()
+
+        expect(createSpy)
+          .toHaveBeenCalledWith({
+            engine,
+          })
       })
     })
   })
