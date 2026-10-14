@@ -6,6 +6,7 @@ export { default as HttpMethodExpressRoute } from './lib/server/express/routes/H
 export { default as MiddlewareExpressRoute } from './lib/server/express/routes/MiddlewareExpressRoute.js'
 export { default as GetMethodExpressRoute } from './lib/server/express/routes/GetMethodExpressRoute.js'
 export { default as PostMethodExpressRoute } from './lib/server/express/routes/PostMethodExpressRoute.js'
+export { default as BaseExpressMiddleware } from './lib/server/express/middleware/BaseExpressMiddleware.js'
 
 /**
  * For GraphQL server.
