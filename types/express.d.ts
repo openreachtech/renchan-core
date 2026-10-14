@@ -7,6 +7,7 @@ import type {
 } from 'express'
 
 import BaseExpressRoute from '../lib/server/express/routes/BaseExpressRoute'
+import BaseExpressMiddleware from '../lib/server/express/middleware/BaseExpressMiddleware'
 
 /**
  * global types
@@ -21,6 +22,9 @@ declare global {
     type Settings = Record<string, any>
 
     type Route = BaseExpressRoute
+
+    type MiddlewareFamilyMember = BaseExpressMiddleware
+    type MiddlewareFamilyMemberCtor = typeof BaseExpressMiddleware
 
     type HttpMethod = 'all'
       | 'connect'
