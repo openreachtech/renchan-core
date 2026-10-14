@@ -4,6 +4,8 @@ import {
 
 import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
+import BaseExpressMiddleware from '../../../../lib/server/express/middleware/BaseExpressMiddleware.js'
+
 import RenchanGraphqlError from '../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
@@ -2200,6 +2202,134 @@ describe('BaseGraphqlServerEngine', () => {
 
       expect(received)
         .toStrictEqual(expected)
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
+  describe('.get:ExpressMiddleware', () => {
+    describe('to be empty by default', () => {
+      test('ExpressMiddleware', () => {
+        expect(BaseGraphqlServerEngine.ExpressMiddleware)
+          .toEqual([])
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
+  describe('#composeExpressMiddleware()', () => {
+    describe('to return an empty array without family', () => {
+      test('EngineCtor: BaseGraphqlServerEngine', () => {
+        const engine = BaseGraphqlServerEngine.create({
+          config: {
+            graphqlEndpoint: '/graphql-customer',
+            staticPath: '/path/to/static/customer/',
+            schemaPath: '/path/to/schema-customer',
+            actualResolversPath: '/path/to/resolvers/customer/actual/',
+            stubResolversPath: '/path/to/resolvers/customer/stub/',
+            postWorkersPath: '/path/to/post-workers/customer/',
+          },
+          share: BaseGraphqlShare.create({
+            broker: null,
+          }),
+          errorHash: {},
+        })
+
+        const actual = engine.composeExpressMiddleware()
+
+        expect(actual)
+          .toEqual([])
+      })
+    })
+
+    describe('to compose the middleware of the family in order', () => {
+      const alphaMiddleware = () => 'alpha'
+      const betaMiddleware = () => 'beta'
+
+      const AlphaExpressMiddleware = class extends BaseExpressMiddleware {
+        composeMiddleware () {
+          return alphaMiddleware
+        }
+      }
+      const BetaExpressMiddleware = class extends BaseExpressMiddleware {
+        composeMiddleware () {
+          return betaMiddleware
+        }
+      }
+
+      const cases = [
+        {
+          params: {
+            ExpressMiddleware: [
+              AlphaExpressMiddleware,
+            ],
+          },
+          expected: [
+            alphaMiddleware,
+          ],
+        },
+        {
+          params: {
+            ExpressMiddleware: [
+              AlphaExpressMiddleware,
+              BetaExpressMiddleware,
+            ],
+          },
+          expected: [
+            alphaMiddleware,
+            betaMiddleware,
+          ],
+        },
+        {
+          params: {
+            ExpressMiddleware: [
+              BetaExpressMiddleware,
+              AlphaExpressMiddleware,
+            ],
+          },
+          expected: [
+            betaMiddleware,
+            alphaMiddleware,
+          ],
+        },
+      ]
+
+      test.each(cases)('family size: $params.ExpressMiddleware.length', ({ params, expected }) => {
+        const EngineCtor = class extends BaseGraphqlServerEngine {
+          /** @override */
+          static get ExpressMiddleware () {
+            return params.ExpressMiddleware
+          }
+        }
+        const engine = EngineCtor.create({
+          config: {
+            graphqlEndpoint: '/graphql-customer',
+            staticPath: '/path/to/static/customer/',
+            schemaPath: '/path/to/schema-customer',
+            actualResolversPath: '/path/to/resolvers/customer/actual/',
+            stubResolversPath: '/path/to/resolvers/customer/stub/',
+            postWorkersPath: '/path/to/post-workers/customer/',
+          },
+          share: BaseGraphqlShare.create({
+            broker: null,
+          }),
+          errorHash: {},
+        })
+        const createSpies = params.ExpressMiddleware.map(Ctor => jest.spyOn(Ctor, 'create'))
+
+        const actual = engine.composeExpressMiddleware()
+
+        expect(actual)
+          .toEqual(expected)
+        createSpies.forEach(spy => {
+          expect(spy)
+            .toHaveBeenCalledWith({
+              engine,
+            })
+          spy.mockRestore()
+        })
+      })
     })
   })
 })
