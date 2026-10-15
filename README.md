@@ -111,12 +111,12 @@ Before a GraphQL document is executed, the request validators below are applied 
 
 Introspection is therefore refused on production.
 
-To watch `maxDocumentDepth` in other environments as well, override `DocumentTooDeepGraphqlRequestValidator.isWatchedEnvironment()` in a derived class, and list that class in `.collectGraphqlRequestValidatorCtors()` of the engine.
+To watch `maxDocumentDepth` in other environments as well, override `DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation()` in a derived class to return `false`, and list that class in `.collectGraphqlRequestValidatorCtors()` of the engine.
 
 ```js
 class EveryEnvironmentDocumentTooDeepGraphqlRequestValidator extends DocumentTooDeepGraphqlRequestValidator {
-  static isWatchedEnvironment ({ engine }) {
-    return true
+  static shouldSkipValidation ({ engine }) {
+    return false
   }
 }
 
