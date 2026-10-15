@@ -59,7 +59,9 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | .get:standardErrorCodeHash | static getter | Defines error codes for built-in errors returned to the frontend |
 | .get:Context | static getter | Specifies the class for context instances passed to all Resolvers |
 | .get:Share | static getter | Specifies the class for instances shared across all Resolvers |
+| .get:ExpressMiddleware | static getter | Specifies the `BaseExpressMiddleware` classes composed by `#composeExpressMiddleware()` |
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
+| #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
@@ -97,12 +99,12 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | Specifies the GraphQL schema file<br>When specifying a folder, it reads the concatenated schema files within |
 | `actualResolversPath` | Specifies the folder path where Resolver classes are defined<br>Files in the folder are imported recursively |
 | `stubResolversPath` | Specifies the folder path for stub Resolver classes<br>Files in the folder are imported recursively |
-| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
+| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone by default, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
 ### `GraphqlServerEngine#collectRequestValidators()`
 
-Before a GraphQL document is executed, the request validators below are applied to it. Both are watched on production alone.
+Before a GraphQL document is executed, the request validators below are applied to it. Both are watched on production alone by default.
 
 | Validator | What it refuses | Error name |
 | :-- | :-- | :-- |
@@ -110,6 +112,29 @@ Before a GraphQL document is executed, the request validators below are applied 
 | `DocumentTooDeepGraphqlRequestValidator` | A document deeper than `maxDocumentDepth` of `.get:config`<br>Applied only where `maxDocumentDepth` is declared | `DocumentTooDeep` |
 
 Introspection is therefore refused on production.
+
+To watch `maxDocumentDepth` in other environments as well, override `DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation()` in a derived class to return `false`, and list that class in `.collectGraphqlRequestValidatorCtors()` of the engine.
+
+```js
+class EveryEnvironmentDocumentTooDeepGraphqlRequestValidator extends DocumentTooDeepGraphqlRequestValidator {
+  static shouldSkipValidation ({ engine }) {
+    return false
+  }
+}
+
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static collectGraphqlRequestValidatorCtors () {
+    return [
+      EveryEnvironmentDocumentTooDeepGraphqlRequestValidator,
+      IntrospectionAccessedGraphqlRequestValidator,
+    ]
+  }
+
+  ...
+}
+```
 
 A refusal is returned with the error code declared under its error name in `.get:standardErrorCodeHash`. When the name is not declared there, the code of `Unknown` is returned.
 
@@ -134,7 +159,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 
 A class that inherits from `BaseGraphqlContext`. Used when generating context instances passed to all Resolvers.
 
-Override `BaseGraphqlContext.findUser()` to generate user entities for authentication/authorization per GraphQL API request.
+Override `BaseGraphqlContext.findUser()` to generate user entities for authentication/authorization per GraphQL API request. It receives `expressRequest`, `engine` and `accessToken`.
 
 The following can be obtained from the `context` instance passed to all Resolvers:
 
@@ -155,6 +180,32 @@ A class that inherits from `BaseGraphqlShare`. Acts as a hub for instances that 
 For example, storing a `PubSub` class instance (commonly used in Subscriptions) as a Share class property allows it to be shared across Resolver calls.
 
 If your application doesn't need to share any instances, define an empty class that inherits from `BaseGraphqlShare`.
+
+### `ExpressMiddleware`
+
+A class that inherits from `BaseExpressMiddleware`. Composes one Express middleware in `#composeMiddleware()`, and reaches the engine through `#engine` and its share through `#get:share`.
+
+```js
+class CorsExpressMiddleware extends BaseExpressMiddleware {
+  composeMiddleware () {
+    return cors()
+  }
+}
+
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  static get ExpressMiddleware () {
+    return [
+      CorsExpressMiddleware,
+    ]
+  }
+
+  collectMiddleware () {
+    return [
+      ...this.composeExpressMiddleware(),
+    ]
+  }
+}
+```
 
 ### `Resolver`
 
@@ -225,7 +276,9 @@ A class that inherits from `BaseRestfulApiServerEngine`. It allows template-styl
 | .get:standardErrorEnvelopHash | static getter | Defines status codes and messages of built-in errors returned to the frontend |
 | .get:Context | static getter | Specifies the class for context instances passed to all Renderers |
 | .get:Share | static getter | Specifies the class for instances shared across all Renderers |
+| .get:ExpressMiddleware | static getter | Specifies the `BaseExpressMiddleware` classes composed by `#composeExpressMiddleware()` |
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to all routes |
+| #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all Renderers |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and path permission checking |
@@ -261,7 +314,7 @@ class MyAppRestfulApiServerEngine extends BaseRestfulApiServerEngine {
 
 A class that inherits from `BaseRestfulApiContext`. Used when generating context instances passed to all Renderers.
 
-Override `BaseRestfulApiContext.findUser()` to generate user entities for authentication/authorization per RESTful API request.
+Override `BaseRestfulApiContext.findUser()` to generate user entities for authentication/authorization per RESTful API request. It receives `expressRequest`, `engine` and `accessToken`.
 
 The following can be obtained from the `context` instance passed to all Renderers:
 
@@ -283,6 +336,32 @@ The following can be obtained from the `context` instance passed to all Renderer
 A class that inherits from `BaseRestfulApiShare`. Acts as a hub for instances that need to be shared across all Renderers.
 
 If your application doesn't need to share any instances, define an empty class that inherits from `BaseRestfulApiShare`.
+
+### `ExpressMiddleware`
+
+A class that inherits from `BaseExpressMiddleware`. Composes one Express middleware in `#composeMiddleware()`, and reaches the engine through `#engine` and its share through `#get:share`.
+
+```js
+class CorsExpressMiddleware extends BaseExpressMiddleware {
+  composeMiddleware () {
+    return cors()
+  }
+}
+
+class MyAppRestfulApiServerEngine extends BaseRestfulApiServerEngine {
+  static get ExpressMiddleware () {
+    return [
+      CorsExpressMiddleware,
+    ]
+  }
+
+  collectMiddleware () {
+    return [
+      ...this.composeExpressMiddleware(),
+    ]
+  }
+}
+```
 
 ### `Renderer`
 

@@ -1,5 +1,7 @@
 import BaseRestfulApiServerEngine from '../../../../lib/server/restfulapi/BaseRestfulApiServerEngine.js'
 
+import BaseExpressMiddleware from '../../../../lib/server/express/middleware/BaseExpressMiddleware.js'
+
 import BaseRestfulApiShare from '../../../../lib/server/restfulapi/contexts/BaseRestfulApiShare.js'
 import RestfulApiResponse from '../../../../lib/server/restfulapi/interfaces/RestfulApiResponse.js'
 
@@ -626,6 +628,19 @@ describe('BaseRestfulApiServerEngine', () => {
 })
 
 describe('BaseRestfulApiServerEngine', () => {
+  describe('.get:ExpressMiddleware', () => {
+    describe('when called as is', () => {
+      test('should be an empty array', () => {
+        const received = BaseRestfulApiServerEngine.ExpressMiddleware
+
+        expect(received)
+          .toStrictEqual([])
+      })
+    })
+  })
+})
+
+describe('BaseRestfulApiServerEngine', () => {
   describe('#get:Ctor', () => {
     describe('to be own Class', () => {
       const cases = [
@@ -787,6 +802,143 @@ describe('BaseRestfulApiServerEngine', () => {
 
         expect(actual)
           .toBe(expected)
+      })
+    })
+  })
+})
+
+describe('BaseRestfulApiServerEngine', () => {
+  describe('#composeExpressMiddleware()', () => {
+    const alphaMiddleware = () => 'alpha'
+    const betaMiddleware = () => 'beta'
+
+    class AlphaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return alphaMiddleware
+      }
+    }
+
+    class BetaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return betaMiddleware
+      }
+    }
+
+    class OnlyAlphaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    class OnlyBetaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class AlphaThenBetaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class BetaThenAlphaEngine extends BaseRestfulApiServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    const mockConfig = {
+      pathPrefix: '/v1',
+      renderersPath: '/path/to/renderers/customer/',
+      staticPath: '/path/to/static/customer/',
+    }
+    const mockArgs = {
+      config: mockConfig,
+      share: BaseRestfulApiShare.create(),
+      errorResponseHash: {},
+    }
+
+    describe('should compose the middleware of the family in order', () => {
+      const cases = [
+        {
+          input: { Engine: BaseRestfulApiServerEngine },
+          expected: [],
+        },
+        {
+          input: { Engine: OnlyAlphaEngine },
+          expected: [
+            alphaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: OnlyBetaEngine },
+          expected: [
+            betaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: AlphaThenBetaEngine },
+          expected: [
+            alphaMiddleware,
+            betaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: BetaThenAlphaEngine },
+          expected: [
+            betaMiddleware,
+            alphaMiddleware,
+          ],
+        },
+      ]
+
+      test.each(cases)('Engine: $input.Engine.name', ({ input, expected }) => {
+        const engine = input.Engine.create(mockArgs)
+
+        const received = engine.composeExpressMiddleware()
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('should create each middleware with the engine', () => {
+      const cases = [
+        {
+          input: {
+            Engine: OnlyAlphaEngine,
+            MiddlewareCtor: AlphaExpressMiddleware,
+          },
+        },
+        {
+          input: {
+            Engine: OnlyBetaEngine,
+            MiddlewareCtor: BetaExpressMiddleware,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.Engine.name', ({ input }) => {
+        const engine = input.Engine.create(mockArgs)
+        const createSpy = jest.spyOn(input.MiddlewareCtor, 'create')
+
+        engine.composeExpressMiddleware()
+
+        expect(createSpy)
+          .toHaveBeenCalledWith({
+            engine,
+          })
       })
     })
   })

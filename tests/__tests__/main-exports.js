@@ -3,6 +3,7 @@ import { default as HttpMethodExpressRouteActual } from '../../lib/server/expres
 import { default as MiddlewareExpressRouteActual } from '../../lib/server/express/routes/MiddlewareExpressRoute.js'
 import { default as GetMethodExpressRouteActual } from '../../lib/server/express/routes/GetMethodExpressRoute.js'
 import { default as PostMethodExpressRouteActual } from '../../lib/server/express/routes/PostMethodExpressRoute.js'
+import { default as BaseExpressMiddlewareActual } from '../../lib/server/express/middleware/BaseExpressMiddleware.js'
 
 import { default as GraphqlServerBuilderActual } from '../../lib/server/graphql/GraphqlServerBuilder.js'
 import { default as BaseGraphqlServerEngineActual } from '../../lib/server/graphql/BaseGraphqlServerEngine.js'
@@ -109,6 +110,7 @@ import {
   MiddlewareExpressRoute,
   GetMethodExpressRoute,
   PostMethodExpressRoute,
+  BaseExpressMiddleware,
 
   GraphqlServerBuilder,
   BaseGraphqlServerEngine,
@@ -208,6 +210,7 @@ describe('main exports', () => {
     { ExportedClass: MiddlewareExpressRoute, ActualClass: MiddlewareExpressRouteActual },
     { ExportedClass: GetMethodExpressRoute, ActualClass: GetMethodExpressRouteActual },
     { ExportedClass: PostMethodExpressRoute, ActualClass: PostMethodExpressRouteActual },
+    { ExportedClass: BaseExpressMiddleware, ActualClass: BaseExpressMiddlewareActual },
 
     { ExportedClass: GraphqlServerBuilder, ActualClass: GraphqlServerBuilderActual },
     { ExportedClass: BaseGraphqlServerEngine, ActualClass: BaseGraphqlServerEngineActual },
