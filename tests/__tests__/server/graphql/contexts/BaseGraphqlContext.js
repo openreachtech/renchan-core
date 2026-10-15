@@ -790,8 +790,8 @@ describe('BaseGraphqlContext', () => {
         }
         const expectedFindUserArgs = {
           expressRequest: params.expressRequest,
-          accessToken: expected.accessToken,
           engine: mockEngine,
+          accessToken: expected.accessToken,
           requestedAt: params.requestedAt,
         }
         const expectedCreateVisaArgs = {
