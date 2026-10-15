@@ -535,8 +535,8 @@ describe('BaseRestfulApiContext', () => {
         }
         const expectedFindUserArgs = {
           expressRequest: params.expressRequest,
-          accessToken: null,
           engine: mockEngine,
+          accessToken: null,
           requestedAt: params.requestedAt,
         }
         const expectedCreateVisaArgs = {
