@@ -4,6 +4,8 @@ import {
 
 import BaseGraphqlServerEngine from '../../../../lib/server/graphql/BaseGraphqlServerEngine.js'
 
+import BaseExpressMiddleware from '../../../../lib/server/express/middleware/BaseExpressMiddleware.js'
+
 import RenchanGraphqlError from '../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
 
 import BaseGraphqlShare from '../../../../lib/server/graphql/contexts/BaseGraphqlShare.js'
@@ -742,6 +744,19 @@ describe('BaseGraphqlServerEngine', () => {
 })
 
 describe('BaseGraphqlServerEngine', () => {
+  describe('.get:ExpressMiddleware', () => {
+    describe('when called as is', () => {
+      test('should be an empty array', () => {
+        const received = BaseGraphqlServerEngine.ExpressMiddleware
+
+        expect(received)
+          .toStrictEqual([])
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('#get:Ctor', () => {
     const AlphaGraphqlShare = class extends BaseGraphqlShare {}
     const BateGraphqlShare = class extends BaseGraphqlShare {}
@@ -1064,6 +1079,148 @@ describe('BaseGraphqlServerEngine', () => {
 
         expect(actual)
           .toBe(expected)
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
+  describe('#composeExpressMiddleware()', () => {
+    const alphaMiddleware = () => 'alpha'
+    const betaMiddleware = () => 'beta'
+
+    class AlphaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return alphaMiddleware
+      }
+    }
+
+    class BetaExpressMiddleware extends BaseExpressMiddleware {
+      composeMiddleware () {
+        return betaMiddleware
+      }
+    }
+
+    class OnlyAlphaEngine extends BaseGraphqlServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    class OnlyBetaEngine extends BaseGraphqlServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class AlphaThenBetaEngine extends BaseGraphqlServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          AlphaExpressMiddleware,
+          BetaExpressMiddleware,
+        ]
+      }
+    }
+
+    class BetaThenAlphaEngine extends BaseGraphqlServerEngine {
+      static get ExpressMiddleware () {
+        return [
+          BetaExpressMiddleware,
+          AlphaExpressMiddleware,
+        ]
+      }
+    }
+
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
+      schemaPath: '/path/to/schema-customer',
+      actualResolversPath: '/path/to/resolvers/customer/actual/',
+      stubResolversPath: '/path/to/resolvers/customer/stub/',
+      postWorkersPath: '/path/to/post-workers/customer/',
+    }
+    const mockArgs = {
+      config: mockConfig,
+      share: BaseGraphqlShare.create({
+        broker: null,
+      }),
+      errorHash: {},
+    }
+
+    describe('should compose the middleware of the family in order', () => {
+      const cases = [
+        {
+          input: { Engine: BaseGraphqlServerEngine },
+          expected: [],
+        },
+        {
+          input: { Engine: OnlyAlphaEngine },
+          expected: [
+            alphaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: OnlyBetaEngine },
+          expected: [
+            betaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: AlphaThenBetaEngine },
+          expected: [
+            alphaMiddleware,
+            betaMiddleware,
+          ],
+        },
+        {
+          input: { Engine: BetaThenAlphaEngine },
+          expected: [
+            betaMiddleware,
+            alphaMiddleware,
+          ],
+        },
+      ]
+
+      test.each(cases)('Engine: $input.Engine.name', ({ input, expected }) => {
+        const engine = input.Engine.create(mockArgs)
+
+        const received = engine.composeExpressMiddleware()
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('should create each middleware with the engine', () => {
+      const cases = [
+        {
+          input: {
+            Engine: OnlyAlphaEngine,
+            MiddlewareCtor: AlphaExpressMiddleware,
+          },
+        },
+        {
+          input: {
+            Engine: OnlyBetaEngine,
+            MiddlewareCtor: BetaExpressMiddleware,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.Engine.name', ({ input }) => {
+        const engine = input.Engine.create(mockArgs)
+        const createSpy = jest.spyOn(input.MiddlewareCtor, 'create')
+
+        engine.composeExpressMiddleware()
+
+        expect(createSpy)
+          .toHaveBeenCalledWith({
+            engine,
+          })
       })
     })
   })
@@ -1930,6 +2087,7 @@ describe('BaseGraphqlServerEngine', () => {
     })
   })
 })
+
 describe('BaseGraphqlServerEngine', () => {
   describe('#collectRequestValidators()', () => {
     const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
