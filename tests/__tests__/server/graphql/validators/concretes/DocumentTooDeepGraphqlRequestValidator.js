@@ -347,7 +347,7 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
       })
     })
 
-    describe('should be truthy where a derived class watches the environment', () => {
+    describe('should be truthy where a derived class skips no environment', () => {
       const cases = [
         {
           input: {
@@ -374,8 +374,8 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
       test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
         const EveryEnvironmentValidator = class extends DocumentTooDeepGraphqlRequestValidator {
           /** @override */
-          static isWatchedEnvironment () {
-            return true
+          static shouldSkipValidation () {
+            return false
           }
         }
 
@@ -493,7 +493,7 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
 })
 
 describe('DocumentTooDeepGraphqlRequestValidator', () => {
-  describe('.isWatchedEnvironment()', () => {
+  describe('.shouldSkipValidation()', () => {
     /** @type {GraphqlType.Config} */
     const mockConfig = {
       graphqlEndpoint: '/graphql-alpha',
@@ -506,42 +506,6 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
     }
 
     describe('should be truthy', () => {
-      const cases = [
-        {
-          input: {
-            env: new EnvironmentFacade({
-              environmentHash: {
-                NODE_ENV: 'production',
-              },
-            })
-              .generateFacade(),
-          },
-        },
-      ]
-
-      test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
-        const share = BaseGraphqlShare.create({
-          env: input.env,
-        })
-
-        const engine = new BaseGraphqlServerEngine({
-          config: mockConfig,
-          share,
-          errorHash: {},
-        })
-
-        const args = {
-          engine,
-        }
-
-        const received = DocumentTooDeepGraphqlRequestValidator.isWatchedEnvironment(args)
-
-        expect(received)
-          .toBeTruthy()
-      })
-    })
-
-    describe('should be falsy', () => {
       const cases = [
         {
           input: {
@@ -590,7 +554,43 @@ describe('DocumentTooDeepGraphqlRequestValidator', () => {
           engine,
         }
 
-        const received = DocumentTooDeepGraphqlRequestValidator.isWatchedEnvironment(args)
+        const received = DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation(args)
+
+        expect(received)
+          .toBeTruthy()
+      })
+    })
+
+    describe('should be falsy', () => {
+      const cases = [
+        {
+          input: {
+            env: new EnvironmentFacade({
+              environmentHash: {
+                NODE_ENV: 'production',
+              },
+            })
+              .generateFacade(),
+          },
+        },
+      ]
+
+      test.each(cases)('NODE_ENV: $input.env.NODE_ENV', ({ input }) => {
+        const share = BaseGraphqlShare.create({
+          env: input.env,
+        })
+
+        const engine = new BaseGraphqlServerEngine({
+          config: mockConfig,
+          share,
+          errorHash: {},
+        })
+
+        const args = {
+          engine,
+        }
+
+        const received = DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation(args)
 
         expect(received)
           .toBeFalsy()
