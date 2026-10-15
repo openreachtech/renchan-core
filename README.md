@@ -59,7 +59,9 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | .get:standardErrorCodeHash | static getter | Defines error codes for built-in errors returned to the frontend |
 | .get:Context | static getter | Specifies the class for context instances passed to all Resolvers |
 | .get:Share | static getter | Specifies the class for instances shared across all Resolvers |
+| .get:ExpressMiddleware | static getter | Specifies the `BaseExpressMiddleware` classes composed by `#composeExpressMiddleware()` |
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
+| #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
@@ -157,7 +159,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 
 A class that inherits from `BaseGraphqlContext`. Used when generating context instances passed to all Resolvers.
 
-Override `BaseGraphqlContext.findUser()` to generate user entities for authentication/authorization per GraphQL API request.
+Override `BaseGraphqlContext.findUser()` to generate user entities for authentication/authorization per GraphQL API request. It receives `expressRequest`, `engine` and `accessToken`.
 
 The following can be obtained from the `context` instance passed to all Resolvers:
 
@@ -178,6 +180,32 @@ A class that inherits from `BaseGraphqlShare`. Acts as a hub for instances that 
 For example, storing a `PubSub` class instance (commonly used in Subscriptions) as a Share class property allows it to be shared across Resolver calls.
 
 If your application doesn't need to share any instances, define an empty class that inherits from `BaseGraphqlShare`.
+
+### `ExpressMiddleware`
+
+A class that inherits from `BaseExpressMiddleware`. Composes one Express middleware in `#composeMiddleware()`, and reaches the engine through `#engine` and its share through `#get:share`.
+
+```js
+class CorsExpressMiddleware extends BaseExpressMiddleware {
+  composeMiddleware () {
+    return cors()
+  }
+}
+
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  static get ExpressMiddleware () {
+    return [
+      CorsExpressMiddleware,
+    ]
+  }
+
+  collectMiddleware () {
+    return [
+      ...this.composeExpressMiddleware(),
+    ]
+  }
+}
+```
 
 ### `Resolver`
 
@@ -248,7 +276,9 @@ A class that inherits from `BaseRestfulApiServerEngine`. It allows template-styl
 | .get:standardErrorEnvelopHash | static getter | Defines status codes and messages of built-in errors returned to the frontend |
 | .get:Context | static getter | Specifies the class for context instances passed to all Renderers |
 | .get:Share | static getter | Specifies the class for instances shared across all Renderers |
+| .get:ExpressMiddleware | static getter | Specifies the `BaseExpressMiddleware` classes composed by `#composeExpressMiddleware()` |
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to all routes |
+| #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all Renderers |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and path permission checking |
@@ -284,7 +314,7 @@ class MyAppRestfulApiServerEngine extends BaseRestfulApiServerEngine {
 
 A class that inherits from `BaseRestfulApiContext`. Used when generating context instances passed to all Renderers.
 
-Override `BaseRestfulApiContext.findUser()` to generate user entities for authentication/authorization per RESTful API request.
+Override `BaseRestfulApiContext.findUser()` to generate user entities for authentication/authorization per RESTful API request. It receives `expressRequest`, `engine` and `accessToken`.
 
 The following can be obtained from the `context` instance passed to all Renderers:
 
@@ -306,6 +336,32 @@ The following can be obtained from the `context` instance passed to all Renderer
 A class that inherits from `BaseRestfulApiShare`. Acts as a hub for instances that need to be shared across all Renderers.
 
 If your application doesn't need to share any instances, define an empty class that inherits from `BaseRestfulApiShare`.
+
+### `ExpressMiddleware`
+
+A class that inherits from `BaseExpressMiddleware`. Composes one Express middleware in `#composeMiddleware()`, and reaches the engine through `#engine` and its share through `#get:share`.
+
+```js
+class CorsExpressMiddleware extends BaseExpressMiddleware {
+  composeMiddleware () {
+    return cors()
+  }
+}
+
+class MyAppRestfulApiServerEngine extends BaseRestfulApiServerEngine {
+  static get ExpressMiddleware () {
+    return [
+      CorsExpressMiddleware,
+    ]
+  }
+
+  collectMiddleware () {
+    return [
+      ...this.composeExpressMiddleware(),
+    ]
+  }
+}
+```
 
 ### `Renderer`
 
