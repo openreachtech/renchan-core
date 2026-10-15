@@ -9,6 +9,13 @@ describe('BaseExpressMiddleware', () => {
   describe('constructor', () => {
     describe('should keep property', () => {
       describe('#engine', () => {
+        /**
+         * @type {Array<{
+         *   input: {
+         *     engine: GraphqlType.ServerEngine | RestfulApiType.ServerEngine
+         *   }
+         * }>}
+         */
         const cases = [
           {
             input: {
@@ -202,6 +209,14 @@ describe('BaseExpressMiddleware', () => {
       })
       const betaShare = BaseRestfulApiShare.create()
 
+      /**
+       * @type {Array<{
+       *   input: {
+       *     engine: GraphqlType.ServerEngine | RestfulApiType.ServerEngine
+       *   }
+       *   expected: GraphqlType.Share | RestfulApiType.Share
+       * }>}
+       */
       const cases = [
         {
           input: {
