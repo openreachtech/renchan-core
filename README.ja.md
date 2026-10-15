@@ -97,12 +97,12 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | GraphQL schema ファイルを指定します<br>フォルダを指定すると、配下にある schema ファイルを連結したものを読み込みます |
 | `actualResolversPath` | Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
 | `stubResolversPath` | stub 用の Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
-| `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
+| `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>既定では production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
 | `redisOptions` | Subscription で Redis を使う場合、この field で host と port を指定します |
 
 ### `GraphqlServerEngine#collectRequestValidators()`
 
-GraphQL document の実行前に、下表の request validator が適用されます。どちらも production でのみ監視します。
+GraphQL document の実行前に、下表の request validator が適用されます。どちらも既定では production でのみ監視します。
 
 | Validator | 拒否するもの | Error name |
 | :-- | :-- | :-- |
@@ -110,6 +110,29 @@ GraphQL document の実行前に、下表の request validator が適用され�
 | `DocumentTooDeepGraphqlRequestValidator` | `.get:config` の `maxDocumentDepth` より深い document<br>`maxDocumentDepth` を宣言したときだけ適用されます | `DocumentTooDeep` |
 
 そのため、production では introspection が拒否されます。
+
+`maxDocumentDepth` を他の環境でも監視するには、派生クラスで `DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation()` を `false` を返すようにオーバーライドし、engine の `.collectGraphqlRequestValidatorCtors()` にそのクラスを並べます。
+
+```js
+class EveryEnvironmentDocumentTooDeepGraphqlRequestValidator extends DocumentTooDeepGraphqlRequestValidator {
+  static shouldSkipValidation ({ engine }) {
+    return false
+  }
+}
+
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static collectGraphqlRequestValidatorCtors () {
+    return [
+      EveryEnvironmentDocumentTooDeepGraphqlRequestValidator,
+      IntrospectionAccessedGraphqlRequestValidator,
+    ]
+  }
+
+  ...
+}
+```
 
 拒否したときは、`.get:standardErrorCodeHash` でその error name に宣言した error code を返します。宣言がなければ、`Unknown` の error code を返します。
 

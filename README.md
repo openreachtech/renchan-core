@@ -97,12 +97,12 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `schemaPath` | Specifies the GraphQL schema file<br>When specifying a folder, it reads the concatenated schema files within |
 | `actualResolversPath` | Specifies the folder path where Resolver classes are defined<br>Files in the folder are imported recursively |
 | `stubResolversPath` | Specifies the folder path for stub Resolver classes<br>Files in the folder are imported recursively |
-| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
+| `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone by default, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
 ### `GraphqlServerEngine#collectRequestValidators()`
 
-Before a GraphQL document is executed, the request validators below are applied to it. Both are watched on production alone.
+Before a GraphQL document is executed, the request validators below are applied to it. Both are watched on production alone by default.
 
 | Validator | What it refuses | Error name |
 | :-- | :-- | :-- |
@@ -110,6 +110,29 @@ Before a GraphQL document is executed, the request validators below are applied 
 | `DocumentTooDeepGraphqlRequestValidator` | A document deeper than `maxDocumentDepth` of `.get:config`<br>Applied only where `maxDocumentDepth` is declared | `DocumentTooDeep` |
 
 Introspection is therefore refused on production.
+
+To watch `maxDocumentDepth` in other environments as well, override `DocumentTooDeepGraphqlRequestValidator.shouldSkipValidation()` in a derived class to return `false`, and list that class in `.collectGraphqlRequestValidatorCtors()` of the engine.
+
+```js
+class EveryEnvironmentDocumentTooDeepGraphqlRequestValidator extends DocumentTooDeepGraphqlRequestValidator {
+  static shouldSkipValidation ({ engine }) {
+    return false
+  }
+}
+
+class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
+  ...
+
+  static collectGraphqlRequestValidatorCtors () {
+    return [
+      EveryEnvironmentDocumentTooDeepGraphqlRequestValidator,
+      IntrospectionAccessedGraphqlRequestValidator,
+    ]
+  }
+
+  ...
+}
+```
 
 A refusal is returned with the error code declared under its error name in `.get:standardErrorCodeHash`. When the name is not declared there, the code of `Unknown` is returned.
 
