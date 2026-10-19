@@ -1284,6 +1284,97 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#skipsToSetupWebSocketServer()', () => {
+    describe('should be truthy', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: true,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: true,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name', async ({ input }) => {
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const received = builder.skipsToSetupWebSocketServer()
+
+        expect(received)
+          .toBeTruthy()
+      })
+    })
+
+    describe('should be falsy', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: false,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              // skipsWebSocket: omitted
+              connectionInitWaitTimeout: null,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: undefined, // graphqlServer: omitted
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name, graphqlServer: $input.graphqlServer', async ({ input }) => {
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const received = builder.skipsToSetupWebSocketServer()
+
+        expect(received)
+          .toBeFalsy()
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#composeServerOptionHash()', () => {
     describe('should compose the options the builder wires', () => {
       const cases = [
