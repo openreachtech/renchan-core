@@ -1429,6 +1429,57 @@ describe('GraphqlServerBuilder', () => {
       })
     })
 
+    describe('to call useServerHandler with the composed options', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+          expected: {
+            connectionInitWaitTimeout: 3000,
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+          },
+          expected: {
+            connectionInitWaitTimeout: 5000,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name', async ({ input, expected }) => {
+        const SpyWebSocketServer = globalThis.constructorSpy.spyOn(WebSocketServer)
+        const useServerSpy = jest.fn()
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          static get WebSocketServer () {
+            return SpyWebSocketServer
+          }
+
+          static get useServerHandler () {
+            return /** @type {*} */ (useServerSpy)
+          }
+        }
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilderProxy.createAsync(args)
+
+        jest.spyOn(builder, 'composeServerOptionHash')
+          .mockReturnValue(expected)
+
+        builder.setupServer({
+          server: new http.Server(),
+        })
+
+        expect(useServerSpy)
+          .toHaveBeenLastCalledWith(expected, expect.any(WebSocketServer))
+      })
+    })
+
     describe('to call useServerHandler with extended options', () => {
       const cases = [
         {
