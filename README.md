@@ -63,6 +63,8 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
 | #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
+| #extendWebSocketServerOptions() | instance method | Extends the options of the `graphql-ws` server mounted on GraphQL endpoints, such as `onSubscribe`. Returns the given options as default |
+| #shouldSkipWebSocketServer() | instance method | Specifies whether to leave the WebSocket server unmounted. Returns `false` as default |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
