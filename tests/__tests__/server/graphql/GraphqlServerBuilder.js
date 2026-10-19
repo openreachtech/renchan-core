@@ -1554,6 +1554,192 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#filterServerHookHash()', () => {
+    describe('should keep the hooks the engine composes', () => {
+      const cases = [
+        {
+          tally: {
+            onConnect: () => true,
+            onDisconnect: () => undefined,
+            onClose: () => undefined,
+            onSubscribe: () => undefined,
+            onOperation: () => undefined,
+            onError: () => undefined,
+            onNext: () => undefined,
+            onComplete: () => undefined,
+          },
+        },
+        {
+          tally: {
+            onSubscribe: () => undefined,
+          },
+        },
+      ]
+
+      test.each(cases)('hooks: $#', async ({ tally }) => {
+        const args = {
+          Engine: CustomerGraphqlServerEngine,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        jest.spyOn(builder.engine, 'composeServerHookHash')
+          .mockReturnValue(tally)
+
+        const received = builder.filterServerHookHash()
+
+        expect(received)
+          .toStrictEqual(tally)
+      })
+    })
+
+    describe('should leave out the options the engine must not decide', () => {
+      /**
+       * @type {Array<{
+       *   input: {
+       *     hookHash: GraphqlType.WebSocketServerHookHash
+       *   }
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          input: {
+            hookHash: {
+              execute: 'engine-execute',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              subscribe: 'engine-subscribe',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              context: 'engine-context',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              schema: 'engine-schema',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              validate: 'engine-validate',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              roots: 'engine-roots',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              connectionInitWaitTimeout: 'engine-connection-init-wait-timeout',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              jsonMessageReviver: 'engine-json-message-reviver',
+            },
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              jsonMessageReplacer: 'engine-json-message-replacer',
+            },
+          },
+        },
+      ])
+
+      test.each(cases)('hookHash: $input.hookHash', async ({ input }) => {
+        const args = {
+          Engine: CustomerGraphqlServerEngine,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        jest.spyOn(builder.engine, 'composeServerHookHash')
+          .mockReturnValue(input.hookHash)
+
+        const received = builder.filterServerHookHash()
+
+        expect(received)
+          .toStrictEqual({})
+      })
+    })
+
+    describe('should keep the hooks among the options the engine must not decide', () => {
+      const onConnect = () => true
+      const onSubscribe = () => undefined
+
+      /**
+       * @type {Array<{
+       *   input: {
+       *     hookHash: GraphqlType.WebSocketServerHookHash
+       *   }
+       *   expected: GraphqlType.WebSocketServerHookHash
+       * }>}
+       */
+      const cases = /** @type {Array<*>} */ ([
+        {
+          input: {
+            hookHash: {
+              onConnect,
+              roots: 'engine-roots',
+              connectionInitWaitTimeout: 'engine-connection-init-wait-timeout',
+            },
+          },
+          expected: {
+            onConnect,
+          },
+        },
+        {
+          input: {
+            hookHash: {
+              onSubscribe,
+              execute: 'engine-execute',
+              jsonMessageReplacer: 'engine-json-message-replacer',
+            },
+          },
+          expected: {
+            onSubscribe,
+          },
+        },
+      ])
+
+      test.each(cases)('hookHash: $#', async ({ input, expected }) => {
+        const args = {
+          Engine: CustomerGraphqlServerEngine,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        jest.spyOn(builder.engine, 'composeServerHookHash')
+          .mockReturnValue(input.hookHash)
+
+        const received = builder.filterServerHookHash()
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#defineValidateHandler()', () => {
     const alphaRule = () => ({})
     const betaRule = () => ({})
