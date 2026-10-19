@@ -14,6 +14,10 @@ import type {
   RedisOptions as RedisOptionsActual,
 } from 'ioredis'
 
+import type {
+  ServerOptions as WebSocketServerOptionsActual,
+} from 'graphql-ws'
+
 import BaseGraphqlServerEngine from '../lib/server/graphql/BaseGraphqlServerEngine'
 
 import GraphqlHttpHandlerBuilder from '../lib/server/graphql/GraphqlHttpHandlerBuilder'
@@ -82,8 +86,26 @@ declare global {
 
       maxDocumentDepth?: number | null
 
+      graphqlServer?: {
+        connectionInitWaitTimeout?: number | null
+        skipsWebSocket?: boolean
+      }
+
       redisOptions?: RedisOptions | null
     }
+
+    type WebSocketServerHookHash = Omit<
+      WebSocketServerOptionsActual,
+      | 'execute'
+      | 'subscribe'
+      | 'context'
+      | 'schema'
+      | 'roots'
+      | 'validate'
+      | 'connectionInitWaitTimeout'
+      | 'jsonMessageReviver'
+      | 'jsonMessageReplacer'
+    >
 
     type Schema = GraphQLSchema
     type HttpRequestParams = RequestParams
