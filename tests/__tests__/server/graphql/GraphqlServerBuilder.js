@@ -1079,6 +1079,71 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#shouldSkipWebSocketServer()', () => {
+    describe('to call engine', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+          expected: true,
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+          },
+          expected: false,
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name, expected: $expected', async ({ input, expected }) => {
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const shouldSkipWebSocketServerSpy = jest.spyOn(builder.engine, 'shouldSkipWebSocketServer')
+          .mockReturnValue(expected)
+
+        const actual = builder.shouldSkipWebSocketServer()
+
+        expect(actual)
+          .toBe(expected)
+        expect(shouldSkipWebSocketServerSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('to be falsy as default', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name', async ({ input }) => {
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const actual = builder.shouldSkipWebSocketServer()
+
+        expect(actual)
+          .toBe(false)
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('.get:GraphqlHttpHandlerBuilder', () => {
     test('to be bridge class', () => {
       const actual = GraphqlServerBuilder.GraphqlHttpHandlerBuilder
