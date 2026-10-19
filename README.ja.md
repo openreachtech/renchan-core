@@ -63,8 +63,7 @@ server/
 | #collectMiddleware() | instance method | GraphQL エンドポイントに付与する Express の middleware を定義します |
 | #composeExpressMiddleware() | instance method | `.get:ExpressMiddleware` から組み立てた Express の middleware を返します。`#collectMiddleware()` に展開して使います |
 | #collectExpressSettings() | instance method | `case sensitive routing` など、Express アプリケーションの設定を定義します |
-| #extendWebSocketServerOptions() | instance method | GraphQL エンドポイントにマウントする `graphql-ws` サーバーのオプション (`onSubscribe` など) を拡張します。デフォルトでは受け取ったオプションをそのまま返します |
-| #shouldSkipWebSocketServer() | instance method | WebSocket サーバーをマウントしないかどうかを指定します。デフォルトは `false` です |
+| #composeServerHookHash() | instance method | GraphQL エンドポイントにマウントする `graphql-ws` サーバーのフック (`onSubscribe` など) を定義します。デフォルトは空のオブジェクトです |
 | #get:schemasToSkipFiltering | instance getter | 認可・認証の判定をスキップする schema field を指定します |
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
 | #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
@@ -102,6 +101,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `actualResolversPath` | Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
 | `stubResolversPath` | stub 用の Resolver クラスを定義するフォルダパスを指定します<br>フォルダ内のファイルは、再帰的に取り込まれます |
 | `maxDocumentDepth` | GraphQL document が到達できる深さを指定します<br>top-level の selection ごとに、selection 自身から最も深い field まで数えます<br>既定では production でのみ監視し、1 以上の整数のときだけ効きます<br>省略すると、深さを制限しません |
+| `graphqlServer` | エンドポイントに WebSocket でマウントする GraphQL サーバーの設定を指定します<br>`connectionInitWaitTimeout`: 接続が開いてから `ConnectionInit` を待つミリ秒数です。省略するか、`null` や正の有限数でない値にすると 3000 になります<br>`skipsWebSocket`: WebSocket サーバーをマウントしないかどうかです。省略すると `false` になります |
 | `redisOptions` | Subscription で Redis を使う場合、この field で host と port を指定します |
 
 ### `GraphqlServerEngine#collectRequestValidators()`
