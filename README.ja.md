@@ -63,6 +63,8 @@ server/
 | #collectMiddleware() | instance method | GraphQL エンドポイントに付与する Express の middleware を定義します |
 | #composeExpressMiddleware() | instance method | `.get:ExpressMiddleware` から組み立てた Express の middleware を返します。`#collectMiddleware()` に展開して使います |
 | #collectExpressSettings() | instance method | `case sensitive routing` など、Express アプリケーションの設定を定義します |
+| #extendWebSocketServerOptions() | instance method | GraphQL エンドポイントにマウントする `graphql-ws` サーバーのオプション (`onSubscribe` など) を拡張します。デフォルトでは受け取ったオプションをそのまま返します |
+| #shouldSkipWebSocketServer() | instance method | WebSocket サーバーをマウントしないかどうかを指定します。デフォルトは `false` です |
 | #get:schemasToSkipFiltering | instance getter | 認可・認証の判定をスキップする schema field を指定します |
 | #generateFilterHandler() | instance method | 全 schema field の直前で認可・認証するロジックを定義します |
 | #get:visaIssuers | instance getter | 認証、認可、schema field 毎のパーミッションを判定するロジックを定義します |
