@@ -86,6 +86,11 @@ declare global {
 
       maxDocumentDepth?: number | null
 
+      graphqlServer?: {
+        connectionInitWaitTimeout?: number | null
+        skipsWebSocket?: boolean
+      }
+
       redisOptions?: RedisOptions | null
     }
 
