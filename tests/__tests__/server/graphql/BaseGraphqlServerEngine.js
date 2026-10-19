@@ -2089,6 +2089,66 @@ describe('BaseGraphqlServerEngine', () => {
 })
 
 describe('BaseGraphqlServerEngine', () => {
+  describe('#extendWebSocketServerOptions()', () => {
+    /** @type {GraphqlType.Config} */
+    const mockConfig = {
+      graphqlEndpoint: '/graphql-customer',
+      staticPath: '/path/to/static/customer/',
+      schemaPath: '/path/to/schema-customer',
+      actualResolversPath: '/path/to/resolvers/customer/actual/',
+      stubResolversPath: '/path/to/resolvers/customer/stub/',
+      postWorkersPath: '/path/to/post-workers/customer/',
+
+      redisOptions: null,
+    }
+    const mockBroker = SubscriptionBroker.create({
+      config: mockConfig,
+    })
+
+    describe('to be the given options as default', () => {
+      const cases = [
+        {
+          input: {
+            options: {},
+          },
+        },
+        {
+          input: {
+            options: {
+              connectionInitWaitTimeout: 3000,
+            },
+          },
+        },
+        {
+          input: {
+            options: {
+              connectionInitWaitTimeout: 5000,
+              onConnect: () => true,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('options: $input.options', ({ input }) => {
+        const args = {
+          config: mockConfig,
+          share: BaseGraphqlShare.create({
+            broker: mockBroker,
+          }),
+          errorHash: {},
+        }
+        const engine = new BaseGraphqlServerEngine(args)
+
+        const actual = engine.extendWebSocketServerOptions(input)
+
+        expect(actual)
+          .toBe(input.options) // same reference
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('#collectRequestValidators()', () => {
     const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
       /** @override */
