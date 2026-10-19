@@ -1570,6 +1570,74 @@ describe('GraphqlServerBuilder', () => {
           .toHaveBeenLastCalledWith(...useServerHandlerExpected)
       })
     })
+
+    describe('to call useServerHandler with extended options', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+          expected: {
+            connectionInitWaitTimeout: 3000,
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+          },
+          expected: {
+            connectionInitWaitTimeout: 5000,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name', async ({ input, expected }) => {
+        const SpyWebSocketServer = globalThis.constructorSpy.spyOn(WebSocketServer)
+        const useServerSpy = jest.fn()
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          static get WebSocketServer () {
+            return SpyWebSocketServer
+          }
+
+          static get useServerHandler () {
+            return /** @type {*} */ (useServerSpy)
+          }
+        }
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilderProxy.createAsync(args)
+
+        const validateHandlerTally = /** @type {*} */ (() => [])
+
+        jest.spyOn(builder, 'defineValidateHandler')
+          .mockReturnValue(validateHandlerTally)
+
+        const extendWebSocketServerOptionsSpy = jest.spyOn(builder, 'extendWebSocketServerOptions')
+          .mockReturnValue(expected)
+
+        const extendWebSocketServerOptionsExpected = {
+          options: {
+            execute,
+            subscribe,
+            context: builder.graphqlHandlerBuilder.context,
+            schema: builder.graphqlHandlerBuilder.schema,
+            validate: validateHandlerTally,
+          },
+        }
+
+        builder.setupServer({
+          server: new http.Server(),
+        })
+
+        expect(extendWebSocketServerOptionsSpy)
+          .toHaveBeenCalledWith(extendWebSocketServerOptionsExpected)
+        expect(useServerSpy)
+          .toHaveBeenLastCalledWith(expected, expect.any(WebSocketServer))
+      })
+    })
   })
 })
 
