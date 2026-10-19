@@ -1550,6 +1550,138 @@ describe('GraphqlServerBuilder', () => {
           .toHaveBeenCalled()
       })
     })
+
+    describe('to skip mounting WebSocket server by config', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: true,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: true,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name', async ({ input }) => {
+        const SpyWebSocketServer = globalThis.constructorSpy.spyOn(WebSocketServer)
+        const useServerSpy = jest.fn()
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          static get WebSocketServer () {
+            return SpyWebSocketServer
+          }
+
+          static get useServerHandler () {
+            return /** @type {*} */ (useServerSpy)
+          }
+        }
+
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilderProxy.createAsync(args)
+
+        builder.setupServer({
+          server: new http.Server(),
+        })
+
+        expect(SpyWebSocketServer.__spy__)
+          .not
+          .toHaveBeenCalled()
+        expect(useServerSpy)
+          .not
+          .toHaveBeenCalled()
+      })
+    })
+
+    describe('to mount WebSocket server by config', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              skipsWebSocket: false,
+            },
+          },
+          expected: {
+            path: '/graphql-customer',
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              // skipsWebSocket: omitted
+              connectionInitWaitTimeout: null,
+            },
+          },
+          expected: {
+            path: '/graphql-admin',
+          },
+        },
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: undefined, // graphqlServer: omitted
+          },
+          expected: {
+            path: '/graphql-customer',
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name, graphqlServer: $input.graphqlServer', async ({ input, expected }) => {
+        const SpyWebSocketServer = globalThis.constructorSpy.spyOn(WebSocketServer)
+        const useServerSpy = jest.fn()
+
+        const GraphqlServerBuilderProxy = class extends GraphqlServerBuilder {
+          static get WebSocketServer () {
+            return SpyWebSocketServer
+          }
+
+          static get useServerHandler () {
+            return /** @type {*} */ (useServerSpy)
+          }
+        }
+
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilderProxy.createAsync(args)
+
+        builder.setupServer({
+          server: new http.Server(),
+        })
+
+        expect(SpyWebSocketServer.__spy__)
+          .toHaveBeenCalledWith(expect.objectContaining(expected))
+        expect(useServerSpy)
+          .toHaveBeenCalledWith(expect.objectContaining({ execute }), expect.any(WebSocketServer))
+      })
+    })
   })
 })
 
