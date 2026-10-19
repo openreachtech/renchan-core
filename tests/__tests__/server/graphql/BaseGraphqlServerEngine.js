@@ -2089,6 +2089,59 @@ describe('BaseGraphqlServerEngine', () => {
 })
 
 describe('BaseGraphqlServerEngine', () => {
+  describe('#composeServerHookHash()', () => {
+    describe('to be empty as default', () => {
+      const cases = [
+        {
+          input: {
+            config: {
+              graphqlEndpoint: '/graphql-customer',
+              staticPath: '/path/to/static/customer/',
+              schemaPath: '/path/to/schema-customer',
+              actualResolversPath: '/path/to/resolvers/customer/actual/',
+              stubResolversPath: '/path/to/resolvers/customer/stub/',
+              postWorkersPath: '/path/to/post-workers/customer/',
+              redisOptions: null,
+            },
+          },
+        },
+        {
+          input: {
+            config: {
+              graphqlEndpoint: '/graphql-admin',
+              staticPath: '/path/to/static/admin/',
+              schemaPath: '/path/to/schema-admin',
+              actualResolversPath: '/path/to/resolvers/admin/actual/',
+              stubResolversPath: '/path/to/resolvers/admin/stub/',
+              postWorkersPath: '/path/to/post-workers/admin/',
+              redisOptions: null,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('graphqlEndpoint: $input.config.graphqlEndpoint', ({ input }) => {
+        const args = {
+          config: input.config,
+          share: BaseGraphqlShare.create({
+            broker: SubscriptionBroker.create({
+              config: input.config,
+            }),
+          }),
+          errorHash: {},
+        }
+        const engine = new BaseGraphqlServerEngine(args)
+
+        const received = engine.composeServerHookHash()
+
+        expect(received)
+          .toStrictEqual({})
+      })
+    })
+  })
+})
+
+describe('BaseGraphqlServerEngine', () => {
   describe('#collectRequestValidators()', () => {
     const AlphaGraphqlServerEngine = class extends BaseGraphqlServerEngine {
       /** @override */

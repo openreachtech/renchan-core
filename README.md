@@ -63,6 +63,7 @@ A class that inherits from `BaseGraphqlServerEngine`. It allows template-style i
 | #collectMiddleware() | instance method | Defines Express middleware to be attached to GraphQL endpoints |
 | #composeExpressMiddleware() | instance method | Returns the Express middleware composed from `.get:ExpressMiddleware`, to be spread into `#collectMiddleware()` |
 | #collectExpressSettings() | instance method | Defines settings of the Express application, such as `case sensitive routing` |
+| #composeServerHookHash() | instance method | Composes the hooks of the `graphql-ws` server mounted on GraphQL endpoints, such as `onSubscribe`. Returns an empty object as default |
 | #get:schemasToSkipFiltering | instance getter | Specifies schema fields to skip authorization/authentication checks |
 | #generateFilterHandler() | instance method | Defines logic for authorization/authentication before all schema fields |
 | #get:visaIssuers | instance getter | Defines logic for authentication, authorization, and permission checking per schema field |
@@ -100,6 +101,7 @@ class MyAppGraphqlServerEngine extends BaseGraphqlServerEngine {
 | `actualResolversPath` | Specifies the folder path where Resolver classes are defined<br>Files in the folder are imported recursively |
 | `stubResolversPath` | Specifies the folder path for stub Resolver classes<br>Files in the folder are imported recursively |
 | `maxDocumentDepth` | Specifies the depth a GraphQL document may reach<br>Counted per top-level selection, from the selection itself down to its deepest field<br>Watched on production alone by default, and only where it is an integer of one or more<br>When omitted, the depth is not capped |
+| `graphqlServer` | Specifies the settings of the GraphQL server mounted on the endpoint over WebSocket<br>`connectionInitWaitTimeout`: the milliseconds to wait for `ConnectionInit` after a connection opens; when omitted, `null`, or not a positive finite number, it is 3000<br>`skipsWebSocket`: whether to leave the WebSocket server unmounted; when omitted, it is `false` |
 | `redisOptions` | When using Redis for Subscription, specify host and port in this field |
 
 ### `GraphqlServerEngine#collectRequestValidators()`
