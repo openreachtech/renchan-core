@@ -1426,6 +1426,131 @@ describe('GraphqlServerBuilder', () => {
 })
 
 describe('GraphqlServerBuilder', () => {
+  describe('#resolveConnectionInitWaitTimeout()', () => {
+    describe('should be the value of the config', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: 5000,
+            },
+          },
+          expected: 5000,
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: 7000,
+            },
+          },
+          expected: 7000,
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name, connectionInitWaitTimeout: $expected', async ({ input, expected }) => {
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const received = builder.resolveConnectionInitWaitTimeout()
+
+        expect(received)
+          .toBe(expected)
+      })
+    })
+
+    describe('should be null when the config holds no usable value', () => {
+      const cases = [
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: null,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              // connectionInitWaitTimeout: omitted
+              skipsWebSocket: false,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: undefined, // graphqlServer: omitted
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: 0,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: Infinity,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: AdminGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: NaN,
+            },
+          },
+        },
+        {
+          input: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            graphqlServer: {
+              connectionInitWaitTimeout: -1000,
+            },
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $input.EngineCtor.name, graphqlServer: $input.graphqlServer', async ({ input }) => {
+        const { config } = input.EngineCtor
+        jest.spyOn(input.EngineCtor, 'config', 'get')
+          .mockReturnValue({
+            ...config,
+            graphqlServer: input.graphqlServer,
+          })
+
+        const args = {
+          Engine: input.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const received = builder.resolveConnectionInitWaitTimeout()
+
+        expect(received)
+          .toBeNull()
+      })
+    })
+  })
+})
+
+describe('GraphqlServerBuilder', () => {
   describe('#buildListenProxyServer()', () => {
     describe('to call dependencies', () => {
       const cases = [
