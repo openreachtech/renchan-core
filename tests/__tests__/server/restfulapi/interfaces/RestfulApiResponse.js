@@ -668,6 +668,15 @@ describe('RestfulApiResponse', () => {
               // course: new Error('second course'),
             },
           },
+          {
+            params: {
+              statusCode: 429,
+              errorMessage: 'third message',
+              headers: {
+                'Retry-After': '120',
+              },
+            },
+          },
         ]
 
         test.each(cases)('statusCode: $params.statusCode', ({ params }) => {
@@ -690,6 +699,7 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 400,
+              headers: {},
               error: {
                 message: 'first message',
                 course: new Error('first course'),
@@ -704,8 +714,49 @@ describe('RestfulApiResponse', () => {
             },
             expected: {
               statusCode: 401,
+              headers: {},
               error: {
                 message: 'second message',
+              },
+            },
+          },
+          {
+            params: {
+              statusCode: 429,
+              errorMessage: 'third message',
+              headers: {
+                'Retry-After': '120',
+              },
+            },
+            expected: {
+              statusCode: 429,
+              headers: {
+                'Retry-After': '120',
+              },
+              error: {
+                message: 'third message',
+              },
+            },
+          },
+          {
+            params: {
+              statusCode: 401,
+              errorMessage: 'fourth message',
+              course: new Error('fourth course'),
+              headers: {
+                'WWW-Authenticate': 'Bearer',
+                'Set-Cookie': ['session=; Max-Age=0', 'token=; Max-Age=0'],
+              },
+            },
+            expected: {
+              statusCode: 401,
+              headers: {
+                'WWW-Authenticate': 'Bearer',
+                'Set-Cookie': ['session=; Max-Age=0', 'token=; Max-Age=0'],
+              },
+              error: {
+                message: 'fourth message',
+                course: new Error('fourth course'),
               },
             },
           },
@@ -951,6 +1002,36 @@ describe('RestfulApiResponse', () => {
             .toHaveProperty('error', {
               message: params.errorEnvelope.errorMessage,
             })
+        })
+      })
+
+      describe('with headers', () => {
+        test.each(cases)('statusCode: $params.errorEnvelope.statusCode', ({ params }) => {
+          const headersTally = {
+            'Retry-After': '120',
+          }
+
+          const DerivedClass = RestfulApiResponse.declareErrorRestfulApiResponse(params)
+
+          const response = DerivedClass.createAsError({
+            headers: headersTally,
+          })
+
+          expect(response)
+            .toHaveProperty('statusCode', params.errorEnvelope.statusCode)
+          expect(response)
+            .toHaveProperty('headers', headersTally)
+        })
+      })
+
+      describe('with no headers', () => {
+        test.each(cases)('statusCode: $params.errorEnvelope.statusCode', ({ params }) => {
+          const DerivedClass = RestfulApiResponse.declareErrorRestfulApiResponse(params)
+
+          const response = DerivedClass.createAsError()
+
+          expect(response)
+            .toHaveProperty('headers', {})
         })
       })
     })
