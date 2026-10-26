@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/renchan",
-  "version": "2.13.0",
+  "version": "2.13.1",
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.1.4",
-    "@openreachtech/renchan-env": "^1.0.6",
+    "@openreachtech/renchan-env": "^1.1.0",
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
     "express": "^4.22.3",
@@ -51,7 +51,7 @@
     "graphql-upload": "^17.1.0",
     "graphql-ws": "^5.16.2",
     "ioredis": "^5.11.1",
-    "multer": "^2.4.0",
+    "multer": "^2.5.0",
     "ws": "^8.22.0"
   },
   "devDependencies": {
@@ -91,14 +91,13 @@
     "proxy-addr": "^2.0.8",
     "qs": "^6.16.0",
     "tar": "^7.5.22",
-    "undici": "^6.28.1",
+    "undici": "^6.29.1",
     "uuid": "^11.1.1"
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": false,
     "bcrypt@5.1.1": true,
-    "fsevents": false,
     "sqlite3@6.0.1": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver": false
   }
 }
