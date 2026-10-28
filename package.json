@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/renchan",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "description": "Renchan Core module for Application.",
   "files": [
     "lib/",
@@ -39,7 +39,7 @@
     "npm": ">=11.16.0"
   },
   "dependencies": {
-    "@graphql-tools/schema": "^10.1.4",
+    "@graphql-tools/schema": "^10.1.5",
     "@openreachtech/renchan-env": "^1.1.0",
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
@@ -89,7 +89,7 @@
     },
     "moment": "^2.31.0",
     "proxy-addr": "^2.0.8",
-    "qs": "^6.16.0",
+    "qs": "^6.16.1",
     "tar": "^7.5.22",
     "undici": "^6.29.1",
     "uuid": "^11.1.1"
