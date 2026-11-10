@@ -84,30 +84,26 @@ jobs:
           echo "node  : $(node -v)"
           echo "npm   : $(npm -v)"
 
-      # ⚠️ This gate runs before npm ci, and the order is the point: npm ci puts the
-      # vulnerable files on the runner, and the test run then executes them through the
-      # real code path. The advisory has to answer before anything is fetched. Auditing
-      # first is possible because npm audit resolves the tree from package-lock.json
-      # alone and needs no node_modules; skipping a doomed install is a side benefit.
+      - name: 📦 Install packages
+        run: npm ci
+
+      # ⚠️ This gate runs after npm ci and before the tests.
+      # The script imports its own dependency from node_modules, so it cannot run before the install.
+      # What still matters is that an advisory answers before the installed files are executed,
+      # and the test run is the step that executes them.
+      # strict-allow-scripts in .npmrc stops npm ci from running install scripts
+      # that allowScripts in package.json does not allow, so the install itself runs
+      # none of the code it has not been told to.
       #
       # ⚠️ The script runs npm audit itself and fails on every advisory except the ones
-      # scripts/stopgap-audit.json lists, a stopgap until a release fixes them. Each entry
-      # carries its reason and the condition for removing it, and an entry whose advisory
-      # is no longer reported fails too, so the list cannot outlive the reason it was
-      # written for. This departs from npm-boilerplate, whose test workflows run plain
-      # npm audit: the listed advisory arrives through jest alone.
+      # the file it is given lists, a stopgap until a release fixes them.
+      # An entry whose advisory is no longer reported fails too, so the list cannot outlive its reason.
       #
       # ⚠️ A 503 from the advisory service leaves npm with no report, and the script says
       # so rather than listing advisories. npm does not retry the bulk POST —
       # `--fetch-retries=4` still sends one request — so rerun the job.
       - name: 🛡️ npm audit
-        # ⚠️ Revert to `npm audit` once scripts/stopgap-audit.json is empty, and delete
-        # scripts/stopgap-audit.js and scripts/stopgap-audit.json along with it.
-        # run: npm audit
-        run: node scripts/stopgap-audit.js
-
-      - name: 📦 Install packages
-        run: npm ci
+        run: npm run audit:npm
 
       - name: 🛠️ Set up database
         run: npm run db:setup
