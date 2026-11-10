@@ -10,6 +10,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "audit:npm": "node node_modules/@openreachtech/mentsu-npm-audit-gate/scripts/npm-audit-gate.js scripts/stopgap-audit/IGNORED_ADVISORIES.js",
     "db:drop": "npm run db:teardown",
     "db:seed:master": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/master --debug",
     "db:seed:dev": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/development --debug",
