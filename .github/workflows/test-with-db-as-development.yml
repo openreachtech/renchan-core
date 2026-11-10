@@ -32,8 +32,8 @@ jobs:
 
     steps:
       # ⚠️ Actions are named by their major tag, and actions.lock pins the commit each one runs.
-      # Regenerate the lockfile with `gh actions-lock --no-narrow`:
-      # without the flag the tool rewrites a major tag to a full one, and the lockfile stops following the major.
+      # Regenerate the lockfile with `gh actions-lock --no-narrow`: without the flag the tool
+      # rewrites a major tag to a full one, and the lockfile stops following the major.
       - name: 🛎️ Checkout repository code
         uses: actions/checkout@v7
 
@@ -63,13 +63,12 @@ jobs:
       - name: 📦 Install packages
         run: npm ci
 
-      # ⚠️ This gate runs after npm ci and before the tests.
+      # ⚠️ This gate runs after npm ci and before ESLint and Jest.
       # The script imports its own dependency from node_modules, so it cannot run before the install.
       # What still matters is that an advisory answers before the installed files are executed,
-      # and the test run is the step that executes them.
-      # strict-allow-scripts in .npmrc stops npm ci from running install scripts
-      # that allowScripts in package.json does not allow, so the install itself runs
-      # none of the code it has not been told to.
+      # and ESLint and Jest are the steps that execute them.
+      # strict-allow-scripts in .npmrc stops npm ci from running install scripts,
+      # so the install itself runs none of that code.
       #
       # ⚠️ The script runs npm audit itself and fails on every advisory except the ones
       # the file it is given lists, a stopgap until a release fixes them.
