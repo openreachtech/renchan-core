@@ -105,6 +105,9 @@ jobs:
       - name: 🛡️ npm audit
         run: npm run audit:npm
 
+      - name: 🛡️ Audit action versions
+        run: npm run audit:actions
+
       - name: 🛠️ Set up database
         run: npm run db:setup
       - run: npm run db:seed:master
