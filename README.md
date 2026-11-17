@@ -10,8 +10,8 @@ Node.js is required. If you haven't installed it yet, please do so first.
 
 | Tool | Version |
 | :-- | :-- |
-| Node.js | >=20.0.0 |
-| npm | >=11.16.0 |
+| Node.js | >=24.19.0 |
+| npm | >=11.17.0 |
 
 ## Command
 
