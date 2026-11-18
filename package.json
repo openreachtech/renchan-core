@@ -9,7 +9,10 @@
   ],
   "main": "index.js",
   "type": "module",
+  "types": "./types/index.d.ts",
   "scripts": {
+    "audit:actions": "node node_modules/@openreachtech/mentsu-github-actions-inspector/scripts/audit-action-version.js",
+    "audit:npm": "node node_modules/@openreachtech/mentsu-npm-audit-gate/scripts/npm-audit-gate.js scripts/stopgap-audit/IGNORED_ADVISORIES.js",
     "db:drop": "npm run db:teardown",
     "db:seed:master": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/master --debug",
     "db:seed:dev": "sequelize-cli db:seed:all --seeders-path app/sequelize/seeders/development --debug",
@@ -35,8 +38,8 @@
   },
   "homepage": "https://github.com/openreachtech/renchan-core#readme",
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=11.16.0"
+    "node": ">=24.19.0",
+    "npm": ">=11.17.0"
   },
   "dependencies": {
     "@graphql-tools/schema": "^10.1.5",
@@ -60,11 +63,13 @@
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-deep-containing": "^1.0.2",
     "@openreachtech/jest-expect-each": "^1.0.3",
+    "@openreachtech/mentsu-github-actions-inspector": "^0.1.0",
+    "@openreachtech/mentsu-npm-audit-gate": "^0.1.1",
     "@openreachtech/mentsu-random-text-generator": "^1.0.3",
     "@openreachtech/renchan-sequelize": "^2.3.0",
     "@steweucen/fertile-forest-sequelize": "^0.1.3",
     "@types/jest": "^30.0.0",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "eslint": "^9.39.5",
     "jest": "^30.5.2",
     "mariadb": "^3.5.4",
@@ -83,10 +88,12 @@
     "brace-expansion@1": "^1.1.21",
     "brace-expansion@2": "^2.1.7",
     "brace-expansion@5": "^5.0.12",
+    "glob": "^14.0.2",
     "graphql-middleware": {
       "@graphql-tools/delegate": "^12.2.0",
       "@graphql-tools/schema": "$@graphql-tools/schema"
     },
+    "minimatch": "^11.0.1",
     "moment": "^2.31.0",
     "proxy-addr": "^2.0.8",
     "qs": "^6.16.1",
@@ -96,8 +103,8 @@
   },
   "allowScripts": {
     "@parcel/watcher@2.6.0": false,
-    "bcrypt@5.1.1": true,
     "sqlite3@6.0.1": true,
-    "unrs-resolver": false
+    "unrs-resolver": false,
+    "bcrypt": false
   }
 }
