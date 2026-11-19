@@ -1,3 +1,7 @@
+import {
+  setTimeout as delay,
+} from 'node:timers/promises'
+
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
@@ -291,6 +295,41 @@ describe('TopicReceiver', () => {
           expect(onMessageSpy)
             .toHaveBeenCalledWith(expected)
         })
+      })
+    })
+
+    describe('to keep calling #onMessage() for every message', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const onMessageSpy = jest.fn()
+
+        const receiver = new TopicReceiver(params)
+          .setOnMessage({
+            onMessage: onMessageSpy,
+          })
+
+        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+
+        expect(onMessageSpy.mock.calls)
+          .toEqual([
+            [{ phase: 'STARTED' }],
+            [{ phase: 'COMPLETED' }],
+          ])
       })
     })
   })
@@ -737,6 +776,57 @@ describe('TopicReceiver', () => {
           .toHaveBeenCalledWith(setOnMessageArgsExpected)
         expect(subscribeSpy)
           .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('to keep messages that arrive back to back', () => {
+      const timeoutTally = Symbol('timeout')
+
+      /**
+       * Await the next value, or the timeout tally when no message reaches it.
+       *
+       * @param {() => Promise<{ value: * }>} nextFunction - Generated next function.
+       * @returns {Promise<*>} - Value of the next result, or the timeout tally.
+       */
+      async function nextValueOrTimeout (nextFunction) {
+        const timeoutController = new AbortController()
+        const timeoutPromise = delay(100, timeoutTally, {
+          signal: timeoutController.signal,
+        })
+          .catch(() => timeoutTally)
+        const nextPromise = nextFunction()
+          .then(result => result.value)
+
+        return Promise.race([
+          nextPromise,
+          timeoutPromise,
+        ])
+          .finally(() => timeoutController.abort())
+      }
+
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
+        const receiver = new TopicReceiver(params)
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+
+        const firstPromise = nextValueOrTimeout(generatedNextFunction)
+
+        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'ITEM' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+
+        const actual = [
+          await firstPromise,
+          await nextValueOrTimeout(generatedNextFunction),
+          await nextValueOrTimeout(generatedNextFunction),
+        ]
+
+        expect(actual)
+          .toEqual([
+            { phase: 'STARTED' },
+            { phase: 'ITEM' },
+            { phase: 'COMPLETED' },
+          ])
       })
     })
   })
