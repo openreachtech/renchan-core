@@ -297,6 +297,41 @@ describe('TopicReceiver', () => {
         })
       })
     })
+
+    describe('to keep calling #onMessage() for every message', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const onMessageSpy = jest.fn()
+
+        const receiver = new TopicReceiver(params)
+          .setOnMessage({
+            onMessage: onMessageSpy,
+          })
+
+        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+
+        expect(onMessageSpy.mock.calls)
+          .toEqual([
+            [{ phase: 'STARTED' }],
+            [{ phase: 'COMPLETED' }],
+          ])
+      })
+    })
   })
 })
 
