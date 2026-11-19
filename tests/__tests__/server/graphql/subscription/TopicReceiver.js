@@ -739,6 +739,54 @@ describe('TopicReceiver', () => {
           .toHaveBeenCalledWith()
       })
     })
+
+    describe('to keep messages that arrive back to back', () => {
+      const timeoutTally = Symbol('timeout')
+
+      /**
+       * Await the next value, or the timeout tally when no message reaches it.
+       *
+       * @param {() => Promise<{ value: * }>} nextFunction - Generated next function.
+       * @returns {Promise<*>} - Value of the next result, or the timeout tally.
+       */
+      async function nextValueOrTimeout (nextFunction) {
+        const timeoutPromise = new Promise(resolve => {
+          setTimeout(() => resolve(timeoutTally), 100)
+        })
+        const nextPromise = nextFunction()
+          .then(result => result.value)
+
+        return Promise.race([
+          nextPromise,
+          timeoutPromise,
+        ])
+      }
+
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
+        const receiver = new TopicReceiver(params)
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+
+        const firstPromise = nextValueOrTimeout(generatedNextFunction)
+
+        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'ITEM' }))
+        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+
+        const actual = [
+          await firstPromise,
+          await nextValueOrTimeout(generatedNextFunction),
+          await nextValueOrTimeout(generatedNextFunction),
+        ]
+
+        expect(actual)
+          .toEqual([
+            { phase: 'STARTED' },
+            { phase: 'ITEM' },
+            { phase: 'COMPLETED' },
+          ])
+      })
+    })
   })
 })
 
