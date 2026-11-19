@@ -1,3 +1,7 @@
+import {
+  setTimeout as delay,
+} from 'node:timers/promises'
+
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
@@ -750,9 +754,11 @@ describe('TopicReceiver', () => {
        * @returns {Promise<*>} - Value of the next result, or the timeout tally.
        */
       async function nextValueOrTimeout (nextFunction) {
-        const timeoutPromise = new Promise(resolve => {
-          setTimeout(() => resolve(timeoutTally), 100)
+        const timeoutController = new AbortController()
+        const timeoutPromise = delay(100, timeoutTally, {
+          signal: timeoutController.signal,
         })
+          .catch(() => timeoutTally)
         const nextPromise = nextFunction()
           .then(result => result.value)
 
@@ -760,6 +766,7 @@ describe('TopicReceiver', () => {
           nextPromise,
           timeoutPromise,
         ])
+          .finally(() => timeoutController.abort())
       }
 
       test.each(cases)('channel: $params.channel', async ({ params }) => {
