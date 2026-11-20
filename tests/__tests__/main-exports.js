@@ -49,7 +49,10 @@ import { default as EventHubActual } from '../../lib/server/graphql/subscription
 
 import { default as ChannelGeneratorActual } from '../../lib/server/graphql/subscription/ChannelGenerator.js'
 import { default as SubscriptionBrokerActual } from '../../lib/server/graphql/subscription/SubscriptionBroker.js'
+import { default as BufferedTopicReceiverActual } from '../../lib/server/graphql/subscription/BufferedTopicReceiver.js'
 import { default as TopicReceiverActual } from '../../lib/server/graphql/subscription/TopicReceiver.js'
+import { default as TopicAsyncIteratorActual } from '../../lib/server/graphql/subscription/TopicAsyncIterator.js'
+import { default as TopicIteratorResultActual } from '../../lib/server/graphql/subscription/TopicIteratorResult.js'
 
 import { default as graphqlUploadExpressWithResolvingContentTypeActual } from '../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
 
@@ -156,7 +159,10 @@ import {
 
   ChannelGenerator,
   SubscriptionBroker,
+  BufferedTopicReceiver,
   TopicReceiver,
+  TopicAsyncIterator,
+  TopicIteratorResult,
 
   graphqlUploadExpressWithResolvingContentType,
 
@@ -256,7 +262,10 @@ describe('main exports', () => {
 
     { ExportedClass: ChannelGenerator, ActualClass: ChannelGeneratorActual },
     { ExportedClass: SubscriptionBroker, ActualClass: SubscriptionBrokerActual },
+    { ExportedClass: BufferedTopicReceiver, ActualClass: BufferedTopicReceiverActual },
     { ExportedClass: TopicReceiver, ActualClass: TopicReceiverActual },
+    { ExportedClass: TopicAsyncIterator, ActualClass: TopicAsyncIteratorActual },
+    { ExportedClass: TopicIteratorResult, ActualClass: TopicIteratorResultActual },
 
     { ExportedClass: RestfulApiServerBuilder, ActualClass: RestfulApiServerBuilderActual },
     { ExportedClass: RestfulApiRoutesBuilder, ActualClass: RestfulApiRoutesBuilderActual },
