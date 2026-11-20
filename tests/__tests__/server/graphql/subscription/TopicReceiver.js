@@ -1,7 +1,3 @@
-import {
-  setTimeout as delay,
-} from 'node:timers/promises'
-
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
 import TopicQueue from '../../../../../lib/server/graphql/subscription/TopicQueue.js'
@@ -848,28 +844,28 @@ describe('TopicReceiver', () => {
       pubSub: LocalPubSub.create(),
     })
 
-    const cases = [
-      {
-        params: {
-          channel: 'alpha-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'beta-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'gamma-channel',
-          broker: brokerMock,
-        },
-      },
-    ]
-
     describe('to be instance of Function', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const receiver = new TopicReceiver(params)
 
@@ -880,110 +876,187 @@ describe('TopicReceiver', () => {
       })
     })
 
-    describe('for generated function', () => {
-      test.each(cases)('channel: $params.channel', async ({ params }) => {
-        const receiver = new TopicReceiver(params)
+    describe('for generated function when no message is held', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            message: '{"phase":"STARTED"}',
+          },
+          expected: {
+            value: { phase: 'STARTED' },
+            done: false,
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            message: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            value: { phase: 'COMPLETED' },
+            done: false,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+        })
+
+        const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
+        const subscribeSpy = jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+
+        const nextPromise = generatedNextFunction()
+
+        /*
+         * The promise waits until the listener delivers a message.
+         */
+        receiver.listener(input.channel, input.message)
+
+        const received = await nextPromise
+
+        expect(received)
+          .toStrictEqual(expected)
+        expect(setOnMessageSpy)
+          .toHaveBeenCalledWith({
+            onMessage: expect.any(Function),
+          })
+        expect(subscribeSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('for generated function when messages are held', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"ITEM"}',
+            gammaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            alpha: { value: { phase: 'STARTED' }, done: false },
+            beta: { value: { phase: 'ITEM' }, done: false },
+            gamma: { value: { phase: 'COMPLETED' }, done: false },
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"id":1}',
+            betaMessage: '{"id":2}',
+            gammaMessage: '{"id":3}',
+          },
+          expected: {
+            alpha: { value: { id: 1 }, done: false },
+            beta: { value: { id: 2 }, done: false },
+            gamma: { value: { id: 3 }, done: false },
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create({
+            topics: [
+              { channel: input.channel, message: input.alphaMessage },
+              { channel: input.channel, message: input.betaMessage },
+              { channel: input.channel, message: input.gammaMessage },
+            ],
+          }),
+        })
 
         const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
         const subscribeSpy = jest.spyOn(receiver, 'subscribe')
 
         const generatedNextFunction = receiver.generateAsyncIteratorNext()
 
-        /*
-          * Confirm null before calling #generateAsyncIteratorNext()
-          */
-        expect(receiver)
-          .toHaveProperty('onMessage', null)
+        const received = {
+          alpha: await generatedNextFunction(),
+          beta: await generatedNextFunction(),
+          gamma: await generatedNextFunction(),
+        }
+
+        expect(received)
+          .toStrictEqual(expected) // in the order of arrival
         expect(setOnMessageSpy)
           .not
           .toHaveBeenCalled()
         expect(subscribeSpy)
           .not
           .toHaveBeenCalled()
-
-        /*
-          * Call generated function.
-          */
-        const setOnMessageArgsExpected = {
-          onMessage: expect.any(Function),
-        }
-
-        const valueTally = {
-          alpha: Symbol('alpha'),
-        }
-        const resolvedTally = {
-          value: valueTally,
-          done: false,
-        }
-
-        /*
-          * 3 seconds later, call #onMessage() with valueTally to resolve the promise.
-          */
-        setTimeout(
-          () => receiver.onMessage(valueTally),
-          2000
-        )
-
-        const actual = await generatedNextFunction()
-
-        expect(actual)
-          .toEqual(resolvedTally)
-
-        expect(setOnMessageSpy)
-          .toHaveBeenCalledWith(setOnMessageArgsExpected)
-        expect(subscribeSpy)
-          .toHaveBeenCalledWith()
       })
     })
 
-    describe('to keep messages that arrive back to back', () => {
-      const timeoutTally = Symbol('timeout')
+    describe('for generated function when messages arrive back to back', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"ITEM"}',
+            gammaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            alpha: { value: { phase: 'STARTED' }, done: false },
+            beta: { value: { phase: 'ITEM' }, done: false },
+            gamma: { value: { phase: 'COMPLETED' }, done: false },
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"id":1}',
+            betaMessage: '{"id":2}',
+            gammaMessage: '{"id":3}',
+          },
+          expected: {
+            alpha: { value: { id: 1 }, done: false },
+            beta: { value: { id: 2 }, done: false },
+            gamma: { value: { id: 3 }, done: false },
+          },
+        },
+      ]
 
-      /**
-       * Await the next value, or the timeout tally when no message reaches it.
-       *
-       * @param {() => Promise<{ value: * }>} nextFunction - Generated next function.
-       * @returns {Promise<*>} - Value of the next result, or the timeout tally.
-       */
-      async function nextValueOrTimeout (nextFunction) {
-        const timeoutController = new AbortController()
-        const timeoutPromise = delay(100, timeoutTally, {
-          signal: timeoutController.signal,
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
         })
-          .catch(() => timeoutTally)
-        const nextPromise = nextFunction()
-          .then(result => result.value)
 
-        return Promise.race([
-          nextPromise,
-          timeoutPromise,
-        ])
-          .finally(() => timeoutController.abort())
-      }
-
-      test.each(cases)('channel: $params.channel', async ({ params }) => {
-        const receiver = new TopicReceiver(params)
+        jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
 
         const generatedNextFunction = receiver.generateAsyncIteratorNext()
 
-        const firstPromise = nextValueOrTimeout(generatedNextFunction)
+        const alphaPromise = generatedNextFunction()
 
-        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'ITEM' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+        /*
+         * All of them arrive before the next call of the generated function.
+         */
+        receiver.listener(input.channel, input.alphaMessage)
+        receiver.listener(input.channel, input.betaMessage)
+        receiver.listener(input.channel, input.gammaMessage)
 
-        const actual = [
-          await firstPromise,
-          await nextValueOrTimeout(generatedNextFunction),
-          await nextValueOrTimeout(generatedNextFunction),
-        ]
+        const received = {
+          alpha: await alphaPromise,
+          beta: await generatedNextFunction(),
+          gamma: await generatedNextFunction(),
+        }
 
-        expect(actual)
-          .toEqual([
-            { phase: 'STARTED' },
-            { phase: 'ITEM' },
-            { phase: 'COMPLETED' },
-          ])
+        expect(received)
+          .toStrictEqual(expected)
       })
     })
   })
