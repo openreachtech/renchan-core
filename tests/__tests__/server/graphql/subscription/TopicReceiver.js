@@ -20,18 +20,21 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
       ]
@@ -51,6 +54,15 @@ describe('TopicReceiver', () => {
 
           expect(receiver)
             .toHaveProperty('broker', params.broker)
+        })
+      })
+
+      describe('#topicQueue', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('topicQueue', params.topicQueue)
         })
       })
     })
