@@ -37,7 +37,8 @@ import BaseScalar from '../lib/server/graphql/scalars/BaseScalar'
 import BaseGraphqlRequestValidator from '../lib/server/graphql/validators/BaseGraphqlRequestValidator'
 
 import SubscriptionBroker from '../lib/server/graphql/subscription/SubscriptionBroker'
-import TopicReceiver from '../lib/server/graphql/subscription/TopicReceiver'
+import { default as TopicReceiverActual } from '../lib/server/graphql/subscription/TopicReceiver'
+import BufferedTopicReceiver from '../lib/server/graphql/subscription/BufferedTopicReceiver'
 import BasePubSub from '../lib/server/graphql/subscription/pubsub/BasePubSub'
 import { default as EventHubActual } from '../lib/server/graphql/subscription/pubsub/tools/EventHub'
 
@@ -224,15 +225,17 @@ declare global {
 
     type SubscriptionBroker = SubscriptionBroker
     type SubscriptionBrokerCtor = typeof SubscriptionBroker
+    type TopicReceiver = TopicReceiverActual | BufferedTopicReceiver
+    type TopicReceiverCtor = typeof TopicReceiverActual | typeof BufferedTopicReceiver
 
     interface SubscribePubSubParams {
       channel: string
-      receiver: TopicReceiver
+      receiver: GraphqlType.TopicReceiver
     }
 
     interface UnsubscribePubSubParams {
       channel: string
-      receiver: TopicReceiver
+      receiver: GraphqlType.TopicReceiver
     }
 
     interface GenerateAsyncIteratorPubSubParams {
