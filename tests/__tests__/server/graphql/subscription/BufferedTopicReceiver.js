@@ -1445,6 +1445,56 @@ describe('BufferedTopicReceiver', () => {
         })
       })
     })
+
+    describe('when onReleaseError() throws', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'channel-0007',
+          },
+          tally: {
+            subscribeError: new Error('subscribe-error-0007'),
+            releaseError: new Error('release-error-0007'),
+            hookError: new Error('hook-error-0007'),
+          },
+        },
+        {
+          input: {
+            channel: 'channel-0008',
+          },
+          tally: {
+            subscribeError: new Error('subscribe-error-0008'),
+            releaseError: new Error('release-error-0008'),
+            hookError: new Error('hook-error-0008'),
+          },
+        },
+      ]
+
+      describe('should resolve the original error', () => {
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const broker = SubscriptionBroker.create({
+            config: {},
+          })
+          jest.spyOn(broker.pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally.subscribeError)
+          jest.spyOn(broker.pubSub, 'unsubscribe')
+            .mockRejectedValue(tally.releaseError)
+          const receiver = BufferedTopicReceiver.create({
+            channel: input.channel,
+            broker,
+          })
+          jest.spyOn(receiver, 'onReleaseError')
+            .mockImplementation(() => {
+              throw tally.hookError
+            })
+
+          const received = await receiver.captureSubscribeError()
+
+          expect(received)
+            .toBe(tally.subscribeError) // same reference
+        })
+      })
+    })
   })
 })
 
