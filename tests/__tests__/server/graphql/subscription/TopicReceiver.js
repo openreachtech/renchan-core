@@ -4,6 +4,7 @@ import {
 
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
+import TopicQueue from '../../../../../lib/server/graphql/subscription/TopicQueue.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import LocalPubSub from '../../../../../lib/server/graphql/subscription/pubsub/LocalPubSub.js'
 
@@ -166,6 +167,19 @@ describe('TopicReceiver', () => {
 
         expect(SpyClass.__spy__)
           .toHaveBeenCalledWith(params)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.get:TopicQueueCtor', () => {
+    describe('when called as is', () => {
+      test('should be TopicQueue', () => {
+        const received = TopicReceiver.TopicQueueCtor
+
+        expect(received)
+          .toBe(TopicQueue) // same reference
       })
     })
   })
