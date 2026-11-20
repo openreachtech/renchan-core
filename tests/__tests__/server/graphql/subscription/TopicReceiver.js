@@ -186,6 +186,39 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('.createTopicQueue()', () => {
+    describe('should create an instance through #TopicQueueCtor', () => {
+      class AlphaTopicQueue extends TopicQueue {}
+
+      class BetaTopicQueue extends TopicQueue {}
+
+      const cases = [
+        {
+          override: {
+            TopicQueueCtor: AlphaTopicQueue,
+          },
+        },
+        {
+          override: {
+            TopicQueueCtor: BetaTopicQueue,
+          },
+        },
+      ]
+
+      test.each(cases)('TopicQueueCtor: $override.TopicQueueCtor.name', ({ override }) => {
+        jest.spyOn(TopicReceiver, 'TopicQueueCtor', 'get')
+          .mockReturnValue(override.TopicQueueCtor)
+
+        const received = TopicReceiver.createTopicQueue()
+
+        expect(received)
+          .toBeInstanceOf(override.TopicQueueCtor)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('#generateListener()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
