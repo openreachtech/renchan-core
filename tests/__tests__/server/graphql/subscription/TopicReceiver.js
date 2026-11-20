@@ -141,28 +141,31 @@ describe('TopicReceiver', () => {
       pubSub: LocalPubSub.create(),
     })
 
-    const cases = [
-      {
-        params: {
-          channel: 'alpha-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'beta-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'gamma-channel',
-          broker: brokerMock,
-        },
-      },
-    ]
-
     describe('to return instance of own class', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const actual = TopicReceiver.create(params)
 
@@ -172,6 +175,30 @@ describe('TopicReceiver', () => {
     })
 
     describe('to call constructor', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
 
@@ -179,6 +206,44 @@ describe('TopicReceiver', () => {
 
         expect(SpyClass.__spy__)
           .toHaveBeenCalledWith(params)
+      })
+    })
+
+    describe('to fill default #topicQueue', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const expected = {
+          channel: params.channel,
+          broker: params.broker,
+          topicQueue: expect.any(TopicQueue),
+        }
+
+        const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
+
+        SpyClass.create(params)
+
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(expected)
       })
     })
   })
