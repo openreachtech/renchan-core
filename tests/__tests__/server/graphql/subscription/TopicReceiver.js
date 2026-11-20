@@ -333,127 +333,160 @@ describe('TopicReceiver', () => {
       })
     })
 
-    describe('to call #onMessage()', () => {
+    describe('to enqueue the topic as received without parsing the message', () => {
       const cases = [
         {
-          params: {
+          input: {
             channel: 'alpha-channel',
-            broker: brokerMock,
+            message: '{"name":"Alice","age":11}',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'alpha-channel',
-                message: `{
-                  "name": "Alice",
-                  "age": 11
-                }`,
-              },
-              expected: {
-                name: 'Alice',
-                age: 11,
-              },
-            },
+          expected: [
+            { channel: 'alpha-channel', message: '{"name":"Alice","age":11}' },
           ],
         },
         {
-          params: {
+          input: {
             channel: 'beta-channel',
-            broker: brokerMock,
+            message: '{"name":"Bob","age":22}',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'beta-channel',
-                message: `{
-                  "name": "Bob",
-                  "age": 22
-                }`,
-              },
-              expected: {
-                name: 'Bob',
-                age: 22,
-              },
-            },
+          expected: [
+            { channel: 'beta-channel', message: '{"name":"Bob","age":22}' },
           ],
         },
         {
-          params: {
+          input: {
             channel: 'gamma-channel',
-            broker: brokerMock,
+            message: 'not a json',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'gamma-channel',
-                message: `{
-                  "name": "Charlie",
-                  "age": 33
-                }`,
-              },
-              expected: {
-                name: 'Charlie',
-                age: 33,
-              },
-            },
+          expected: [
+            { channel: 'gamma-channel', message: 'not a json' },
           ],
         },
       ]
 
-      describe.each(cases)('channel: $params.channel', ({ params, channelCases }) => {
-        test.each(channelCases)('channel: $input.channel', ({ input, expected }) => {
-          const onMessageSpy = jest.fn()
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create()
 
-          const receiver = new TopicReceiver(params)
-            .setOnMessage({
-              onMessage: onMessageSpy,
-            })
-
-          const listener = receiver.generateListener()
-
-          listener(
-            input.channel,
-            input.message
-          )
-
-          expect(onMessageSpy)
-            .toHaveBeenCalledWith(expected)
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
         })
+          .setOnMessage({
+            onMessage: () => {},
+          })
+
+        const listener = receiver.generateListener()
+
+        listener(
+          input.channel,
+          input.message
+        )
+
+        expect(topicQueue)
+          .toHaveProperty('topics', expected)
       })
     })
 
-    describe('to keep calling #onMessage() for every message', () => {
+    describe('to call #onMessage() with no arguments after enqueueing', () => {
       const cases = [
         {
-          params: {
+          input: {
             channel: 'alpha-channel',
-            broker: brokerMock,
+            message: '{"name":"Alice","age":11}',
           },
         },
         {
-          params: {
+          input: {
             channel: 'beta-channel',
-            broker: brokerMock,
+            message: '{"name":"Bob","age":22}',
+          },
+        },
+        {
+          input: {
+            channel: 'gamma-channel',
+            message: '{"name":"Charlie","age":33}',
           },
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
-        const onMessageSpy = jest.fn()
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const topicQueue = TopicQueue.create()
 
-        const receiver = new TopicReceiver(params)
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
           .setOnMessage({
-            onMessage: onMessageSpy,
+            onMessage: () => {},
           })
 
-        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+        const onMessageSpy = jest.spyOn(receiver, 'onMessage')
 
-        expect(onMessageSpy.mock.calls)
-          .toEqual([
-            [{ phase: 'STARTED' }],
-            [{ phase: 'COMPLETED' }],
-          ])
+        const listener = receiver.generateListener()
+
+        listener(
+          input.channel,
+          input.message
+        )
+
+        expect(onMessageSpy)
+          .toHaveBeenCalledWith()
+        expect(onMessageSpy)
+          .toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('to keep every topic that arrives back to back', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: [
+            { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+            { channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' },
+          ],
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"phase":"ITEM","id":1}',
+            betaMessage: '{"phase":"ITEM","id":2}',
+          },
+          expected: [
+            { channel: 'beta-channel', message: '{"phase":"ITEM","id":1}' },
+            { channel: 'beta-channel', message: '{"phase":"ITEM","id":2}' },
+          ],
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create()
+
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
+          .setOnMessage({
+            onMessage: () => {},
+          })
+
+        const onMessageSpy = jest.spyOn(receiver, 'onMessage')
+
+        const listener = receiver.generateListener()
+
+        listener(input.channel, input.alphaMessage)
+        listener(input.channel, input.betaMessage)
+
+        expect(topicQueue)
+          .toHaveProperty('topics', expected)
+        expect(onMessageSpy)
+          .toHaveBeenCalledTimes(2)
       })
     })
   })
