@@ -892,6 +892,82 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('#buildIterationValue()', () => {
+    const brokerMock = new SubscriptionBroker({
+      pubSub: LocalPubSub.create(),
+    })
+
+    describe('should take the topic at the head out as a parsed value', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [
+              { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+            ],
+          },
+          expected: {
+            value: { phase: 'STARTED' },
+            topics: [],
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              { channel: 'beta-channel', message: '{"id":1}' },
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+          expected: {
+            value: { id: 1 },
+            topics: [
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+        },
+        {
+          input: {
+            channel: 'gamma-channel',
+            topics: [
+              { channel: 'gamma-channel', message: '{"name":"Alice","age":11}' },
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+          expected: {
+            value: { name: 'Alice', age: 11 },
+            topics: [
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create({
+          topics: input.topics,
+        })
+
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        const received = receiver.buildIterationValue()
+
+        expect(received)
+          .toStrictEqual(expected.value)
+        expect(topicQueue)
+          .toHaveProperty('topics', expected.topics)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('#generateAsyncIteratorReturn()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
