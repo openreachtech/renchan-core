@@ -4,6 +4,7 @@ import {
 
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
+import TopicQueue from '../../../../../lib/server/graphql/subscription/TopicQueue.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import LocalPubSub from '../../../../../lib/server/graphql/subscription/pubsub/LocalPubSub.js'
 
@@ -19,18 +20,21 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
       ]
@@ -50,6 +54,15 @@ describe('TopicReceiver', () => {
 
           expect(receiver)
             .toHaveProperty('broker', params.broker)
+        })
+      })
+
+      describe('#topicQueue', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('topicQueue', params.topicQueue)
         })
       })
     })
@@ -166,6 +179,52 @@ describe('TopicReceiver', () => {
 
         expect(SpyClass.__spy__)
           .toHaveBeenCalledWith(params)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.get:TopicQueueCtor', () => {
+    describe('when called as is', () => {
+      test('should be TopicQueue', () => {
+        const received = TopicReceiver.TopicQueueCtor
+
+        expect(received)
+          .toBe(TopicQueue) // same reference
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.createTopicQueue()', () => {
+    describe('should create an instance through #TopicQueueCtor', () => {
+      class AlphaTopicQueue extends TopicQueue {}
+
+      class BetaTopicQueue extends TopicQueue {}
+
+      const cases = [
+        {
+          override: {
+            TopicQueueCtor: AlphaTopicQueue,
+          },
+        },
+        {
+          override: {
+            TopicQueueCtor: BetaTopicQueue,
+          },
+        },
+      ]
+
+      test.each(cases)('TopicQueueCtor: $override.TopicQueueCtor.name', ({ override }) => {
+        jest.spyOn(TopicReceiver, 'TopicQueueCtor', 'get')
+          .mockReturnValue(override.TopicQueueCtor)
+
+        const received = TopicReceiver.createTopicQueue()
+
+        expect(received)
+          .toBeInstanceOf(override.TopicQueueCtor)
       })
     })
   })
@@ -827,6 +886,82 @@ describe('TopicReceiver', () => {
             { phase: 'ITEM' },
             { phase: 'COMPLETED' },
           ])
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('#buildIterationValue()', () => {
+    const brokerMock = new SubscriptionBroker({
+      pubSub: LocalPubSub.create(),
+    })
+
+    describe('should take the topic at the head out as a parsed value', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [
+              { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+            ],
+          },
+          expected: {
+            value: { phase: 'STARTED' },
+            topics: [],
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              { channel: 'beta-channel', message: '{"id":1}' },
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+          expected: {
+            value: { id: 1 },
+            topics: [
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+        },
+        {
+          input: {
+            channel: 'gamma-channel',
+            topics: [
+              { channel: 'gamma-channel', message: '{"name":"Alice","age":11}' },
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+          expected: {
+            value: { name: 'Alice', age: 11 },
+            topics: [
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create({
+          topics: input.topics,
+        })
+
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        const received = receiver.buildIterationValue()
+
+        expect(received)
+          .toStrictEqual(expected.value)
+        expect(topicQueue)
+          .toHaveProperty('topics', expected.topics)
       })
     })
   })
