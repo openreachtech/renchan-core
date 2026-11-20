@@ -62,7 +62,10 @@ export { default as EventHub } from './lib/server/graphql/subscription/pubsub/to
 
 export { default as ChannelGenerator } from './lib/server/graphql/subscription/ChannelGenerator.js'
 export { default as SubscriptionBroker } from './lib/server/graphql/subscription/SubscriptionBroker.js'
+export { default as BufferedTopicReceiver } from './lib/server/graphql/subscription/BufferedTopicReceiver.js'
 export { default as TopicReceiver } from './lib/server/graphql/subscription/TopicReceiver.js'
+export { default as TopicAsyncIterator } from './lib/server/graphql/subscription/TopicAsyncIterator.js'
+export { default as TopicIteratorResult } from './lib/server/graphql/subscription/TopicIteratorResult.js'
 
 /**
  * For RESTful API server.
