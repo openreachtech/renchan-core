@@ -1,9 +1,6 @@
-import {
-  setTimeout as delay,
-} from 'node:timers/promises'
-
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
+import TopicQueue from '../../../../../lib/server/graphql/subscription/TopicQueue.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import LocalPubSub from '../../../../../lib/server/graphql/subscription/pubsub/LocalPubSub.js'
 
@@ -19,18 +16,21 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            topicQueue: TopicQueue.create(),
           },
         },
       ]
@@ -50,6 +50,15 @@ describe('TopicReceiver', () => {
 
           expect(receiver)
             .toHaveProperty('broker', params.broker)
+        })
+      })
+
+      describe('#topicQueue', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('topicQueue', params.topicQueue)
         })
       })
     })
@@ -128,28 +137,31 @@ describe('TopicReceiver', () => {
       pubSub: LocalPubSub.create(),
     })
 
-    const cases = [
-      {
-        params: {
-          channel: 'alpha-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'beta-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'gamma-channel',
-          broker: brokerMock,
-        },
-      },
-    ]
-
     describe('to return instance of own class', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const actual = TopicReceiver.create(params)
 
@@ -159,6 +171,30 @@ describe('TopicReceiver', () => {
     })
 
     describe('to call constructor', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
 
@@ -166,6 +202,90 @@ describe('TopicReceiver', () => {
 
         expect(SpyClass.__spy__)
           .toHaveBeenCalledWith(params)
+      })
+    })
+
+    describe('to fill default #topicQueue', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const expected = {
+          channel: params.channel,
+          broker: params.broker,
+          topicQueue: expect.any(TopicQueue),
+        }
+
+        const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
+
+        SpyClass.create(params)
+
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(expected)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.get:TopicQueueCtor', () => {
+    describe('when called as is', () => {
+      test('should be TopicQueue', () => {
+        const received = TopicReceiver.TopicQueueCtor
+
+        expect(received)
+          .toBe(TopicQueue) // same reference
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.createTopicQueue()', () => {
+    describe('should create an instance through #TopicQueueCtor', () => {
+      class AlphaTopicQueue extends TopicQueue {}
+
+      class BetaTopicQueue extends TopicQueue {}
+
+      const cases = [
+        {
+          override: {
+            TopicQueueCtor: AlphaTopicQueue,
+          },
+        },
+        {
+          override: {
+            TopicQueueCtor: BetaTopicQueue,
+          },
+        },
+      ]
+
+      test.each(cases)('TopicQueueCtor: $override.TopicQueueCtor.name', ({ override }) => {
+        jest.spyOn(TopicReceiver, 'TopicQueueCtor', 'get')
+          .mockReturnValue(override.TopicQueueCtor)
+
+        const received = TopicReceiver.createTopicQueue()
+
+        expect(received)
+          .toBeInstanceOf(override.TopicQueueCtor)
       })
     })
   })
@@ -209,127 +329,160 @@ describe('TopicReceiver', () => {
       })
     })
 
-    describe('to call #onMessage()', () => {
+    describe('to enqueue the topic as received without parsing the message', () => {
       const cases = [
         {
-          params: {
+          input: {
             channel: 'alpha-channel',
-            broker: brokerMock,
+            message: '{"name":"Alice","age":11}',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'alpha-channel',
-                message: `{
-                  "name": "Alice",
-                  "age": 11
-                }`,
-              },
-              expected: {
-                name: 'Alice',
-                age: 11,
-              },
-            },
+          expected: [
+            { channel: 'alpha-channel', message: '{"name":"Alice","age":11}' },
           ],
         },
         {
-          params: {
+          input: {
             channel: 'beta-channel',
-            broker: brokerMock,
+            message: '{"name":"Bob","age":22}',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'beta-channel',
-                message: `{
-                  "name": "Bob",
-                  "age": 22
-                }`,
-              },
-              expected: {
-                name: 'Bob',
-                age: 22,
-              },
-            },
+          expected: [
+            { channel: 'beta-channel', message: '{"name":"Bob","age":22}' },
           ],
         },
         {
-          params: {
+          input: {
             channel: 'gamma-channel',
-            broker: brokerMock,
+            message: 'not a json',
           },
-          channelCases: [
-            {
-              input: {
-                channel: 'gamma-channel',
-                message: `{
-                  "name": "Charlie",
-                  "age": 33
-                }`,
-              },
-              expected: {
-                name: 'Charlie',
-                age: 33,
-              },
-            },
+          expected: [
+            { channel: 'gamma-channel', message: 'not a json' },
           ],
         },
       ]
 
-      describe.each(cases)('channel: $params.channel', ({ params, channelCases }) => {
-        test.each(channelCases)('channel: $input.channel', ({ input, expected }) => {
-          const onMessageSpy = jest.fn()
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create()
 
-          const receiver = new TopicReceiver(params)
-            .setOnMessage({
-              onMessage: onMessageSpy,
-            })
-
-          const listener = receiver.generateListener()
-
-          listener(
-            input.channel,
-            input.message
-          )
-
-          expect(onMessageSpy)
-            .toHaveBeenCalledWith(expected)
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
         })
+          .setOnMessage({
+            onMessage: () => {},
+          })
+
+        const listener = receiver.generateListener()
+
+        listener(
+          input.channel,
+          input.message
+        )
+
+        expect(topicQueue)
+          .toHaveProperty('topics', expected)
       })
     })
 
-    describe('to keep calling #onMessage() for every message', () => {
+    describe('to call #onMessage() with no arguments after enqueueing', () => {
       const cases = [
         {
-          params: {
+          input: {
             channel: 'alpha-channel',
-            broker: brokerMock,
+            message: '{"name":"Alice","age":11}',
           },
         },
         {
-          params: {
+          input: {
             channel: 'beta-channel',
-            broker: brokerMock,
+            message: '{"name":"Bob","age":22}',
+          },
+        },
+        {
+          input: {
+            channel: 'gamma-channel',
+            message: '{"name":"Charlie","age":33}',
           },
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
-        const onMessageSpy = jest.fn()
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const topicQueue = TopicQueue.create()
 
-        const receiver = new TopicReceiver(params)
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
           .setOnMessage({
-            onMessage: onMessageSpy,
+            onMessage: () => {},
           })
 
-        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+        const onMessageSpy = jest.spyOn(receiver, 'onMessage')
 
-        expect(onMessageSpy.mock.calls)
-          .toEqual([
-            [{ phase: 'STARTED' }],
-            [{ phase: 'COMPLETED' }],
-          ])
+        const listener = receiver.generateListener()
+
+        listener(
+          input.channel,
+          input.message
+        )
+
+        expect(onMessageSpy)
+          .toHaveBeenCalledWith()
+        expect(onMessageSpy)
+          .toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('to keep every topic that arrives back to back', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: [
+            { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+            { channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' },
+          ],
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"phase":"ITEM","id":1}',
+            betaMessage: '{"phase":"ITEM","id":2}',
+          },
+          expected: [
+            { channel: 'beta-channel', message: '{"phase":"ITEM","id":1}' },
+            { channel: 'beta-channel', message: '{"phase":"ITEM","id":2}' },
+          ],
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create()
+
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
+          .setOnMessage({
+            onMessage: () => {},
+          })
+
+        const onMessageSpy = jest.spyOn(receiver, 'onMessage')
+
+        const listener = receiver.generateListener()
+
+        listener(input.channel, input.alphaMessage)
+        listener(input.channel, input.betaMessage)
+
+        expect(topicQueue)
+          .toHaveProperty('topics', expected)
+        expect(onMessageSpy)
+          .toHaveBeenCalledTimes(2)
       })
     })
   })
@@ -691,28 +844,28 @@ describe('TopicReceiver', () => {
       pubSub: LocalPubSub.create(),
     })
 
-    const cases = [
-      {
-        params: {
-          channel: 'alpha-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'beta-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'gamma-channel',
-          broker: brokerMock,
-        },
-      },
-    ]
-
     describe('to be instance of Function', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const receiver = new TopicReceiver(params)
 
@@ -723,110 +876,263 @@ describe('TopicReceiver', () => {
       })
     })
 
-    describe('for generated function', () => {
-      test.each(cases)('channel: $params.channel', async ({ params }) => {
-        const receiver = new TopicReceiver(params)
+    describe('for generated function when no message is held', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            message: '{"phase":"STARTED"}',
+          },
+          expected: {
+            value: { phase: 'STARTED' },
+            done: false,
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            message: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            value: { phase: 'COMPLETED' },
+            done: false,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+        })
+
+        const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
+        const subscribeSpy = jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+
+        const nextPromise = generatedNextFunction()
+
+        /*
+         * The promise waits until the listener delivers a message.
+         */
+        receiver.listener(input.channel, input.message)
+
+        const received = await nextPromise
+
+        expect(received)
+          .toStrictEqual(expected)
+        expect(setOnMessageSpy)
+          .toHaveBeenCalledWith({
+            onMessage: expect.any(Function),
+          })
+        expect(subscribeSpy)
+          .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('for generated function when messages are held', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"ITEM"}',
+            gammaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            alpha: { value: { phase: 'STARTED' }, done: false },
+            beta: { value: { phase: 'ITEM' }, done: false },
+            gamma: { value: { phase: 'COMPLETED' }, done: false },
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"id":1}',
+            betaMessage: '{"id":2}',
+            gammaMessage: '{"id":3}',
+          },
+          expected: {
+            alpha: { value: { id: 1 }, done: false },
+            beta: { value: { id: 2 }, done: false },
+            gamma: { value: { id: 3 }, done: false },
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create({
+            topics: [
+              { channel: input.channel, message: input.alphaMessage },
+              { channel: input.channel, message: input.betaMessage },
+              { channel: input.channel, message: input.gammaMessage },
+            ],
+          }),
+        })
 
         const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
         const subscribeSpy = jest.spyOn(receiver, 'subscribe')
 
         const generatedNextFunction = receiver.generateAsyncIteratorNext()
 
-        /*
-          * Confirm null before calling #generateAsyncIteratorNext()
-          */
-        expect(receiver)
-          .toHaveProperty('onMessage', null)
+        const received = {
+          alpha: await generatedNextFunction(),
+          beta: await generatedNextFunction(),
+          gamma: await generatedNextFunction(),
+        }
+
+        expect(received)
+          .toStrictEqual(expected) // in the order of arrival
         expect(setOnMessageSpy)
           .not
           .toHaveBeenCalled()
         expect(subscribeSpy)
           .not
           .toHaveBeenCalled()
-
-        /*
-          * Call generated function.
-          */
-        const setOnMessageArgsExpected = {
-          onMessage: expect.any(Function),
-        }
-
-        const valueTally = {
-          alpha: Symbol('alpha'),
-        }
-        const resolvedTally = {
-          value: valueTally,
-          done: false,
-        }
-
-        /*
-          * 3 seconds later, call #onMessage() with valueTally to resolve the promise.
-          */
-        setTimeout(
-          () => receiver.onMessage(valueTally),
-          2000
-        )
-
-        const actual = await generatedNextFunction()
-
-        expect(actual)
-          .toEqual(resolvedTally)
-
-        expect(setOnMessageSpy)
-          .toHaveBeenCalledWith(setOnMessageArgsExpected)
-        expect(subscribeSpy)
-          .toHaveBeenCalledWith()
       })
     })
 
-    describe('to keep messages that arrive back to back', () => {
-      const timeoutTally = Symbol('timeout')
+    describe('for generated function when messages arrive back to back', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            alphaMessage: '{"phase":"STARTED"}',
+            betaMessage: '{"phase":"ITEM"}',
+            gammaMessage: '{"phase":"COMPLETED"}',
+          },
+          expected: {
+            alpha: { value: { phase: 'STARTED' }, done: false },
+            beta: { value: { phase: 'ITEM' }, done: false },
+            gamma: { value: { phase: 'COMPLETED' }, done: false },
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            alphaMessage: '{"id":1}',
+            betaMessage: '{"id":2}',
+            gammaMessage: '{"id":3}',
+          },
+          expected: {
+            alpha: { value: { id: 1 }, done: false },
+            beta: { value: { id: 2 }, done: false },
+            gamma: { value: { id: 3 }, done: false },
+          },
+        },
+      ]
 
-      /**
-       * Await the next value, or the timeout tally when no message reaches it.
-       *
-       * @param {() => Promise<{ value: * }>} nextFunction - Generated next function.
-       * @returns {Promise<*>} - Value of the next result, or the timeout tally.
-       */
-      async function nextValueOrTimeout (nextFunction) {
-        const timeoutController = new AbortController()
-        const timeoutPromise = delay(100, timeoutTally, {
-          signal: timeoutController.signal,
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
         })
-          .catch(() => timeoutTally)
-        const nextPromise = nextFunction()
-          .then(result => result.value)
 
-        return Promise.race([
-          nextPromise,
-          timeoutPromise,
-        ])
-          .finally(() => timeoutController.abort())
-      }
-
-      test.each(cases)('channel: $params.channel', async ({ params }) => {
-        const receiver = new TopicReceiver(params)
+        jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
 
         const generatedNextFunction = receiver.generateAsyncIteratorNext()
 
-        const firstPromise = nextValueOrTimeout(generatedNextFunction)
+        const alphaPromise = generatedNextFunction()
 
-        receiver.listener(params.channel, JSON.stringify({ phase: 'STARTED' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'ITEM' }))
-        receiver.listener(params.channel, JSON.stringify({ phase: 'COMPLETED' }))
+        /*
+         * All of them arrive before the next call of the generated function.
+         */
+        receiver.listener(input.channel, input.alphaMessage)
+        receiver.listener(input.channel, input.betaMessage)
+        receiver.listener(input.channel, input.gammaMessage)
 
-        const actual = [
-          await firstPromise,
-          await nextValueOrTimeout(generatedNextFunction),
-          await nextValueOrTimeout(generatedNextFunction),
-        ]
+        const received = {
+          alpha: await alphaPromise,
+          beta: await generatedNextFunction(),
+          gamma: await generatedNextFunction(),
+        }
 
-        expect(actual)
-          .toEqual([
-            { phase: 'STARTED' },
-            { phase: 'ITEM' },
-            { phase: 'COMPLETED' },
-          ])
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('#buildIterationValue()', () => {
+    const brokerMock = new SubscriptionBroker({
+      pubSub: LocalPubSub.create(),
+    })
+
+    describe('should take the topic at the head out as a parsed value', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [
+              { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+            ],
+          },
+          expected: {
+            value: { phase: 'STARTED' },
+            topics: [],
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              { channel: 'beta-channel', message: '{"id":1}' },
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+          expected: {
+            value: { id: 1 },
+            topics: [
+              { channel: 'beta-channel', message: '{"id":2}' },
+            ],
+          },
+        },
+        {
+          input: {
+            channel: 'gamma-channel',
+            topics: [
+              { channel: 'gamma-channel', message: '{"name":"Alice","age":11}' },
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+          expected: {
+            value: { name: 'Alice', age: 11 },
+            topics: [
+              { channel: 'gamma-channel', message: '{"id":2}' },
+              { channel: 'gamma-channel', message: '{"id":3}' },
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input, expected }) => {
+        const topicQueue = TopicQueue.create({
+          topics: input.topics,
+        })
+
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        const received = receiver.buildIterationValue()
+
+        expect(received)
+          .toStrictEqual(expected.value)
+        expect(topicQueue)
+          .toHaveProperty('topics', expected.topics)
       })
     })
   })
