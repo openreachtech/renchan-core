@@ -876,7 +876,7 @@ describe('TopicReceiver', () => {
             message: '{"phase":"STARTED"}',
           },
           expected: {
-            value: { phase: 'STARTED' },
+            value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
             done: false,
           },
         },
@@ -886,7 +886,7 @@ describe('TopicReceiver', () => {
             message: '{"phase":"COMPLETED"}',
           },
           expected: {
-            value: { phase: 'COMPLETED' },
+            value: TopicParcel.create({ channel: 'beta-channel', message: '{"phase":"COMPLETED"}' }),
             done: false,
           },
         },
@@ -913,7 +913,6 @@ describe('TopicReceiver', () => {
         receiver.listener(input.channel, input.message)
 
         const received = await nextPromise
-
         expect(received)
           .toStrictEqual(expected)
         expect(setOnMessageSpy)
@@ -935,9 +934,18 @@ describe('TopicReceiver', () => {
             gammaMessage: '{"phase":"COMPLETED"}',
           },
           expected: {
-            alpha: { value: { phase: 'STARTED' }, done: false },
-            beta: { value: { phase: 'ITEM' }, done: false },
-            gamma: { value: { phase: 'COMPLETED' }, done: false },
+            alpha: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
+              done: false,
+            },
+            beta: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"ITEM"}' }),
+              done: false,
+            },
+            gamma: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' }),
+              done: false,
+            },
           },
         },
         {
@@ -948,9 +956,18 @@ describe('TopicReceiver', () => {
             gammaMessage: '{"id":3}',
           },
           expected: {
-            alpha: { value: { id: 1 }, done: false },
-            beta: { value: { id: 2 }, done: false },
-            gamma: { value: { id: 3 }, done: false },
+            alpha: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+              done: false,
+            },
+            beta: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
+              done: false,
+            },
+            gamma: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":3}' }),
+              done: false,
+            },
           },
         },
       ]
@@ -961,9 +978,9 @@ describe('TopicReceiver', () => {
           broker: brokerMock,
           topicQueue: TopicQueue.create({
             topics: [
-              { channel: input.channel, message: input.alphaMessage },
-              { channel: input.channel, message: input.betaMessage },
-              { channel: input.channel, message: input.gammaMessage },
+              TopicParcel.create({ channel: input.channel, message: input.alphaMessage }),
+              TopicParcel.create({ channel: input.channel, message: input.betaMessage }),
+              TopicParcel.create({ channel: input.channel, message: input.gammaMessage }),
             ],
           }),
         })
@@ -973,14 +990,16 @@ describe('TopicReceiver', () => {
 
         const generatedNextFunction = receiver.generateAsyncIteratorNext()
 
-        const received = {
-          alpha: await generatedNextFunction(),
-          beta: await generatedNextFunction(),
-          gamma: await generatedNextFunction(),
-        }
+        const alphaResult = await generatedNextFunction()
+        const betaResult = await generatedNextFunction()
+        const gammaResult = await generatedNextFunction()
 
-        expect(received)
-          .toStrictEqual(expected) // in the order of arrival
+        expect(alphaResult)
+          .toStrictEqual(expected.alpha)
+        expect(betaResult)
+          .toStrictEqual(expected.beta)
+        expect(gammaResult)
+          .toStrictEqual(expected.gamma)
         expect(setOnMessageSpy)
           .not
           .toHaveBeenCalled()
@@ -1000,9 +1019,18 @@ describe('TopicReceiver', () => {
             gammaMessage: '{"phase":"COMPLETED"}',
           },
           expected: {
-            alpha: { value: { phase: 'STARTED' }, done: false },
-            beta: { value: { phase: 'ITEM' }, done: false },
-            gamma: { value: { phase: 'COMPLETED' }, done: false },
+            alpha: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
+              done: false,
+            },
+            beta: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"ITEM"}' }),
+              done: false,
+            },
+            gamma: {
+              value: TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' }),
+              done: false,
+            },
           },
         },
         {
@@ -1013,9 +1041,18 @@ describe('TopicReceiver', () => {
             gammaMessage: '{"id":3}',
           },
           expected: {
-            alpha: { value: { id: 1 }, done: false },
-            beta: { value: { id: 2 }, done: false },
-            gamma: { value: { id: 3 }, done: false },
+            alpha: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+              done: false,
+            },
+            beta: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
+              done: false,
+            },
+            gamma: {
+              value: TopicParcel.create({ channel: 'beta-channel', message: '{"id":3}' }),
+              done: false,
+            },
           },
         },
       ]
@@ -1041,14 +1078,16 @@ describe('TopicReceiver', () => {
         receiver.listener(input.channel, input.betaMessage)
         receiver.listener(input.channel, input.gammaMessage)
 
-        const received = {
-          alpha: await alphaPromise,
-          beta: await generatedNextFunction(),
-          gamma: await generatedNextFunction(),
-        }
+        const alphaResult = await alphaPromise
+        const betaResult = await generatedNextFunction()
+        const gammaResult = await generatedNextFunction()
 
-        expect(received)
-          .toStrictEqual(expected)
+        expect(alphaResult)
+          .toStrictEqual(expected.alpha)
+        expect(betaResult)
+          .toStrictEqual(expected.beta)
+        expect(gammaResult)
+          .toStrictEqual(expected.gamma)
       })
     })
 
