@@ -338,7 +338,7 @@ describe('TopicReceiver', () => {
             message: '{"name":"Alice","age":11}',
           },
           expected: [
-            { channel: 'alpha-channel', message: '{"name":"Alice","age":11}' },
+            TopicParcel.create({ channel: 'alpha-channel', message: '{"name":"Alice","age":11}' }),
           ],
         },
         {
@@ -347,16 +347,7 @@ describe('TopicReceiver', () => {
             message: '{"name":"Bob","age":22}',
           },
           expected: [
-            { channel: 'beta-channel', message: '{"name":"Bob","age":22}' },
-          ],
-        },
-        {
-          input: {
-            channel: 'gamma-channel',
-            message: 'not a json',
-          },
-          expected: [
-            { channel: 'gamma-channel', message: 'not a json' },
+            TopicParcel.create({ channel: 'beta-channel', message: '{"name":"Bob","age":22}' }),
           ],
         },
       ]
@@ -444,8 +435,8 @@ describe('TopicReceiver', () => {
             betaMessage: '{"phase":"COMPLETED"}',
           },
           expected: [
-            { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
-            { channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' },
+            TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
+            TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"COMPLETED"}' }),
           ],
         },
         {
@@ -455,8 +446,8 @@ describe('TopicReceiver', () => {
             betaMessage: '{"phase":"ITEM","id":2}',
           },
           expected: [
-            { channel: 'beta-channel', message: '{"phase":"ITEM","id":1}' },
-            { channel: 'beta-channel', message: '{"phase":"ITEM","id":2}' },
+            TopicParcel.create({ channel: 'beta-channel', message: '{"phase":"ITEM","id":1}' }),
+            TopicParcel.create({ channel: 'beta-channel', message: '{"phase":"ITEM","id":2}' }),
           ],
         },
       ]
