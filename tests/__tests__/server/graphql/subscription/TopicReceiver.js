@@ -1,6 +1,7 @@
 import TopicReceiver from '../../../../../lib/server/graphql/subscription/TopicReceiver.js'
 
 import TopicQueue from '../../../../../lib/server/graphql/subscription/TopicQueue.js'
+import TopicParcel from '../../../../../lib/server/graphql/subscription/TopicParcel.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import LocalPubSub from '../../../../../lib/server/graphql/subscription/pubsub/LocalPubSub.js'
 
@@ -1109,7 +1110,7 @@ describe('TopicReceiver', () => {
             input: {
               channel: 'alpha-channel',
               topics: [
-                { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+                TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
               ],
             },
           },
@@ -1117,8 +1118,8 @@ describe('TopicReceiver', () => {
             input: {
               channel: 'beta-channel',
               topics: [
-                { channel: 'beta-channel', message: '{"id":1}' },
-                { channel: 'beta-channel', message: '{"id":2}' },
+                TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+                TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
               ],
             },
           },
@@ -1196,6 +1197,84 @@ describe('TopicReceiver', () => {
           expect(subscribeSpy)
             .toHaveBeenCalledWith()
         })
+      })
+    })
+
+    describe('should keep waiting when a topic which is not available arrives', () => {
+      const cases = [
+        {
+          input: {
+            message: '{"alpha":',
+          },
+        },
+        {
+          input: {
+            message: 'not-json',
+          },
+        },
+      ]
+
+      test.each(cases)('message: $input.message', async ({ input }) => {
+        const topicQueue = TopicQueue.create()
+
+        const receiver = new TopicReceiver({
+          channel: 'alpha-channel',
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        const waiting = receiver.waitTopic()
+
+        receiver.listener('alpha-channel', input.message)
+
+        const pending = new Promise(resolve => {
+          setTimeout(() => resolve('pending'), 10)
+        })
+        const received = await Promise.race([waiting, pending])
+
+        expect(received)
+          .toBe('pending')
+      })
+    })
+
+    describe('should resolve when an available topic arrives after a topic which is not available', () => {
+      const cases = [
+        {
+          input: {
+            message: '{"alpha":1}',
+          },
+        },
+        {
+          input: {
+            message: '[1,2]',
+          },
+        },
+      ]
+
+      test.each(cases)('message: $input.message', async ({ input }) => {
+        const topicQueue = TopicQueue.create()
+
+        const receiver = new TopicReceiver({
+          channel: 'alpha-channel',
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        const waiting = receiver.waitTopic()
+
+        receiver.listener('alpha-channel', '{"alpha":')
+        receiver.listener('alpha-channel', input.message)
+
+        await expect(waiting)
+          .resolves
+          .not
+          .toThrow()
       })
     })
 
