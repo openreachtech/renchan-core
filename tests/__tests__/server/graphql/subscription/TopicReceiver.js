@@ -1345,54 +1345,39 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
-  describe('#buildIterationValue()', () => {
+  describe('#extractTopicParcel()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
     })
 
-    describe('should take the topic at the head out as a parsed value', () => {
+    describe('should take the topic parcel at the head out as it is', () => {
       const cases = [
         {
           input: {
             channel: 'alpha-channel',
             topics: [
-              { channel: 'alpha-channel', message: '{"phase":"STARTED"}' },
+              TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
             ],
           },
           expected: {
-            value: { phase: 'STARTED' },
-            topics: [],
+            channel: 'alpha-channel',
+            message: '{"phase":"STARTED"}',
+            rest: [],
           },
         },
         {
           input: {
             channel: 'beta-channel',
             topics: [
-              { channel: 'beta-channel', message: '{"id":1}' },
-              { channel: 'beta-channel', message: '{"id":2}' },
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
             ],
           },
           expected: {
-            value: { id: 1 },
-            topics: [
-              { channel: 'beta-channel', message: '{"id":2}' },
-            ],
-          },
-        },
-        {
-          input: {
-            channel: 'gamma-channel',
-            topics: [
-              { channel: 'gamma-channel', message: '{"name":"Alice","age":11}' },
-              { channel: 'gamma-channel', message: '{"id":2}' },
-              { channel: 'gamma-channel', message: '{"id":3}' },
-            ],
-          },
-          expected: {
-            value: { name: 'Alice', age: 11 },
-            topics: [
-              { channel: 'gamma-channel', message: '{"id":2}' },
-              { channel: 'gamma-channel', message: '{"id":3}' },
+            channel: 'beta-channel',
+            message: '{"id":1}',
+            rest: [
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
             ],
           },
         },
@@ -1409,12 +1394,51 @@ describe('TopicReceiver', () => {
           topicQueue,
         })
 
-        const received = receiver.buildIterationValue()
+        const received = receiver.extractTopicParcel()
 
         expect(received)
-          .toStrictEqual(expected.value)
+          .toBeInstanceOf(TopicParcel)
+        expect(received)
+          .toHaveProperty('channel', expected.channel)
+        expect(received)
+          .toHaveProperty('message', expected.message)
         expect(topicQueue)
-          .toHaveProperty('topics', expected.topics)
+          .toHaveProperty('topics', expected.rest)
+      })
+    })
+
+    describe('should return null when no available topic parcel is held', () => {
+      const cases = [
+        {
+          input: {
+            message: '{"alpha":',
+          },
+        },
+        {
+          input: {
+            message: 'not-json',
+          },
+        },
+      ]
+
+      test.each(cases)('message: $input.message', ({ input }) => {
+        const topicQueue = TopicQueue.create()
+
+        topicQueue.enqueue({
+          channel: 'alpha-channel',
+          message: input.message,
+        })
+
+        const receiver = new TopicReceiver({
+          channel: 'alpha-channel',
+          broker: brokerMock,
+          topicQueue,
+        })
+
+        const received = receiver.extractTopicParcel()
+
+        expect(received)
+          .toBeNull()
       })
     })
   })
