@@ -1050,7 +1050,8 @@ describe('TopicReceiver', () => {
             onMessage: expect.any(Function),
           })
         expect(subscribeSpy)
-          .toHaveBeenCalledWith()
+          .not
+          .toHaveBeenCalled()
       })
     })
 
@@ -1220,40 +1221,6 @@ describe('TopicReceiver', () => {
           .toStrictEqual(expected.gamma)
       })
     })
-
-    describe('for generated function when subscribe() fails', () => {
-      const cases = [
-        {
-          input: {
-            channel: 'alpha-channel',
-          },
-          tally: new Error('alpha subscribe failed'),
-        },
-        {
-          input: {
-            channel: 'beta-channel',
-          },
-          tally: new Error('beta subscribe failed'),
-        },
-      ]
-
-      test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
-        const receiver = new TopicReceiver({
-          channel: input.channel,
-          broker: brokerMock,
-          topicQueue: TopicQueue.create(),
-        })
-
-        jest.spyOn(receiver, 'subscribe')
-          .mockRejectedValue(tally)
-
-        const generatedNextFunction = receiver.generateAsyncIteratorNext()
-
-        await expect(generatedNextFunction())
-          .rejects
-          .toBe(tally) // same reference
-      })
-    })
   })
 })
 
@@ -1355,7 +1322,8 @@ describe('TopicReceiver', () => {
               onMessage: expect.any(Function),
             })
           expect(subscribeSpy)
-            .toHaveBeenCalledWith()
+            .not
+            .toHaveBeenCalled()
         })
       })
     })
@@ -1435,40 +1403,6 @@ describe('TopicReceiver', () => {
           .resolves
           .not
           .toThrow()
-      })
-    })
-
-    describe('when subscribe() fails', () => {
-      describe('should reject with the error', () => {
-        const cases = [
-          {
-            input: {
-              channel: 'alpha-channel',
-            },
-            tally: new Error('alpha subscribe failed'),
-          },
-          {
-            input: {
-              channel: 'beta-channel',
-            },
-            tally: new Error('beta subscribe failed'),
-          },
-        ]
-
-        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
-          const receiver = new TopicReceiver({
-            channel: input.channel,
-            broker: brokerMock,
-            topicQueue: TopicQueue.create(),
-          })
-
-          jest.spyOn(receiver, 'subscribe')
-            .mockRejectedValue(tally)
-
-          await expect(receiver.waitTopic())
-            .rejects
-            .toBe(tally) // same reference
-        })
       })
     })
   })
