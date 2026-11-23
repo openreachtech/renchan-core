@@ -18,6 +18,7 @@ describe('TopicReceiver', () => {
             channel: 'alpha-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -25,6 +26,7 @@ describe('TopicReceiver', () => {
             channel: 'beta-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -32,6 +34,7 @@ describe('TopicReceiver', () => {
             channel: 'gamma-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
       ]
@@ -62,6 +65,15 @@ describe('TopicReceiver', () => {
             .toHaveProperty('topicQueue', params.topicQueue)
         })
       })
+
+      describe('#onMessage', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('onMessage', params.onMessage)
+        })
+      })
     })
 
     describe('to setup properties', () => {
@@ -74,25 +86,28 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
       ]
 
       describe('#broker', () => {
         test.each(cases)('channel: $params.channel', ({ params }) => {
-          const expected = null
+          const expected = expect.any(Function)
 
           const receiver = new TopicReceiver(params)
 
@@ -492,18 +507,21 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
       ]
@@ -514,7 +532,7 @@ describe('TopicReceiver', () => {
         const receiver = new TopicReceiver(params)
 
         expect(receiver)
-          .toHaveProperty('onMessage', null)
+          .toHaveProperty('onMessage', params.onMessage)
 
         receiver.setOnMessage({
           onMessage: onMessageTally,
