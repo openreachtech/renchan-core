@@ -764,7 +764,7 @@ describe('BaseSubscriptionResolver', () => {
 
         const resolver = BaseSubscriptionResolver.create()
 
-        const actual = resolver.generateAsyncIterable({
+        const actual = await resolver.generateAsyncIterable({
           context: mockContext,
           channel: tally.channel,
         })
