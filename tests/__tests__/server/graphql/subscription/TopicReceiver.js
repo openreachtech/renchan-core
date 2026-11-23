@@ -18,6 +18,7 @@ describe('TopicReceiver', () => {
             channel: 'alpha-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -25,6 +26,7 @@ describe('TopicReceiver', () => {
             channel: 'beta-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -32,6 +34,7 @@ describe('TopicReceiver', () => {
             channel: 'gamma-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
       ]
@@ -62,6 +65,15 @@ describe('TopicReceiver', () => {
             .toHaveProperty('topicQueue', params.topicQueue)
         })
       })
+
+      describe('#onMessage', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('onMessage', params.onMessage)
+        })
+      })
     })
 
     describe('to setup properties', () => {
@@ -74,25 +86,28 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
       ]
 
       describe('#broker', () => {
         test.each(cases)('channel: $params.channel', ({ params }) => {
-          const expected = null
+          const expected = expect.any(Function)
 
           const receiver = new TopicReceiver(params)
 
@@ -178,6 +193,7 @@ describe('TopicReceiver', () => {
             channel: 'alpha-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -185,6 +201,7 @@ describe('TopicReceiver', () => {
             channel: 'beta-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
         {
@@ -192,6 +209,7 @@ describe('TopicReceiver', () => {
             channel: 'gamma-channel',
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            onMessage: () => {},
           },
         },
       ]
@@ -233,6 +251,46 @@ describe('TopicReceiver', () => {
           channel: params.channel,
           broker: params.broker,
           topicQueue: expect.any(TopicQueue),
+          onMessage: expect.any(Function),
+        }
+
+        const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
+
+        SpyClass.create(params)
+
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(expected)
+      })
+    })
+
+    describe('to fill default #onMessage', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const expected = {
+          channel: params.channel,
+          broker: params.broker,
+          topicQueue: expect.any(TopicQueue),
+          onMessage: expect.any(Function),
         }
 
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
@@ -492,18 +550,21 @@ describe('TopicReceiver', () => {
           params: {
             channel: 'alpha-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'beta-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
         {
           params: {
             channel: 'gamma-channel',
             broker: brokerMock,
+            onMessage: () => {},
           },
         },
       ]
@@ -514,7 +575,7 @@ describe('TopicReceiver', () => {
         const receiver = new TopicReceiver(params)
 
         expect(receiver)
-          .toHaveProperty('onMessage', null)
+          .toHaveProperty('onMessage', params.onMessage)
 
         receiver.setOnMessage({
           onMessage: onMessageTally,
@@ -689,14 +750,14 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const expected = {
           [Symbol.asyncIterator]: expect.any(Function),
         }
 
         const receiver = new TopicReceiver(params)
 
-        const actual = receiver.generateAsyncIterable()
+        const actual = await receiver.generateAsyncIterable()
 
         expect(actual)
           .toEqual(expected)
@@ -729,7 +790,7 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const nextTally = async () => ({
           value: null,
           done: false,
@@ -751,7 +812,7 @@ describe('TopicReceiver', () => {
         jest.spyOn(receiver, 'generateAsyncIteratorThrow')
           .mockReturnValue(throwTally)
 
-        const iterable = receiver.generateAsyncIterable()
+        const iterable = await receiver.generateAsyncIterable()
         const iteratorFunction = iterable[Symbol.asyncIterator]
 
         const actual = iteratorFunction()
@@ -762,6 +823,75 @@ describe('TopicReceiver', () => {
           .toHaveProperty('return', returnTally)
         expect(actual)
           .toHaveProperty('throw', throwTally)
+      })
+    })
+
+    describe('to subscribe before returning the iterable', () => {
+      const brokerMock = new SubscriptionBroker({
+        pubSub: LocalPubSub.create(),
+      })
+
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
+        const receiver = new TopicReceiver(params)
+
+        const subscribeSpy = jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        await receiver.generateAsyncIterable()
+
+        expect(subscribeSpy)
+          .toHaveBeenCalledWith()
+        expect(subscribeSpy)
+          .toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('to reject when subscribe() fails', () => {
+      const brokerMock = new SubscriptionBroker({
+        pubSub: LocalPubSub.create(),
+      })
+
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+          tally: new Error('alpha-error'),
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+          tally: new Error('beta-error'),
+        },
+      ]
+
+      test.each(cases)('error: $tally.message', async ({ params, tally }) => {
+        const receiver = new TopicReceiver(params)
+
+        jest.spyOn(receiver, 'subscribe')
+          .mockRejectedValue(tally)
+
+        await expect(receiver.generateAsyncIterable())
+          .rejects
+          .toBe(tally)
       })
     })
   })
@@ -795,7 +925,7 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const nextTally = async () => ({
           value: null,
           done: false,
@@ -920,7 +1050,8 @@ describe('TopicReceiver', () => {
             onMessage: expect.any(Function),
           })
         expect(subscribeSpy)
-          .toHaveBeenCalledWith()
+          .not
+          .toHaveBeenCalled()
       })
     })
 
@@ -1090,40 +1221,6 @@ describe('TopicReceiver', () => {
           .toStrictEqual(expected.gamma)
       })
     })
-
-    describe('for generated function when subscribe() fails', () => {
-      const cases = [
-        {
-          input: {
-            channel: 'alpha-channel',
-          },
-          tally: new Error('alpha subscribe failed'),
-        },
-        {
-          input: {
-            channel: 'beta-channel',
-          },
-          tally: new Error('beta subscribe failed'),
-        },
-      ]
-
-      test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
-        const receiver = new TopicReceiver({
-          channel: input.channel,
-          broker: brokerMock,
-          topicQueue: TopicQueue.create(),
-        })
-
-        jest.spyOn(receiver, 'subscribe')
-          .mockRejectedValue(tally)
-
-        const generatedNextFunction = receiver.generateAsyncIteratorNext()
-
-        await expect(generatedNextFunction())
-          .rejects
-          .toBe(tally) // same reference
-      })
-    })
   })
 })
 
@@ -1225,7 +1322,8 @@ describe('TopicReceiver', () => {
               onMessage: expect.any(Function),
             })
           expect(subscribeSpy)
-            .toHaveBeenCalledWith()
+            .not
+            .toHaveBeenCalled()
         })
       })
     })
@@ -1305,40 +1403,6 @@ describe('TopicReceiver', () => {
           .resolves
           .not
           .toThrow()
-      })
-    })
-
-    describe('when subscribe() fails', () => {
-      describe('should reject with the error', () => {
-        const cases = [
-          {
-            input: {
-              channel: 'alpha-channel',
-            },
-            tally: new Error('alpha subscribe failed'),
-          },
-          {
-            input: {
-              channel: 'beta-channel',
-            },
-            tally: new Error('beta subscribe failed'),
-          },
-        ]
-
-        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
-          const receiver = new TopicReceiver({
-            channel: input.channel,
-            broker: brokerMock,
-            topicQueue: TopicQueue.create(),
-          })
-
-          jest.spyOn(receiver, 'subscribe')
-            .mockRejectedValue(tally)
-
-          await expect(receiver.waitTopic())
-            .rejects
-            .toBe(tally) // same reference
-        })
       })
     })
   })
