@@ -750,14 +750,14 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const expected = {
           [Symbol.asyncIterator]: expect.any(Function),
         }
 
         const receiver = new TopicReceiver(params)
 
-        const actual = receiver.generateAsyncIterable()
+        const actual = await receiver.generateAsyncIterable()
 
         expect(actual)
           .toEqual(expected)
@@ -790,7 +790,7 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const nextTally = async () => ({
           value: null,
           done: false,
@@ -812,7 +812,7 @@ describe('TopicReceiver', () => {
         jest.spyOn(receiver, 'generateAsyncIteratorThrow')
           .mockReturnValue(throwTally)
 
-        const iterable = receiver.generateAsyncIterable()
+        const iterable = await receiver.generateAsyncIterable()
         const iteratorFunction = iterable[Symbol.asyncIterator]
 
         const actual = iteratorFunction()
@@ -823,6 +823,75 @@ describe('TopicReceiver', () => {
           .toHaveProperty('return', returnTally)
         expect(actual)
           .toHaveProperty('throw', throwTally)
+      })
+    })
+
+    describe('to subscribe before returning the iterable', () => {
+      const brokerMock = new SubscriptionBroker({
+        pubSub: LocalPubSub.create(),
+      })
+
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
+        const receiver = new TopicReceiver(params)
+
+        const subscribeSpy = jest.spyOn(receiver, 'subscribe')
+          .mockResolvedValue()
+
+        await receiver.generateAsyncIterable()
+
+        expect(subscribeSpy)
+          .toHaveBeenCalledWith()
+        expect(subscribeSpy)
+          .toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('to reject when subscribe() fails', () => {
+      const brokerMock = new SubscriptionBroker({
+        pubSub: LocalPubSub.create(),
+      })
+
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+          tally: new Error('alpha-error'),
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+          tally: new Error('beta-error'),
+        },
+      ]
+
+      test.each(cases)('error: $tally.message', async ({ params, tally }) => {
+        const receiver = new TopicReceiver(params)
+
+        jest.spyOn(receiver, 'subscribe')
+          .mockRejectedValue(tally)
+
+        await expect(receiver.generateAsyncIterable())
+          .rejects
+          .toBe(tally)
       })
     })
   })
@@ -856,7 +925,7 @@ describe('TopicReceiver', () => {
         },
       ]
 
-      test.each(cases)('channel: $params.channel', ({ params }) => {
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
         const nextTally = async () => ({
           value: null,
           done: false,
