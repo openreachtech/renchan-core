@@ -592,12 +592,12 @@ describe('SubscriptionBroker', () => {
 
         const broker = SubscriptionBroker.create(params)
 
-        test.each(cases)('input: $input', ({ input }) => {
+        test.each(cases)('input: $input', async ({ input }) => {
           const args = {
             channel: input.channel,
           }
 
-          const actual = broker.generateAsyncIterable(args)
+          const actual = await broker.generateAsyncIterable(args)
 
           expect(actual)
             .toEqual(expected)
