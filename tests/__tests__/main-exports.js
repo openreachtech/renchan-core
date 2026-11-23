@@ -50,6 +50,7 @@ import { default as EventHubActual } from '../../lib/server/graphql/subscription
 import { default as ChannelGeneratorActual } from '../../lib/server/graphql/subscription/ChannelGenerator.js'
 import { default as SubscriptionBrokerActual } from '../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import { default as TopicParcelActual } from '../../lib/server/graphql/subscription/TopicParcel.js'
+import { default as TopicQueueActual } from '../../lib/server/graphql/subscription/TopicQueue.js'
 import { default as TopicReceiverActual } from '../../lib/server/graphql/subscription/TopicReceiver.js'
 
 import { default as graphqlUploadExpressWithResolvingContentTypeActual } from '../../lib/server/graphql/middleware/graphqlUploadExpressWithResolvingContentType.js'
@@ -158,6 +159,7 @@ import {
   ChannelGenerator,
   SubscriptionBroker,
   TopicParcel,
+  TopicQueue,
   TopicReceiver,
 
   graphqlUploadExpressWithResolvingContentType,
@@ -259,6 +261,7 @@ describe('main exports', () => {
     { ExportedClass: ChannelGenerator, ActualClass: ChannelGeneratorActual },
     { ExportedClass: SubscriptionBroker, ActualClass: SubscriptionBrokerActual },
     { ExportedClass: TopicParcel, ActualClass: TopicParcelActual },
+    { ExportedClass: TopicQueue, ActualClass: TopicQueueActual },
     { ExportedClass: TopicReceiver, ActualClass: TopicReceiverActual },
 
     { ExportedClass: RestfulApiServerBuilder, ActualClass: RestfulApiServerBuilderActual },
