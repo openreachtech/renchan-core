@@ -2,6 +2,7 @@ import BaseSubscriptionResolver from '../../../../../lib/server/graphql/resolver
 import BaseResolver from '../../../../../lib/server/graphql/resolvers/BaseResolver.js'
 import SubscriptionBroker from '../../../../../lib/server/graphql/subscription/SubscriptionBroker.js'
 import RenchanGraphqlError from '../../../../../lib/server/graphql/errors/RenchanGraphqlError.js'
+import TopicParcel from '../../../../../lib/server/graphql/subscription/TopicParcel.js'
 
 import CustomerGraphqlContext from '../../../../../app/server/graphql/contexts/CustomerGraphqlContext.js'
 import AdminGraphqlContext from '../../../../../app/server/graphql/contexts/AdminGraphqlContext.js'
@@ -763,7 +764,7 @@ describe('BaseSubscriptionResolver', () => {
 
         const resolver = BaseSubscriptionResolver.create()
 
-        const actual = resolver.generateAsyncIterable({
+        const actual = await resolver.generateAsyncIterable({
           context: mockContext,
           channel: tally.channel,
         })
@@ -773,6 +774,52 @@ describe('BaseSubscriptionResolver', () => {
 
         expect(generateAsyncIterableSpy)
           .toHaveBeenCalledWith(generateAsyncIterableArgsExpected)
+      })
+    })
+  })
+})
+
+describe('BaseSubscriptionResolver', () => {
+  describe('#resolve()', () => {
+    class AlphaSubscriptionResolver extends BaseSubscriptionResolver {
+      /**
+       * get: Name of the schema.
+       *
+       * @returns {string} - Name of the schema.
+       */
+      static get schema () {
+        return 'alpha'
+      }
+    }
+
+    describe('to return the value of the schema out of the message of the topic parcel', () => {
+      const cases = [
+        {
+          input: {
+            message: JSON.stringify({ alpha: { id: 1 } }),
+          },
+          expected: { id: 1 },
+        },
+        {
+          input: {
+            message: JSON.stringify({ alpha: 'alpha-value' }),
+          },
+          expected: 'alpha-value',
+        },
+      ]
+
+      test.each(cases)('message: $input.message', ({ input, expected }) => {
+        const resolver = AlphaSubscriptionResolver.create()
+
+        const payload = TopicParcel.create({
+          channel: 'alpha-channel',
+          message: input.message,
+        })
+
+        const received = resolver.resolve(payload)
+
+        expect(received)
+          .toStrictEqual(expected)
       })
     })
   })

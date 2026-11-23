@@ -62,6 +62,8 @@ export { default as EventHub } from './lib/server/graphql/subscription/pubsub/to
 
 export { default as ChannelGenerator } from './lib/server/graphql/subscription/ChannelGenerator.js'
 export { default as SubscriptionBroker } from './lib/server/graphql/subscription/SubscriptionBroker.js'
+export { default as TopicParcel } from './lib/server/graphql/subscription/TopicParcel.js'
+export { default as TopicQueue } from './lib/server/graphql/subscription/TopicQueue.js'
 export { default as TopicReceiver } from './lib/server/graphql/subscription/TopicReceiver.js'
 
 /**
