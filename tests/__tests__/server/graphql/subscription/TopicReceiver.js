@@ -19,6 +19,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -27,6 +28,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -35,6 +37,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
       ]
@@ -72,6 +75,15 @@ describe('TopicReceiver', () => {
 
           expect(receiver)
             .toHaveProperty('onMessage', params.onMessage)
+        })
+      })
+
+      describe('#abortController', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('abortController', params.abortController)
         })
       })
     })
@@ -194,6 +206,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -202,6 +215,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -210,6 +224,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
       ]
@@ -252,6 +267,7 @@ describe('TopicReceiver', () => {
           broker: params.broker,
           topicQueue: expect.any(TopicQueue),
           onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
         }
 
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
@@ -291,6 +307,47 @@ describe('TopicReceiver', () => {
           broker: params.broker,
           topicQueue: expect.any(TopicQueue),
           onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
+        }
+
+        const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
+
+        SpyClass.create(params)
+
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(expected)
+      })
+    })
+
+    describe('to fill default #abortController', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const expected = {
+          channel: params.channel,
+          broker: params.broker,
+          topicQueue: expect.any(TopicQueue),
+          onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
         }
 
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
@@ -312,6 +369,19 @@ describe('TopicReceiver', () => {
 
         expect(received)
           .toBe(TopicQueue) // same reference
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.get:AbortControllerCtor', () => {
+    describe('when called as is', () => {
+      test('should be AbortController', () => {
+        const received = TopicReceiver.AbortControllerCtor
+
+        expect(received)
+          .toBe(AbortController) // same reference
       })
     })
   })
@@ -345,6 +415,39 @@ describe('TopicReceiver', () => {
 
         expect(received)
           .toBeInstanceOf(override.TopicQueueCtor)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
+  describe('.createAbortController()', () => {
+    describe('should create an instance through #AbortControllerCtor', () => {
+      class AlphaAbortController extends AbortController {}
+
+      class BetaAbortController extends AbortController {}
+
+      const cases = [
+        {
+          override: {
+            AbortControllerCtor: AlphaAbortController,
+          },
+        },
+        {
+          override: {
+            AbortControllerCtor: BetaAbortController,
+          },
+        },
+      ]
+
+      test.each(cases)('AbortControllerCtor: $override.AbortControllerCtor.name', ({ override }) => {
+        jest.spyOn(TopicReceiver, 'AbortControllerCtor', 'get')
+          .mockReturnValue(override.AbortControllerCtor)
+
+        const received = TopicReceiver.createAbortController()
+
+        expect(received)
+          .toBeInstanceOf(override.AbortControllerCtor)
       })
     })
   })
