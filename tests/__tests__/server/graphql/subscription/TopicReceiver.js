@@ -1458,6 +1458,127 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('#canAnswerNext()', () => {
+    const brokerMock = new SubscriptionBroker({
+      pubSub: LocalPubSub.create(),
+    })
+
+    describe('should return true when a topic is held', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [
+              TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
+            ],
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
+            ],
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create({
+            topics: input.topics,
+          }),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        const received = receiver.canAnswerNext()
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+
+    describe('should return true when the iteration has ended', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [],
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+            ],
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create({
+            topics: input.topics,
+          }),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        input.abortController.abort()
+
+        const received = receiver.canAnswerNext()
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+
+    describe('should return false when no topic is held and the iteration has not ended', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        const received = receiver.canAnswerNext()
+
+        expect(received)
+          .toBe(false)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('#waitTopic()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
