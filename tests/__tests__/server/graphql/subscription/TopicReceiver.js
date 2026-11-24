@@ -1328,6 +1328,80 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('#hasEnded()', () => {
+    const brokerMock = new SubscriptionBroker({
+      pubSub: LocalPubSub.create(),
+    })
+
+    describe('should return false when the abortController has not been aborted', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        const received = receiver.hasEnded()
+
+        expect(received)
+          .toBe(false)
+      })
+    })
+
+    describe('should return true when the abortController has been aborted', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        input.abortController.abort()
+
+        const received = receiver.hasEnded()
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('#waitTopic()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
