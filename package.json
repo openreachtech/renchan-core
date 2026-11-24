@@ -55,7 +55,7 @@
     "graphql-ws": "^5.16.2",
     "ioredis": "^5.11.1",
     "multer": "^2.5.0",
-    "ws": "^8.22.0"
+    "ws": "^8.23.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.14",
