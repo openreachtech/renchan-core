@@ -1613,6 +1613,7 @@ describe('TopicReceiver', () => {
             topicQueue: TopicQueue.create({
               topics: input.topics,
             }),
+            abortController: new AbortController(),
           })
 
           const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
@@ -1654,6 +1655,7 @@ describe('TopicReceiver', () => {
             channel: input.channel,
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
+            abortController: new AbortController(),
           })
 
           const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
@@ -1703,6 +1705,7 @@ describe('TopicReceiver', () => {
           channel: 'alpha-channel',
           broker: brokerMock,
           topicQueue,
+          abortController: new AbortController(),
         })
 
         jest.spyOn(receiver, 'subscribe')
@@ -1743,6 +1746,7 @@ describe('TopicReceiver', () => {
           channel: 'alpha-channel',
           broker: brokerMock,
           topicQueue,
+          abortController: new AbortController(),
         })
 
         jest.spyOn(receiver, 'subscribe')
@@ -1757,6 +1761,89 @@ describe('TopicReceiver', () => {
           .resolves
           .not
           .toThrow()
+      })
+    })
+
+    describe('when the iteration has ended', () => {
+      describe('should return without waiting', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+              abortController: new AbortController(),
+            },
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+              abortController: new AbortController(),
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input }) => {
+          const receiver = new TopicReceiver({
+            channel: input.channel,
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+            onMessage: () => {},
+            abortController: input.abortController,
+          })
+
+          const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
+
+          input.abortController.abort()
+
+          const received = await receiver.waitTopic()
+
+          expect(received)
+            .toBeUndefined()
+          expect(setOnMessageSpy)
+            .not
+            .toHaveBeenCalled()
+        })
+      })
+    })
+
+    describe('when the iteration ends while waiting', () => {
+      describe('should stop waiting', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+              abortController: new AbortController(),
+            },
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+              abortController: new AbortController(),
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input }) => {
+          const receiver = new TopicReceiver({
+            channel: input.channel,
+            broker: brokerMock,
+            topicQueue: TopicQueue.create(),
+            onMessage: () => {},
+            abortController: input.abortController,
+          })
+
+          const waiting = receiver.waitTopic()
+
+          /*
+           * What return() and throw() do: end the iteration, then call #onMessage().
+           */
+          input.abortController.abort()
+          receiver.onMessage()
+
+          const received = await waiting
+
+          expect(received)
+            .toBeUndefined()
+        })
       })
     })
   })
