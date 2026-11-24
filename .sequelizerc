@@ -1,6 +1,11 @@
-module.exports = {
+// NOTE: `sequelize-cli` reads this file through `require()`.
+//   A default export would arrive nested under `default`,
+//   so the config is exported under the name `module.exports`.
+const config = {
   'config': 'app/sequelize/config.cjs',
   'migrations-path': 'app/sequelize/migrations',
   'models-path': 'app/sequelize/models',
   'seeders-path': 'app/sequelize/seeders',
 }
+
+export { config as 'module.exports' }

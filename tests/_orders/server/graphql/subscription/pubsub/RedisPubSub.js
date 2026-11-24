@@ -382,6 +382,79 @@ describe('RedisPubSub', () => {
           .toHaveBeenCalledWith(params.channel)
       })
     })
+
+    describe('when the subscribe command fails', () => {
+      describe('should reject with the original error', () => {
+        const cases = [
+          {
+            params: {
+              channel: 'alpha-channel',
+              eventHub: EventHub.create({
+                channel: 'alpha-channel',
+              }),
+            },
+            tally: new Error('alpha subscribe failed'),
+          },
+          {
+            params: {
+              channel: 'beta-channel',
+              eventHub: EventHub.create({
+                channel: 'beta-channel',
+              }),
+            },
+            tally: new Error('beta subscribe failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $params.channel', async ({ params, tally }) => {
+          jest.spyOn(redisPubSub.subscribingRedisClient, 'subscribe')
+            .mockRejectedValue(tally)
+
+          await expect(redisPubSub.setupBroadcasterOnSubscribe(params))
+            .rejects
+            .toBe(tally) // same reference
+        })
+      })
+
+      describe('should remove the message listener from the Redis client', () => {
+        const cases = [
+          {
+            params: {
+              channel: 'alpha-channel',
+              eventHub: EventHub.create({
+                channel: 'alpha-channel',
+              }),
+            },
+            tally: new Error('alpha subscribe failed'),
+          },
+          {
+            params: {
+              channel: 'beta-channel',
+              eventHub: EventHub.create({
+                channel: 'beta-channel',
+              }),
+            },
+            tally: new Error('beta subscribe failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $params.channel', async ({ params, tally }) => {
+          jest.spyOn(redisPubSub.subscribingRedisClient, 'subscribe')
+            .mockRejectedValue(tally)
+
+          await expect(redisPubSub.setupBroadcasterOnSubscribe(params))
+            .rejects
+            .toBe(tally) // same reference
+
+          const received = redisPubSub.subscribingRedisClient
+            .listeners('message')
+
+          expect(received)
+            .not
+            .toContain(params.eventHub.listener)
+        })
+      })
+    })
   })
 })
 

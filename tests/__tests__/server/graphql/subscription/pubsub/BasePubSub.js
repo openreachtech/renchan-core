@@ -187,6 +187,7 @@ describe('BasePubSub', () => {
         test.each(cases)('channel: $params.channel', async ({ params }) => {
           const createEventHubArgsExpected = {
             channel: params.channel,
+            broadcasterReadyPromise: expect.any(Promise),
           }
           const addListenerArgsExpected = {
             listener: params.receiver.listener,
@@ -214,6 +215,356 @@ describe('BasePubSub', () => {
             .toHaveBeenCalledWith(addListenerArgsExpected)
           expect(setupBroadcasterOnSubscribeSpay)
             .toHaveBeenCalledWith(setupBroadcasterOnSubscribeArgsExpected)
+        })
+      })
+    })
+
+    describe('when #setupBroadcasterOnSubscribe() fails', () => {
+      const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
+        config: {
+          redisOptions: null,
+        },
+      }))
+
+      describe('should reject with the original error', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+        })
+      })
+
+      describe('should revoke the subscription of the receiver', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+          const revokeSubscriptionSpy = jest.spyOn(pubSub, 'revokeSubscription')
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+
+          expect(revokeSubscriptionSpy)
+            .toHaveBeenCalledWith({
+              channel: input.channel,
+              receiver,
+            })
+        })
+      })
+
+      describe('should leave no event hub in #eventMap', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+
+          const received = pubSub.eventMap
+            .has(input.channel)
+
+          expect(received)
+            .toBe(false)
+        })
+      })
+    })
+
+    describe('when two receivers subscribe to a new channel at the same time', () => {
+      const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
+        config: {
+          redisOptions: null,
+        },
+      }))
+
+      describe('should reject both receivers with the original error when setting up fails', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const firstReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+          const secondReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          const expected = [
+            {
+              status: 'rejected',
+              reason: tally,
+            },
+            {
+              status: 'rejected',
+              reason: tally,
+            },
+          ]
+
+          const received = await Promise.allSettled([
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: firstReceiver,
+            }),
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: secondReceiver,
+            }),
+          ])
+
+          expect(received)
+            .toStrictEqual(expected)
+        })
+      })
+
+      describe('should leave no event hub in #eventMap when setting up fails', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const firstReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+          const secondReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          await Promise.allSettled([
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: firstReceiver,
+            }),
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: secondReceiver,
+            }),
+          ])
+
+          const received = pubSub.eventMap
+            .has(input.channel)
+
+          expect(received)
+            .toBe(false)
+        })
+      })
+
+      describe('should resolve both receivers when setting up succeeds', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input }) => {
+          const pubSub = new BasePubSub()
+
+          const firstReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+          const secondReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockResolvedValue()
+
+          const expected = [
+            {
+              status: 'fulfilled',
+              value: undefined,
+            },
+            {
+              status: 'fulfilled',
+              value: undefined,
+            },
+          ]
+
+          const received = await Promise.allSettled([
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: firstReceiver,
+            }),
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: secondReceiver,
+            }),
+          ])
+
+          expect(received)
+            .toStrictEqual(expected)
+        })
+      })
+
+      describe('should set up the channel only once', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input }) => {
+          const pubSub = new BasePubSub()
+
+          const firstReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+          const secondReceiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          const setupBroadcasterOnSubscribeSpy = jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockResolvedValue()
+
+          await Promise.all([
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: firstReceiver,
+            }),
+            pubSub.subscribe({
+              channel: input.channel,
+              receiver: secondReceiver,
+            }),
+          ])
+
+          expect(setupBroadcasterOnSubscribeSpy)
+            .toHaveBeenCalledWith({
+              eventHub: expect.any(EventHub),
+            })
+          expect(setupBroadcasterOnSubscribeSpy)
+            .toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -246,6 +597,187 @@ describe('BasePubSub', () => {
         await expect(pubSub.setupBroadcasterOnSubscribe(params))
           .rejects
           .toThrow('101.X000.001 {"memberName":"BasePubSub#setupBroadcasterOnSubscribe()"}')
+      })
+    })
+  })
+})
+
+describe('BasePubSub', () => {
+  describe('#revokeSubscription()', () => {
+    const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
+      config: {
+        redisOptions: null,
+      },
+    }))
+
+    describe('should remove the listener of the receiver from the event hub', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        const removeListenerSpy = jest.spyOn(eventHub, 'removeListener')
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        expect(removeListenerSpy)
+          .toHaveBeenCalledWith({
+            listener: receiver.listener,
+          })
+      })
+    })
+
+    describe('should delete the event hub from #eventMap when no listener remains', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        const received = pubSub.eventMap
+          .has(input.channel)
+
+        expect(received)
+          .toBe(false)
+      })
+    })
+
+    describe('should keep the event hub in #eventMap when another listener remains', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const extraReceiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+          .addListener({
+            listener: extraReceiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        const received = pubSub.eventMap
+          .has(input.channel)
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+
+    describe('should do nothing when the channel is not set in #eventMap', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+
+        expect(() => pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        }))
+          .not
+          .toThrow()
       })
     })
   })
@@ -498,11 +1030,13 @@ describe('BasePubSub', () => {
         {
           params: {
             channel: 'alpha-channel',
+            broadcasterReadyPromise: Promise.resolve(),
           },
         },
         {
           params: {
             channel: 'beta-channel',
+            broadcasterReadyPromise: Promise.resolve(),
           },
         },
       ]
@@ -514,6 +1048,8 @@ describe('BasePubSub', () => {
           .toBeInstanceOf(EventHub)
         expect(actual)
           .toHaveProperty('channel', params.channel)
+        expect(actual)
+          .toHaveProperty('broadcasterReadyPromise', params.broadcasterReadyPromise)
       })
     })
   })
