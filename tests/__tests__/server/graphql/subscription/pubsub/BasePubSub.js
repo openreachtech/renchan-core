@@ -252,6 +252,187 @@ describe('BasePubSub', () => {
 })
 
 describe('BasePubSub', () => {
+  describe('#revokeSubscription()', () => {
+    const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
+      config: {
+        redisOptions: null,
+      },
+    }))
+
+    describe('should remove the listener of the receiver from the event hub', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        const removeListenerSpy = jest.spyOn(eventHub, 'removeListener')
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        expect(removeListenerSpy)
+          .toHaveBeenCalledWith({
+            listener: receiver.listener,
+          })
+      })
+    })
+
+    describe('should delete the event hub from #eventMap when no listener remains', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        const received = pubSub.eventMap
+          .has(input.channel)
+
+        expect(received)
+          .toBe(false)
+      })
+    })
+
+    describe('should keep the event hub in #eventMap when another listener remains', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const extraReceiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+        const eventHub = EventHub.create({
+          channel: input.channel,
+        })
+          .addListener({
+            listener: receiver.listener,
+          })
+          .addListener({
+            listener: extraReceiver.listener,
+          })
+
+        pubSub.eventMap
+          .set(input.channel, eventHub)
+
+        pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        })
+
+        const received = pubSub.eventMap
+          .has(input.channel)
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+
+    describe('should do nothing when the channel is not set in #eventMap', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', ({ input }) => {
+        const pubSub = new BasePubSub()
+
+        const receiver = TopicReceiver.create({
+          channel: input.channel,
+          broker: brokerMock,
+        })
+
+        expect(() => pubSub.revokeSubscription({
+          channel: input.channel,
+          receiver,
+        }))
+          .not
+          .toThrow()
+      })
+    })
+  })
+})
+
+describe('BasePubSub', () => {
   describe('#unsubscribe()', () => {
     describe('to call members', () => {
       const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
