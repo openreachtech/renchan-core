@@ -74,6 +74,44 @@ describe('EventHub', () => {
             .toHaveProperty('emitter', emitter)
         })
       })
+
+      describe('#broadcasterReadyPromise', () => {
+        const cases = [
+          {
+            params: {
+              channel: 'alpha-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+          {
+            params: {
+              channel: 'beta-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+          {
+            params: {
+              channel: 'gamma-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const emitter = new EventEmitter()
+
+          const args = {
+            channel: params.channel,
+            emitter,
+            broadcasterReadyPromise: params.broadcasterReadyPromise,
+          }
+
+          const actual = new EventHub(args)
+
+          expect(actual)
+            .toHaveProperty('broadcasterReadyPromise', params.broadcasterReadyPromise)
+        })
+      })
     })
   })
 })
@@ -124,18 +162,21 @@ describe('EventHub', () => {
             params: {
               channel: 'alpha-channel',
               EventEmitter: class AlphaEmitter extends EventEmitter {},
+              broadcasterReadyPromise: Promise.resolve(),
             },
           },
           {
             params: {
               channel: 'beta-channel',
               EventEmitter: class BetaEmitter extends EventEmitter {},
+              broadcasterReadyPromise: Promise.resolve(),
             },
           },
           {
             params: {
               channel: 'gamma-channel',
               EventEmitter: class GammaEmitter extends EventEmitter {},
+              broadcasterReadyPromise: Promise.resolve(),
             },
           },
         ]
@@ -148,6 +189,7 @@ describe('EventHub', () => {
           const args = {
             channel: params.channel,
             emitter,
+            broadcasterReadyPromise: params.broadcasterReadyPromise,
           }
 
           SpyClass.create(args)
@@ -180,6 +222,7 @@ describe('EventHub', () => {
           const expected = {
             channel: params.channel,
             emitter: expect.any(EventEmitter),
+            broadcasterReadyPromise: expect.any(Promise),
           }
 
           const SpyClass = globalThis.constructorSpy.spyOn(EventHub)
@@ -189,6 +232,29 @@ describe('EventHub', () => {
           expect(SpyClass.__spy__)
             .toHaveBeenCalledWith(expected)
         })
+      })
+    })
+
+    describe('to fill default broadcasterReadyPromise', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', async ({ params }) => {
+        const actual = EventHub.create(params)
+
+        await expect(actual.broadcasterReadyPromise)
+          .resolves
+          .toBeUndefined()
       })
     })
   })
