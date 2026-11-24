@@ -1863,28 +1863,31 @@ describe('TopicReceiver', () => {
       pubSub: LocalPubSub.create(),
     })
 
-    const cases = [
-      {
-        params: {
-          channel: 'alpha-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'beta-channel',
-          broker: brokerMock,
-        },
-      },
-      {
-        params: {
-          channel: 'gamma-channel',
-          broker: brokerMock,
-        },
-      },
-    ]
-
     describe('to be instance of Function', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', ({ params }) => {
         const receiver = new TopicReceiver(params)
 
@@ -1896,6 +1899,30 @@ describe('TopicReceiver', () => {
     })
 
     describe('for generated function', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
       test.each(cases)('channel: $params.channel', async ({ params }) => {
         const receiver = new TopicReceiver(params)
 
@@ -1912,6 +1939,92 @@ describe('TopicReceiver', () => {
 
         expect(unsubscribeSpy)
           .toHaveBeenCalledWith()
+      })
+    })
+
+    describe('to end the iteration', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('alpha thrown'),
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('beta thrown'),
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        jest.spyOn(receiver, 'unsubscribe')
+          .mockResolvedValue()
+
+        const generatedThrowFunction = receiver.generateAsyncIteratorThrow()
+
+        await expect(generatedThrowFunction(tally))
+          .rejects
+          .toBe(tally) // same reference
+
+        const received = receiver.hasEnded()
+
+        expect(received)
+          .toBe(true)
+      })
+    })
+
+    describe('to end the iteration even when #unsubscribe() fails', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('alpha unsubscribe failed'),
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('beta unsubscribe failed'),
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        jest.spyOn(receiver, 'unsubscribe')
+          .mockRejectedValue(tally)
+
+        const generatedThrowFunction = receiver.generateAsyncIteratorThrow()
+
+        await expect(generatedThrowFunction(new Error('thrown')))
+          .rejects
+          .toBe(tally) // same reference
+
+        const received = receiver.hasEnded()
+
+        expect(received)
+          .toBe(true)
       })
     })
   })
