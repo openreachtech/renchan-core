@@ -1380,6 +1380,110 @@ describe('TopicReceiver', () => {
           .toStrictEqual(expected)
       })
     })
+
+    describe('for generated function when return() is called while waiting', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        jest.spyOn(receiver, 'unsubscribe')
+          .mockResolvedValue()
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+        const generatedReturnFunction = receiver.generateAsyncIteratorReturn()
+
+        const waiting = generatedNextFunction()
+
+        await generatedReturnFunction()
+
+        const received = await waiting
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
+
+    describe('for generated function when throw() is called while waiting', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('alpha thrown'),
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+          tally: new Error('beta thrown'),
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, tally, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        jest.spyOn(receiver, 'unsubscribe')
+          .mockResolvedValue()
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+        const generatedThrowFunction = receiver.generateAsyncIteratorThrow()
+
+        const waiting = generatedNextFunction()
+
+        await expect(generatedThrowFunction(tally))
+          .rejects
+          .toBe(tally) // same reference
+
+        const received = await waiting
+
+        expect(received)
+          .toStrictEqual(expected)
+      })
+    })
   })
 })
 
