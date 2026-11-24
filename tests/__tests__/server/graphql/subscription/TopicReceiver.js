@@ -206,6 +206,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -214,6 +215,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -222,6 +224,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
       ]
@@ -264,6 +267,7 @@ describe('TopicReceiver', () => {
           broker: params.broker,
           topicQueue: expect.any(TopicQueue),
           onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
         }
 
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
@@ -303,6 +307,47 @@ describe('TopicReceiver', () => {
           broker: params.broker,
           topicQueue: expect.any(TopicQueue),
           onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
+        }
+
+        const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
+
+        SpyClass.create(params)
+
+        expect(SpyClass.__spy__)
+          .toHaveBeenCalledWith(expected)
+      })
+    })
+
+    describe('to fill default #abortController', () => {
+      const cases = [
+        {
+          params: {
+            channel: 'alpha-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'beta-channel',
+            broker: brokerMock,
+          },
+        },
+        {
+          params: {
+            channel: 'gamma-channel',
+            broker: brokerMock,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $params.channel', ({ params }) => {
+        const expected = {
+          channel: params.channel,
+          broker: params.broker,
+          topicQueue: expect.any(TopicQueue),
+          onMessage: expect.any(Function),
+          abortController: expect.any(AbortController),
         }
 
         const SpyClass = globalThis.constructorSpy.spyOn(TopicReceiver)
