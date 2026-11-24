@@ -217,6 +217,135 @@ describe('BasePubSub', () => {
         })
       })
     })
+
+    describe('when #setupBroadcasterOnSubscribe() fails', () => {
+      const brokerMock = SubscriptionBroker.create(/** @type {*} */ ({
+        config: {
+          redisOptions: null,
+        },
+      }))
+
+      describe('should reject with the original error', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+        })
+      })
+
+      describe('should revoke the subscription of the receiver', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+          const revokeSubscriptionSpy = jest.spyOn(pubSub, 'revokeSubscription')
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+
+          expect(revokeSubscriptionSpy)
+            .toHaveBeenCalledWith({
+              channel: input.channel,
+              receiver,
+            })
+        })
+      })
+
+      describe('should leave no event hub in #eventMap', () => {
+        const cases = [
+          {
+            input: {
+              channel: 'alpha-channel',
+            },
+            tally: new Error('alpha setup failed'),
+          },
+          {
+            input: {
+              channel: 'beta-channel',
+            },
+            tally: new Error('beta setup failed'),
+          },
+        ]
+
+        test.each(cases)('channel: $input.channel', async ({ input, tally }) => {
+          const pubSub = new BasePubSub()
+
+          const receiver = TopicReceiver.create({
+            channel: input.channel,
+            broker: brokerMock,
+          })
+
+          jest.spyOn(pubSub, 'setupBroadcasterOnSubscribe')
+            .mockRejectedValue(tally)
+
+          await expect(pubSub.subscribe({
+            channel: input.channel,
+            receiver,
+          }))
+            .rejects
+            .toBe(tally) // same reference
+
+          const received = pubSub.eventMap
+            .has(input.channel)
+
+          expect(received)
+            .toBe(false)
+        })
+      })
+    })
   })
 })
 
