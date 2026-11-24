@@ -1130,6 +1130,7 @@ describe('TopicReceiver', () => {
           channel: input.channel,
           broker: brokerMock,
           topicQueue: TopicQueue.create(),
+          abortController: new AbortController(),
         })
 
         const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
@@ -1217,6 +1218,7 @@ describe('TopicReceiver', () => {
               TopicParcel.create({ channel: input.channel, message: input.gammaMessage }),
             ],
           }),
+          abortController: new AbortController(),
         })
 
         const setOnMessageSpy = jest.spyOn(receiver, 'setOnMessage')
@@ -1296,6 +1298,7 @@ describe('TopicReceiver', () => {
           channel: input.channel,
           broker: brokerMock,
           topicQueue: TopicQueue.create(),
+          abortController: new AbortController(),
         })
 
         jest.spyOn(receiver, 'subscribe')
@@ -1322,6 +1325,59 @@ describe('TopicReceiver', () => {
           .toStrictEqual(expected.beta)
         expect(gammaResult)
           .toStrictEqual(expected.gamma)
+      })
+    })
+
+    describe('for generated function when the iteration has ended', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            topics: [
+              TopicParcel.create({ channel: 'alpha-channel', message: '{"phase":"STARTED"}' }),
+            ],
+            abortController: new AbortController(),
+          },
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            topics: [
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":1}' }),
+              TopicParcel.create({ channel: 'beta-channel', message: '{"id":2}' }),
+            ],
+            abortController: new AbortController(),
+          },
+          expected: {
+            value: null,
+            done: true,
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input, expected }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create({
+            topics: input.topics,
+          }),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        input.abortController.abort()
+
+        const generatedNextFunction = receiver.generateAsyncIteratorNext()
+
+        const received = await generatedNextFunction()
+
+        expect(received)
+          .toStrictEqual(expected)
       })
     })
   })
