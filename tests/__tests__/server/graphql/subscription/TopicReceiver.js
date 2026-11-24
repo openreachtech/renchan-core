@@ -1962,6 +1962,7 @@ describe('TopicReceiver', () => {
             channel: 'alpha-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
         {
@@ -1969,6 +1970,7 @@ describe('TopicReceiver', () => {
             channel: 'beta-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
         {
@@ -1976,6 +1978,7 @@ describe('TopicReceiver', () => {
             channel: 'gamma-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
       ]
@@ -1997,6 +2000,7 @@ describe('TopicReceiver', () => {
             channel: 'alpha-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
         {
@@ -2004,6 +2008,7 @@ describe('TopicReceiver', () => {
             channel: 'beta-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
         {
@@ -2011,6 +2016,7 @@ describe('TopicReceiver', () => {
             channel: 'gamma-channel',
             broker: brokerMock,
             abortController: new AbortController(),
+            onMessage: () => {},
           },
         },
       ]
@@ -2116,6 +2122,44 @@ describe('TopicReceiver', () => {
 
         expect(received)
           .toBe(true)
+      })
+    })
+
+    describe('to call #onMessage() to wake a waiting next() up', () => {
+      const cases = [
+        {
+          input: {
+            channel: 'alpha-channel',
+            abortController: new AbortController(),
+          },
+        },
+        {
+          input: {
+            channel: 'beta-channel',
+            abortController: new AbortController(),
+          },
+        },
+      ]
+
+      test.each(cases)('channel: $input.channel', async ({ input }) => {
+        const receiver = new TopicReceiver({
+          channel: input.channel,
+          broker: brokerMock,
+          topicQueue: TopicQueue.create(),
+          onMessage: () => {},
+          abortController: input.abortController,
+        })
+
+        jest.spyOn(receiver, 'unsubscribe')
+          .mockResolvedValue()
+        const onMessageSpy = jest.spyOn(receiver, 'onMessage')
+
+        const generatedReturnFunction = receiver.generateAsyncIteratorReturn()
+
+        await generatedReturnFunction()
+
+        expect(onMessageSpy)
+          .toHaveBeenCalledWith()
       })
     })
   })
