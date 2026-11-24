@@ -47,7 +47,7 @@
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
     "express": "^4.22.3",
-    "graphql": "^16.14.2",
+    "graphql": "^16.15.0",
     "graphql-http": "^1.23.1",
     "graphql-middleware": "^6.1.35",
     "graphql-playground-middleware-express": "^1.7.23",
