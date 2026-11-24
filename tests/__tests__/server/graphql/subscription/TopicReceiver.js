@@ -364,6 +364,39 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('.createAbortController()', () => {
+    describe('should create an instance through #AbortControllerCtor', () => {
+      class AlphaAbortController extends AbortController {}
+
+      class BetaAbortController extends AbortController {}
+
+      const cases = [
+        {
+          override: {
+            AbortControllerCtor: AlphaAbortController,
+          },
+        },
+        {
+          override: {
+            AbortControllerCtor: BetaAbortController,
+          },
+        },
+      ]
+
+      test.each(cases)('AbortControllerCtor: $override.AbortControllerCtor.name', ({ override }) => {
+        jest.spyOn(TopicReceiver, 'AbortControllerCtor', 'get')
+          .mockReturnValue(override.AbortControllerCtor)
+
+        const received = TopicReceiver.createAbortController()
+
+        expect(received)
+          .toBeInstanceOf(override.AbortControllerCtor)
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('#generateListener()', () => {
     const brokerMock = new SubscriptionBroker({
       pubSub: LocalPubSub.create(),
