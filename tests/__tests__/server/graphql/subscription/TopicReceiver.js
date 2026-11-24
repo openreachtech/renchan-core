@@ -318,6 +318,19 @@ describe('TopicReceiver', () => {
 })
 
 describe('TopicReceiver', () => {
+  describe('.get:AbortControllerCtor', () => {
+    describe('when called as is', () => {
+      test('should be AbortController', () => {
+        const received = TopicReceiver.AbortControllerCtor
+
+        expect(received)
+          .toBe(AbortController) // same reference
+      })
+    })
+  })
+})
+
+describe('TopicReceiver', () => {
   describe('.createTopicQueue()', () => {
     describe('should create an instance through #TopicQueueCtor', () => {
       class AlphaTopicQueue extends TopicQueue {}
