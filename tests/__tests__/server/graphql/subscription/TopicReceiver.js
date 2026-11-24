@@ -19,6 +19,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -27,6 +28,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
         {
@@ -35,6 +37,7 @@ describe('TopicReceiver', () => {
             broker: brokerMock,
             topicQueue: TopicQueue.create(),
             onMessage: () => {},
+            abortController: new AbortController(),
           },
         },
       ]
@@ -72,6 +75,15 @@ describe('TopicReceiver', () => {
 
           expect(receiver)
             .toHaveProperty('onMessage', params.onMessage)
+        })
+      })
+
+      describe('#abortController', () => {
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const receiver = new TopicReceiver(params)
+
+          expect(receiver)
+            .toHaveProperty('abortController', params.abortController)
         })
       })
     })
