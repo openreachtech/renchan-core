@@ -74,6 +74,44 @@ describe('EventHub', () => {
             .toHaveProperty('emitter', emitter)
         })
       })
+
+      describe('#broadcasterReadyPromise', () => {
+        const cases = [
+          {
+            params: {
+              channel: 'alpha-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+          {
+            params: {
+              channel: 'beta-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+          {
+            params: {
+              channel: 'gamma-channel',
+              broadcasterReadyPromise: Promise.resolve(),
+            },
+          },
+        ]
+
+        test.each(cases)('channel: $params.channel', ({ params }) => {
+          const emitter = new EventEmitter()
+
+          const args = {
+            channel: params.channel,
+            emitter,
+            broadcasterReadyPromise: params.broadcasterReadyPromise,
+          }
+
+          const actual = new EventHub(args)
+
+          expect(actual)
+            .toHaveProperty('broadcasterReadyPromise', params.broadcasterReadyPromise)
+        })
+      })
     })
   })
 })
