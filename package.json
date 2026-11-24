@@ -47,7 +47,7 @@
     "bignumber.js": "^9.3.1",
     "cors": "^2.8.6",
     "express": "^4.22.3",
-    "graphql": "^16.14.2",
+    "graphql": "^16.15.0",
     "graphql-http": "^1.23.1",
     "graphql-middleware": "^6.1.35",
     "graphql-playground-middleware-express": "^1.7.23",
@@ -55,10 +55,10 @@
     "graphql-ws": "^5.16.2",
     "ioredis": "^5.11.1",
     "multer": "^2.5.0",
-    "ws": "^8.22.0"
+    "ws": "^8.23.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-env": "^7.29.14",
     "@openreachtech/eslint-config": "^4.5.0",
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-deep-containing": "^1.0.2",
@@ -72,7 +72,7 @@
     "bcrypt": "^6.0.0",
     "eslint": "^9.39.5",
     "jest": "^30.5.2",
-    "mariadb": "^3.5.4",
+    "mariadb": "^3.5.5",
     "sequelize": "^6.37.8",
     "sequelize-cli": "^6.6.5",
     "sequelize-mig": "^3.1.3",
