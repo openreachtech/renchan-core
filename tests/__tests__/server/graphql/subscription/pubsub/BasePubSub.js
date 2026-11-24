@@ -808,11 +808,13 @@ describe('BasePubSub', () => {
         {
           params: {
             channel: 'alpha-channel',
+            broadcasterReadyPromise: Promise.resolve(),
           },
         },
         {
           params: {
             channel: 'beta-channel',
+            broadcasterReadyPromise: Promise.resolve(),
           },
         },
       ]
@@ -824,6 +826,8 @@ describe('BasePubSub', () => {
           .toBeInstanceOf(EventHub)
         expect(actual)
           .toHaveProperty('channel', params.channel)
+        expect(actual)
+          .toHaveProperty('broadcasterReadyPromise', params.broadcasterReadyPromise)
       })
     })
   })
