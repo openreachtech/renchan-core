@@ -831,7 +831,6 @@ describe('RestfulApiServerBuilder', () => {
         const portTally = 2999
         const listenExpected = [
           portTally,
-          expect.any(Function),
         ]
 
         const args = {
@@ -855,12 +854,14 @@ describe('RestfulApiServerBuilder', () => {
           server: serverTally,
         })
 
-        actual.listen(portTally)
+        const received = actual.listen(portTally)
 
         expect(actual)
           .toEqual(expected)
         expect(listenSpy)
           .toHaveBeenCalledWith(...listenExpected)
+        expect(received)
+          .toBe(serverTally)
       })
     })
 
@@ -875,7 +876,6 @@ describe('RestfulApiServerBuilder', () => {
           },
           expected: [
             2999,
-            expect.any(Function),
           ],
         },
         {
@@ -889,7 +889,6 @@ describe('RestfulApiServerBuilder', () => {
           expected: [
             2999,
             '127.0.0.1',
-            expect.any(Function),
           ],
         },
         {
@@ -905,7 +904,6 @@ describe('RestfulApiServerBuilder', () => {
             3999,
             '::1',
             511,
-            expect.any(Function),
           ],
         },
       ]
@@ -963,28 +961,22 @@ describe('RestfulApiServerBuilder', () => {
 
         const serverTally = new http.Server()
 
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
         const listenSpy = jest.spyOn(serverTally, 'listen')
           .mockImplementation(
-            (...listenArgs) => {
-              listenArgs.at(-1)()
-
-              return serverTally
-            }
+            (...listenArgs) => actual.once('listening', listenArgs.at(-1))
           )
         const logSpy = jest.spyOn(console, 'log')
           .mockImplementation(() => {})
         const callbackMock = jest.fn()
 
-        const actual = builder.buildListenProxyServer({
-          server: serverTally,
-        })
-
         actual.listen(...params.leadingArgs, callbackMock)
+        actual.emit('listening')
 
         expect(listenSpy)
-          .toHaveBeenCalledWith(...params.leadingArgs, expect.any(Function))
-        expect(listenSpy)
-          .not
           .toHaveBeenCalledWith(...params.leadingArgs, callbackMock)
         expect(callbackMock)
           .toHaveBeenCalledTimes(1)
@@ -1012,24 +1004,21 @@ describe('RestfulApiServerBuilder', () => {
 
         const serverTally = new http.Server()
 
-        jest.spyOn(serverTally, 'listen')
-          .mockImplementation(
-            (...listenArgs) => {
-              listenArgs.at(-1)()
-
-              return serverTally
-            }
-          )
-        const logSpy = jest.spyOn(console, 'log')
-          .mockImplementation(() => {})
-
         const actual = builder.buildListenProxyServer({
           server: serverTally,
         })
 
+        jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            (...listenArgs) => actual.once('listening', listenArgs.at(-1))
+          )
+        const logSpy = jest.spyOn(console, 'log')
+          .mockImplementation(() => {})
+
         const callbackMock = jest.fn()
 
         actual.listen(2999, callbackMock)
+        actual.emit('listening')
 
         expect(callbackMock.mock.contexts)
           .toHaveLength(1)
