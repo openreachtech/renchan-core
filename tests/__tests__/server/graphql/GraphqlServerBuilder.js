@@ -2540,11 +2540,7 @@ describe('GraphqlServerBuilder', () => {
 
         const listenSpy = jest.spyOn(serverTally, 'listen')
           .mockImplementation(
-            (...listenArgs) => {
-              listenArgs.at(-1)()
-
-              return serverTally
-            }
+            (...listenArgs) => serverTally.once('listening', listenArgs.at(-1))
           )
         const logSpy = jest.spyOn(console, 'log')
           .mockImplementation(() => {})
@@ -2555,6 +2551,7 @@ describe('GraphqlServerBuilder', () => {
         })
 
         actual.listen(...params.leadingArgs, callbackMock)
+        actual.emit('listening')
 
         expect(listenSpy)
           .toHaveBeenCalledWith(...params.leadingArgs, expect.any(Function))
@@ -2589,11 +2586,7 @@ describe('GraphqlServerBuilder', () => {
 
         jest.spyOn(serverTally, 'listen')
           .mockImplementation(
-            (...listenArgs) => {
-              listenArgs.at(-1)()
-
-              return serverTally
-            }
+            (...listenArgs) => serverTally.once('listening', listenArgs.at(-1))
           )
         const logSpy = jest.spyOn(console, 'log')
           .mockImplementation(() => {})
@@ -2605,6 +2598,7 @@ describe('GraphqlServerBuilder', () => {
         const callbackMock = jest.fn()
 
         actual.listen(2999, callbackMock)
+        actual.emit('listening')
 
         expect(callbackMock.mock.contexts)
           .toHaveLength(1)
