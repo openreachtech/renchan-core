@@ -2508,5 +2508,111 @@ describe('GraphqlServerBuilder', () => {
           .toHaveBeenCalledWith(...expected)
       })
     })
+
+    describe('to run the caller\'s callback after the log line', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+            leadingArgs: [
+              2999,
+            ],
+          },
+        },
+        {
+          params: {
+            EngineCtor: AdminGraphqlServerEngine,
+            leadingArgs: [
+              2999,
+              '127.0.0.1',
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name, leadingArgs: $params.leadingArgs', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        const listenSpy = jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            (...listenArgs) => {
+              listenArgs.at(-1)()
+
+              return serverTally
+            }
+          )
+        const logSpy = jest.spyOn(console, 'log')
+          .mockImplementation(() => {})
+        const callbackMock = jest.fn()
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        actual.listen(...params.leadingArgs, callbackMock)
+
+        expect(listenSpy)
+          .toHaveBeenCalledWith(...params.leadingArgs, expect.any(Function))
+        expect(listenSpy)
+          .not
+          .toHaveBeenCalledWith(...params.leadingArgs, callbackMock)
+        expect(callbackMock)
+          .toHaveBeenCalledTimes(1)
+        expect(logSpy.mock.invocationCallOrder[0])
+          .toBeLessThan(callbackMock.mock.invocationCallOrder[0])
+
+        logSpy.mockRestore()
+      })
+    })
+
+    describe('to run the caller\'s callback on the server', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            (...listenArgs) => {
+              listenArgs.at(-1)()
+
+              return serverTally
+            }
+          )
+        const logSpy = jest.spyOn(console, 'log')
+          .mockImplementation(() => {})
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        const callbackMock = jest.fn()
+
+        actual.listen(2999, callbackMock)
+
+        expect(callbackMock.mock.contexts)
+          .toHaveLength(1)
+        expect(callbackMock.mock.contexts[0])
+          .toBe(actual)
+
+        logSpy.mockRestore()
+      })
+    })
   })
 })
