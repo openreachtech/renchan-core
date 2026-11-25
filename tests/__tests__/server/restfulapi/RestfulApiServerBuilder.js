@@ -933,5 +933,66 @@ describe('RestfulApiServerBuilder', () => {
           .toHaveBeenCalledWith(...expected)
       })
     })
+
+    describe('to run the caller\'s callback after the log line', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: AlphaRestfulApiServerEngine,
+            leadingArgs: [
+              2999,
+            ],
+          },
+        },
+        {
+          params: {
+            EngineCtor: BetaRestfulApiServerEngine,
+            leadingArgs: [
+              2999,
+              '127.0.0.1',
+            ],
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name, leadingArgs: $params.leadingArgs', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await RestfulApiServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        const listenSpy = jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            (...listenArgs) => {
+              listenArgs.at(-1)()
+
+              return serverTally
+            }
+          )
+        const logSpy = jest.spyOn(console, 'log')
+          .mockImplementation(() => {})
+        const callbackMock = jest.fn()
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        actual.listen(...params.leadingArgs, callbackMock)
+
+        expect(listenSpy)
+          .toHaveBeenCalledWith(...params.leadingArgs, expect.any(Function))
+        expect(listenSpy)
+          .not
+          .toHaveBeenCalledWith(...params.leadingArgs, callbackMock)
+        expect(callbackMock)
+          .toHaveBeenCalledTimes(1)
+        expect(logSpy.mock.invocationCallOrder[0])
+          .toBeLessThan(callbackMock.mock.invocationCallOrder[0])
+
+        logSpy.mockRestore()
+      })
+    })
   })
 })
