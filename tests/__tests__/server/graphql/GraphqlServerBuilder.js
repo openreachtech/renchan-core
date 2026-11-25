@@ -2569,5 +2569,50 @@ describe('GraphqlServerBuilder', () => {
         logSpy.mockRestore()
       })
     })
+
+    describe('to run the caller\'s callback on the server', () => {
+      const cases = [
+        {
+          params: {
+            EngineCtor: CustomerGraphqlServerEngine,
+          },
+        },
+      ]
+
+      test.each(cases)('Engine: $params.EngineCtor.name', async ({ params }) => {
+        const args = {
+          Engine: params.EngineCtor,
+        }
+        const builder = await GraphqlServerBuilder.createAsync(args)
+
+        const serverTally = new http.Server()
+
+        jest.spyOn(serverTally, 'listen')
+          .mockImplementation(
+            (...listenArgs) => {
+              listenArgs.at(-1)()
+
+              return serverTally
+            }
+          )
+        const logSpy = jest.spyOn(console, 'log')
+          .mockImplementation(() => {})
+
+        const actual = builder.buildListenProxyServer({
+          server: serverTally,
+        })
+
+        const callbackMock = jest.fn()
+
+        actual.listen(2999, callbackMock)
+
+        expect(callbackMock.mock.contexts)
+          .toHaveLength(1)
+        expect(callbackMock.mock.contexts[0])
+          .toBe(actual)
+
+        logSpy.mockRestore()
+      })
+    })
   })
 })
